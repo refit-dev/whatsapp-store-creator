@@ -1,0 +1,30 @@
+
+ 
+2 of 2 unhandled errors
+
+Unhandled Runtime Error
+Error: There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering.
+
+Call Stack
+updateHostRoot
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (15503:0)
+beginWork$1
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (17382:0)
+beginWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (25711:0)
+performUnitOfWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24557:0)
+workLoopSync
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24273:0)
+renderRootSync
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24228:0)
+recoverFromConcurrentError
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (23453:0)
+performConcurrentWorkOnRoot
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (23398:0)
+workLoop
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js (261:0)
+flushWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js (230:0)
+MessagePort.performWorkUntilDeadline
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/scheduler/cjs/scheduler.development.js (534:0)

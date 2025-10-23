@@ -1,0 +1,46 @@
+Unhandled Runtime Error
+Error: Text content does not match server-rendered HTML.
+
+Warning: Text content did not match. Server: "/lightsapien" Client: "2ccc205f-0a53-480b-b845-5fb6eea230fc-00-1ar38554f9xuf.janeway.replit.dev/lightsapien"
+
+See more info here: https://nextjs.org/docs/messages/react-hydration-error
+
+Component Stack
+span
+div
+div
+ShareStoreLink
+./components/ShareStoreLink.tsx (12:11)
+div
+div
+div
+main
+Call Stack
+checkForUnmatchedText
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (31330:0)
+diffHydratedProperties
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (33485:0)
+hydrateInstance
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (34486:0)
+prepareToHydrateHostInstance
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (7013:0)
+completeWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (18683:0)
+completeUnitOfWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24763:0)
+performUnitOfWork
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24568:0)
+workLoopSync
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24273:0)
+renderRootSync
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (24228:0)
+performSyncWorkOnRoot
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (23705:0)
+flushSyncWorkAcrossRoots_impl
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (10000:0)
+flushSyncWorkOnAllRoots
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (9960:0)
+processRootScheduleInMicrotask
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (10102:0)
+eval
+node_modules/.pnpm/next@13.5.11_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js (10273:0)

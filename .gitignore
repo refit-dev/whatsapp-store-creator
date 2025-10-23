@@ -1,0 +1,24 @@
+﻿# Node/Next.js
+node_modules/
+.next/
+.out/
+dist/
+build/
+coverage/
+.vscode/
+*.log
+
+# Framework/tools
+.vercel/
+.turbo/
+.cache/
+
+# pnpm caches (the big ones in your error)
+.local/
+.pnpm-store/
+
+# OS crap
+.DS_Store
+
+# env
+.env*
