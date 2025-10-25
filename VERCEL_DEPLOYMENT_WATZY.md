@@ -9,6 +9,37 @@ This guide will help you deploy your watzy WhatsApp store platform to Vercel and
 - ✅ Supabase project with all environment variables
 - ✅ Razorpay account credentials
 
+## Quick Fix for "No Production Deployment" Error
+
+If you see the message: "Your domain is properly configured, but you don't have a production deployment", follow these steps:
+
+### **Immediate Solution - Install Vercel CLI and Deploy:**
+
+```powershell
+# 1. Install Vercel CLI globally
+npm install -g vercel
+
+# 2. Navigate to your project directory
+cd "c:\My Projects\whatsapp-store-creator-1\whatsapp-store-creator-1"
+
+# 3. Login to Vercel (if not already logged in)
+vercel login
+
+# 4. Deploy to production
+vercel --prod
+```
+
+### **Alternative - Deploy via Git Push:**
+
+```bash
+# 1. Commit your latest changes
+git add .
+git commit -m "Deploy watzy to production"
+
+# 2. Push to main branch (triggers automatic deployment)
+git push origin main
+```
+
 ## Step 1: Prepare Your Project
 
 ### 1.1 Create Vercel Configuration
