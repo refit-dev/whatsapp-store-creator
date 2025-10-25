@@ -24,27 +24,36 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const order = orderSchema.parse(body);
-    
-    const supabase = createServerClient();
 
-    // Get store details
-    const { data: store } = await supabase
-      .from('stores')
-      .select('id, currency')
-      .eq('handle', order.storeHandle)
-      .single();
+    // Try to use service role if available, fallback to regular client
+    const hasServiceRole = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabase = createServerClient(hasServiceRole);
+
+    // Get store details (maybeSingle avoids error when 0 rows returned)
+    const { data: store, error: storeError } = await supabase
+      .from("stores")
+      .select("id, currency")
+      .eq("handle", order.storeHandle)
+      .maybeSingle();
+
+    if (storeError) {
+      console.error("Store lookup error:", storeError);
+      return new NextResponse("Store lookup failed", { status: 500 });
+    }
 
     if (!store) {
-      return new NextResponse('Store not found', { status: 404 });
+      return new NextResponse("Store not found", { status: 404 });
     }
 
     // Calculate totals
-    const subtotalCents = order.items.reduce((sum, item) => 
-      sum + (item.priceCents * item.qty), 0);
+    const subtotalCents = order.items.reduce(
+      (sum, item) => sum + item.priceCents * item.qty,
+      0
+    );
 
     // Create order
     const { data: newOrder, error } = await supabase
-      .from('orders')
+      .from("orders")
       .insert({
         store_id: store.id,
         buyer_name: order.buyer.name,
@@ -53,16 +62,16 @@ export async function POST(req: Request) {
         items: order.items,
         subtotal_cents: subtotalCents,
         total_cents: subtotalCents, // Add tax/shipping later
-        status: 'created'
-      } as Database['public']['Tables']['orders']['Insert'])
+        status: "created",
+      } as Database["public"]["Tables"]["orders"]["Insert"])
       .select()
       .single();
 
     if (error) throw error;
-    
+
     return NextResponse.json(newOrder);
   } catch (e) {
     console.error(e);
-    return new NextResponse('Bad Request', { status: 400 });
+    return new NextResponse("Bad Request", { status: 400 });
   }
 }

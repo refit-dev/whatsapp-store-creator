@@ -1,12 +1,12 @@
-import '../styles/globals.css';
-import { Inter } from 'next/font/google';
+import "../styles/globals.css";
+import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: 'WhatsApp Micro-Store',
-  description: 'Create your WhatsApp-powered store with payments',
-  manifest: '/manifest.json',
+export const metadata: Metadata = {
+  title: "watzy",
+  description: "Create your WhatsApp-powered store in minutes",
 };
 
 export default function RootLayout({

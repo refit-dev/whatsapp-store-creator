@@ -1,6 +1,6 @@
 {
-  "name": "WhatsApp Micro-Store",
-  "short_name": "WA Store",
+  "name": "watzy",
+  "short_name": "watzy",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

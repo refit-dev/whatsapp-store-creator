@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { getUser } from "@/lib/auth";
 import type { Database } from "@/types/supabase";
 import { StoreSettingsForm } from "@/components/StoreSettingsForm";
+import Link from "next/link";
 
 export default async function StoreSettingsPage() {
   const user = await getUser();
@@ -12,13 +13,15 @@ export default async function StoreSettingsPage() {
   }
 
   const cookieStore = cookies();
-  const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore });
-  
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  });
+
   const { data: stores } = await supabase
-    .from('stores')
-    .select('*')
-    .eq('owner_id', user.id)
-    .order('created_at')
+    .from("stores")
+    .select("*")
+    .eq("owner_id", user.id)
+    .order("created_at")
     .limit(1);
 
   const store = stores?.[0];
@@ -28,14 +31,32 @@ export default async function StoreSettingsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="mb-8">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors mb-4"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Dashboard
+            </Link>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {store ? 'Store Settings' : 'Create Your Store'}
+              {store ? "Store Settings" : "Create Your Store"}
             </h1>
             <p className="text-gray-600">
-              {store 
-                ? 'Manage your store details and settings' 
-                : 'Set up your WhatsApp micro-store in minutes'
-              }
+              {store
+                ? "Manage your store details and settings"
+                : "Set up your WhatsApp micro-store in minutes"}
             </p>
           </div>
 

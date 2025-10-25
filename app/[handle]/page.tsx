@@ -35,7 +35,9 @@ export async function generateMetadata({
 
   return {
     title: store ? `${store.name} | WhatsApp Store` : "Store Not Found",
-    description: store ? `Shop at ${store.name} - Order directly via WhatsApp` : "Store not found",
+    description: store
+      ? `Shop at ${store.name} - Order directly via WhatsApp`
+      : "Store not found",
   };
 }
 
@@ -70,10 +72,21 @@ export default async function StorefrontPage({
 
   const products: Product[] = data || [];
 
+  // Create a clean store object with only serializable properties
+  const cleanStore = {
+    id: store.id,
+    handle: store.handle,
+    name: store.name,
+    logo_url: store.logo_url,
+    banner_url: store.banner_url,
+    currency: store.currency,
+    whatsapp_e164: store.whatsapp_e164,
+  };
+
   // Pass data to client component
   return (
-    <StorefrontClient 
-      store={store}
+    <StorefrontClient
+      store={cleanStore}
       products={products}
       handle={params.handle}
     />
