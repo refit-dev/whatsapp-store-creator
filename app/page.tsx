@@ -3,8 +3,33 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="max-w-6xl mx-auto px-6 py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Watzy
+            </h1>
+          </div>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link
+              href="/auth"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/auth"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all"
+            >
+              Get Started
+            </Link>
+          </nav>
+        </div>
+      </header>
+
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-16">
+      <div className="max-w-6xl mx-auto px-6 pt-12 pb-16">
         <div className="text-center space-y-8">
           {/* Badge */}
           <div className="inline-block">
