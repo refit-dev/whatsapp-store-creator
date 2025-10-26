@@ -16,6 +16,7 @@ export function ReferralBanner() {
   } = useSubscription();
   const [isCreatingCode, setIsCreatingCode] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleCreateCode = async () => {
     setIsCreatingCode(true);
@@ -59,127 +60,154 @@ export function ReferralBanner() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-xl p-6 text-white mb-6 shadow-lg">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🎁</span>
-            <h3 className="text-xl font-bold">
-              Refer Friends & Get FREE Months!
-            </h3>
+    <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-xl text-white shadow-lg">
+      {/* Compact Header - Always Visible */}
+      <div
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/10 transition-colors rounded-xl"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🎁</span>
+          <div>
+            <h3 className="font-bold text-lg">Get FREE Months!</h3>
+            <p className="text-sm text-green-100">
+              {referralCount}/{maxReferrals} referrals • {remainingReferrals}{" "}
+              months remaining
+            </p>
           </div>
+        </div>
 
-          <p className="text-green-100 mb-4">
-            Share your referral link and get <strong>1 month FREE</strong> for
-            each friend who signs up!
-            <span className="block mt-1 text-yellow-200">
-              📊 {referralCount}/{maxReferrals} referrals used •{" "}
-              {remainingReferrals} months remaining
-            </span>
-            {status === "trial" && (
-              <span className="block mt-1 text-yellow-200">
-                ⏰ You have {daysRemaining} days left in your free trial
-              </span>
-            )}
-            {hasReachedReferralLimit && (
-              <span className="block mt-1 text-orange-200 font-semibold">
-                ℹ️ You've earned the maximum 6 months free! You can still share
-                your code to help friends get started.
-              </span>
-            )}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            {!referralCode ? (
-              <button
-                onClick={handleCreateCode}
-                disabled={isCreatingCode}
-                className="bg-white text-green-600 px-6 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors disabled:opacity-50"
-              >
-                {isCreatingCode ? "Creating..." : "Generate My Referral Code"}
-              </button>
-            ) : (
-              <>
-                <div className="flex-1 bg-white/20 rounded-lg p-3 backdrop-blur-sm">
-                  <div className="text-sm opacity-90 mb-1">
-                    Your Referral Code:
-                  </div>
-                  <div className="font-mono text-lg font-bold">
-                    {referralCode}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleCopyCode}
-                  className="bg-white text-green-600 px-6 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-                >
-                  {showCopied ? "✅ Copied!" : "📋 Copy Link"}
-                </button>
-
-                <button
-                  onClick={handleCopyMessage}
-                  className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
-                >
-                  📱 Copy Message
-                </button>
-              </>
-            )}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:block text-right">
+            <div className="text-sm opacity-90">After Trial</div>
+            <div className="text-xl font-bold">₹259/mo</div>
           </div>
+          <button className="text-white/80 hover:text-white">
+            <svg
+              className={`w-5 h-5 transition-transform ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
 
-          {referralCount > 0 && (
-            <div className="mt-4 bg-white/20 rounded-lg p-3 backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🎉</span>
-                <span className="font-semibold">
-                  {referralCount} successful referral
-                  {referralCount !== 1 ? "s" : ""}!
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="px-4 pb-4 border-t border-white/20">
+          <div className="pt-4">
+            <p className="text-green-100 mb-4">
+              Share your referral link and get <strong>1 month FREE</strong> for
+              each friend who signs up!
+              {status === "trial" && (
+                <span className="block mt-1 text-yellow-200">
+                  ⏰ You have {daysRemaining} days left in your free trial
                 </span>
-                {hasReachedReferralLimit && (
-                  <span className="text-green-200 text-sm ml-2">
-                    (You're awesome! 🌟)
+              )}
+              {hasReachedReferralLimit && (
+                <span className="block mt-1 text-orange-200 font-semibold">
+                  ℹ️ You've earned the maximum 6 months free! You can still
+                  share your code to help friends get started.
+                </span>
+              )}
+            </p>
+
+            <div className="space-y-3">
+              {!referralCode ? (
+                <button
+                  onClick={handleCreateCode}
+                  disabled={isCreatingCode}
+                  className="w-full sm:w-auto bg-white text-green-600 px-6 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors disabled:opacity-50"
+                >
+                  {isCreatingCode ? "Creating..." : "Generate My Referral Code"}
+                </button>
+              ) : (
+                <>
+                  <div className="bg-white/20 rounded-lg p-3 backdrop-blur-sm">
+                    <div className="text-sm opacity-90 mb-1">
+                      Your Referral Code:
+                    </div>
+                    <div className="font-mono text-lg font-bold">
+                      {referralCode}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={handleCopyCode}
+                      className="flex-1 bg-white text-green-600 px-4 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors text-sm"
+                    >
+                      {showCopied ? "✅ Copied!" : "📋 Copy Link"}
+                    </button>
+
+                    <button
+                      onClick={handleCopyMessage}
+                      className="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors text-sm"
+                    >
+                      📱 Copy Message
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {referralCount > 0 && (
+              <div className="mt-4 bg-white/20 rounded-lg p-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🎉</span>
+                  <span className="font-semibold">
+                    {referralCount} successful referral
+                    {referralCount !== 1 ? "s" : ""}!
                   </span>
-                )}
+                  {hasReachedReferralLimit && (
+                    <span className="text-green-200 text-sm ml-2">
+                      (You're awesome! 🌟)
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm opacity-90 mt-1">
+                  Earned: {referralCount} free months
+                  {!hasReachedReferralLimit &&
+                    ` • Remaining: ${remainingReferrals} months`}
+                  {hasReachedReferralLimit && " • Keep sharing to help others!"}
+                </div>
               </div>
-              <div className="text-sm opacity-90 mt-1">
-                Earned: {referralCount} free months
-                {!hasReachedReferralLimit &&
-                  ` • Remaining: ${remainingReferrals} months`}
-                {hasReachedReferralLimit && " • Keep sharing to help others!"}
+            )}
+
+            {/* Features highlight */}
+            <div className="mt-4 pt-4 border-t border-white/20">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span>✅</span>
+                  <span>Unlimited Products</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>✅</span>
+                  <span>WhatsApp Integration</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>✅</span>
+                  <span>Order Management</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>✅</span>
+                  <span>Analytics Dashboard</span>
+                </div>
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="ml-4 text-right">
-          <div className="bg-white/20 rounded-lg p-3 backdrop-blur-sm">
-            <div className="text-sm opacity-90">After Trial</div>
-            <div className="text-2xl font-bold">₹259</div>
-            <div className="text-sm opacity-90">per month</div>
           </div>
         </div>
-      </div>
-
-      {/* Features highlight */}
-      <div className="mt-4 pt-4 border-t border-white/20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span>Unlimited Products</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span>WhatsApp Integration</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span>Order Management</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span>Analytics Dashboard</span>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
