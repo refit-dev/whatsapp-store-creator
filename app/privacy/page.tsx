@@ -211,6 +211,38 @@ export default function PrivacyPolicy() {
               </div>
             </section>
           </div>
+
+          {/* Navigation */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <Link
+                href="/"
+                className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+              >
+                ← Back to Home
+              </Link>
+              <div className="flex gap-4">
+                <Link
+                  href="/terms"
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Terms & Conditions
+                </Link>
+                <Link
+                  href="/shipping"
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Shipping Policy
+                </Link>
+                <Link
+                  href="/cancellation-refund"
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancellation & Refund
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

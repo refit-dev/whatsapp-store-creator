@@ -221,6 +221,22 @@ export default function Home() {
                 </li>
                 <li>
                   <Link
+                    href="/shipping"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Shipping Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/cancellation-refund"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Cancellation & Refund
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/contact"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
