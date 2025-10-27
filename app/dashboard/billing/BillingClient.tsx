@@ -20,76 +20,46 @@ export function BillingClient() {
   const handleUpgrade = async () => {
     setIsProcessing(true);
     try {
-      // Create Razorpay order
-      const orderResponse = await fetch("/api/razorpay/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: 25900, // ₹259 in paise
-          currency: "INR",
-        }),
-      });
+      // Create Razorpay subscription
+      const subscriptionResponse = await fetch(
+        "/api/razorpay/create-subscription",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: "user_" + Date.now(), // You should use actual user ID
+            userEmail: "user@example.com", // You should use actual user email
+            userName: "User", // You should use actual user name
+            phone: "", // Optional phone number
+          }),
+        }
+      );
 
-      if (!orderResponse.ok) {
-        throw new Error("Failed to create order");
+      if (!subscriptionResponse.ok) {
+        throw new Error("Failed to create subscription");
       }
 
-      const { orderId, amount } = await orderResponse.json();
+      const { subscriptionId, shortUrl } = await subscriptionResponse.json();
 
-      // Initialize Razorpay
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: amount,
-        currency: "INR",
-        name: "WhatsApp Micro Store",
-        description: "Monthly Pro Subscription",
-        order_id: orderId,
-        handler: async function (response: any) {
+      // Redirect to Razorpay's hosted checkout page for subscription
+      if (shortUrl) {
+        window.open(shortUrl, "_blank");
+
+        // You can also poll for subscription status
+        setTimeout(async () => {
           try {
-            // Verify payment
-            const verifyResponse = await fetch("/api/razorpay/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              }),
-            });
-
-            if (verifyResponse.ok) {
-              await refreshSubscription();
-              alert(
-                "Payment successful! Your subscription has been activated."
-              );
-            } else {
-              throw new Error("Payment verification failed");
-            }
+            await refreshSubscription();
           } catch (error) {
-            console.error("Payment verification error:", error);
-            alert("Payment verification failed. Please contact support.");
+            console.log("Status refresh failed:", error);
           }
-        },
-        prefill: {
-          name: "",
-          email: "",
-          contact: "",
-        },
-        theme: {
-          color: "#3B82F6",
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-          },
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+        }, 5000);
+      } else {
+        throw new Error("No checkout URL received");
+      }
     } catch (error) {
-      console.error("Payment error:", error);
-      alert("Payment initialization failed. Please try again.");
+      console.error("Subscription error:", error);
+      alert("Subscription creation failed. Please try again.");
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -204,14 +174,6 @@ export function BillingClient() {
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✅</span>
                   <span>Priority support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✅</span>
-                  <span>Custom branding</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✅</span>
-                  <span>Referral rewards</span>
                 </li>
               </ul>
 
