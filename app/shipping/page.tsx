@@ -75,8 +75,6 @@ export default function ShippingPage() {
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Platform for sellers to showcase products</li>
                   <li>Order processing system via WhatsApp</li>
-                  <li>General shipping guidelines and best practices</li>
-                  <li>Customer support for shipping-related disputes</li>
                 </ul>
               </div>
             </section>
@@ -137,28 +135,6 @@ export default function ShippingPage() {
                   in their product descriptions or during WhatsApp
                   conversations.
                 </p>
-
-                <h3 className="text-xl font-semibold text-gray-900 mt-4">
-                  Cost Guidelines
-                </h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>
-                    Product prices should typically include shipping within
-                    reasonable local areas
-                  </li>
-                  <li>
-                    For long-distance shipping, sellers may negotiate additional
-                    charges with buyers
-                  </li>
-                  <li>
-                    Any extra shipping costs must be clearly communicated before
-                    order confirmation
-                  </li>
-                  <li>
-                    Buyers have the right to cancel if unexpected shipping
-                    charges are introduced
-                  </li>
-                </ul>
 
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mt-4">
                   <p className="text-yellow-800">
