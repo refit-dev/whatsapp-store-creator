@@ -206,7 +206,7 @@ export default function PrivacyPolicy() {
                 <p className="text-gray-700">
                   <strong>Email:</strong> hello@watzy.app
                   <br />
-                  <strong>WhatsApp:</strong> +91-7304848472
+                  <strong>WhatsApp:</strong> +91 92114 53827
                 </p>
               </div>
             </section>

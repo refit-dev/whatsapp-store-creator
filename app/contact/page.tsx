@@ -143,7 +143,7 @@ export default function ContactUs() {
                     <h3 className="text-lg font-medium text-gray-900">
                       WhatsApp
                     </h3>
-                    <p className="text-gray-600">+91-7304848472</p>
+                    <p className="text-gray-600">+91 92114 53827</p>
                     <p className="text-sm text-gray-500 mt-1">
                       Quick support and questions
                     </p>

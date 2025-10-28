@@ -5,7 +5,7 @@ BEGIN;
 
 -- Update any existing demo stores (both demo-bakery and demo-bakes handles)
 UPDATE stores 
-SET whatsapp_e164 = '+917304848472'
+SET whatsapp_e164 = '+919211453827'
 WHERE handle IN ('demo-bakery', 'demo-bakes');
 
 -- Check and create demo-bakery store if it doesn't exist
@@ -19,7 +19,7 @@ INSERT INTO stores (
 ) VALUES (
   'demo-bakery',
   'Sweet Delights Bakery',
-  '+917304848472',
+  '+919211453827',
   'INR',
   false,
   NULL

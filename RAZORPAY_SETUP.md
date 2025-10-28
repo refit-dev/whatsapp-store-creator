@@ -20,7 +20,7 @@ Execute the SQL in `setup_subscription_system.sql` in your Supabase SQL Editor:
 
 - Creates subscription tables and functions
 - Sets up RLS policies
-- Updates demo store WhatsApp number to +91-7304848472
+- Updates demo store WhatsApp number to +91 92114 53827
 - Creates automatic trial assignment for new users
 
 #### 2. Setup Razorpay Account

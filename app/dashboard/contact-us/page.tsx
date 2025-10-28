@@ -350,7 +350,7 @@ export default function DashboardContactUs() {
             </h3>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="https://wa.me/917304848472"
+                href="https://wa.me/919211453827"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"

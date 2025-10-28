@@ -278,7 +278,7 @@ DO $$
 BEGIN
   IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'stores') THEN
     UPDATE stores 
-    SET whatsapp_e164 = '+91-7304848472' 
+    SET whatsapp_e164 = '+919211453827' 
     WHERE handle LIKE '%demo%' OR name ILIKE '%demo%';
   END IF;
 END $$;
