@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
 import { CartProvider } from "@/components/CartProvider";
 import { ProductGrid } from "@/components/ProductGrid";
 import { FloatingCartButton } from "@/components/FloatingCartButton";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -28,13 +29,40 @@ interface StorefrontClientProps {
   handle: string;
 }
 
-export function StorefrontClient({ store, products, handle }: StorefrontClientProps) {
+export function StorefrontClient({
+  store,
+  products,
+  handle,
+}: StorefrontClientProps) {
   return (
     <CartProvider>
       <main className="min-h-screen bg-gray-50">
         {/* Store Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-4 py-6">
+            {/* Return to Home Link */}
+            <div className="mb-4">
+              <Link
+                href="/"
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                ← Back to Home
+              </Link>
+            </div>
+
             {store.banner_url && (
               <img
                 src={store.banner_url}
@@ -51,8 +79,12 @@ export function StorefrontClient({ store, products, handle }: StorefrontClientPr
                 />
               )}
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{store.name}</h1>
-                <p className="text-gray-600 mt-1">Browse our products and order via WhatsApp</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                  {store.name}
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Browse our products and order via WhatsApp
+                </p>
               </div>
             </div>
           </div>
@@ -63,14 +95,23 @@ export function StorefrontClient({ store, products, handle }: StorefrontClientPr
           {products.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🛍️</div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">Coming Soon</h2>
-              <p className="text-gray-600">This store is being set up. Check back soon for amazing products!</p>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                Coming Soon
+              </h2>
+              <p className="text-gray-600">
+                This store is being set up. Check back soon for amazing
+                products!
+              </p>
             </div>
           ) : (
             <>
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Our Products</h2>
-                <p className="text-gray-600">Add items to your cart and checkout via WhatsApp</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Our Products
+                </h2>
+                <p className="text-gray-600">
+                  Add items to your cart and checkout via WhatsApp
+                </p>
               </div>
               <ProductGrid products={products} currency={store.currency} />
             </>
