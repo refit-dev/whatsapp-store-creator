@@ -40,15 +40,23 @@ export default function TermsAndConditions() {
               <strong>Effective Date:</strong> October 25, 2025
             </p>
 
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded mb-8">
+              <p className="text-blue-800">
+                <strong>Service Provider:</strong> ANKIT NANDA (HUF)
+                <br />
+                <strong>Platform:</strong> watzy - WhatsApp Store Creator
+              </p>
+            </div>
+
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 1. Acceptance of Terms
               </h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using watzy ("Service"), you accept and agree
-                to be bound by the terms and provision of this agreement. If you
-                do not agree to abide by the above, please do not use this
-                service.
+                By accessing and using watzy ("Service"), operated by ANKIT
+                NANDA (HUF), you accept and agree to be bound by the terms and
+                provision of this agreement. If you do not agree to abide by the
+                above, please do not use this service.
               </p>
             </section>
 
@@ -274,6 +282,8 @@ export default function TermsAndConditions() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
+                  <strong>Business Name:</strong> ANKIT NANDA (HUF)
+                  <br />
                   <strong>Email:</strong> hello@watzy.app
                   <br />
                   <strong>WhatsApp:</strong> +91-7304848472
