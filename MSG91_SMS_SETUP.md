@@ -1,14 +1,20 @@
-# Twilio SMS Integration Setup Guide
+# MSG91 SMS Integration Setup Guide
 
-Your WhatsApp Store Creator now supports SMS verification via Twilio. Follow these steps to complete the setup:
+Your WhatsApp Store Creator now supports SMS verification via MSG91. Follow these steps to complete the setup:
 
-## 1. Sign up for Twilio
+## 1. Sign up for MSG91
 
-1. Go to [Twilio Console](https://console.twilio.com/)
+1. Go to [MSG91 Console](https://msg91.com/)
 2. Sign up for a free account
-3. Verify your phone number
+3. Complete KYC verification (required for Indian accounts)
 
-## 2. Get Your Twilio Credentials
+## 2. Get Your MSG91 Credentials
+
+From your MSG91 Dashboard:
+
+1. **Auth Key**: Found in API section of your dashboard
+2. **Sender ID**: Create/approve a sender ID (like "WATZY" or "VERIFY")
+3. **Route ID**: Use route 4 (promotional) or 1 (transactional)
 
 From your Twilio Console Dashboard:
 

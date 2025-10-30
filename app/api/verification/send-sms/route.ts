@@ -5,24 +5,36 @@ import { cookies } from "next/headers";
 
 // SMS sending utility (integrate with your SMS provider)
 async function sendVerificationSMS(phoneNumber: string, code: string) {
-  // Production: Use Twilio for SMS sending
+  // Production: Use MSG91 for SMS sending
   try {
-    const twilio = require("twilio");
-    const client = twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
-
-    await client.messages.create({
-      body: `Your WhatsApp Store Creator verification code is: ${code}. This code expires in 10 minutes.`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phoneNumber,
+    const response = await fetch("https://api.msg91.com/api/v5/otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authkey: process.env.MSG91_AUTH_KEY!,
+      },
+      body: JSON.stringify({
+        template_id:
+          process.env.MSG91_TEMPLATE_ID || "67292ce7d6fc05424b1e2d71", // Default OTP template
+        mobile: phoneNumber.replace("+", ""), // Remove + for MSG91
+        authkey: process.env.MSG91_AUTH_KEY,
+        otp: code,
+        sender: process.env.MSG91_SENDER_ID || "WATZY",
+        route: process.env.MSG91_ROUTE || "4",
+      }),
     });
 
-    console.log(`📱 SMS sent successfully to ${phoneNumber}`);
-    return true;
+    const result = await response.json();
+
+    if (response.ok && result.type === "success") {
+      console.log(`📱 SMS sent successfully to ${phoneNumber} via MSG91`);
+      return true;
+    } else {
+      console.error("MSG91 SMS error:", result);
+      throw new Error(`MSG91 error: ${result.message || "Unknown error"}`);
+    }
   } catch (error) {
-    console.error("Twilio SMS error:", error);
+    console.error("MSG91 SMS error:", error);
     // Fallback to development mode
     console.log(`📱 SMS Verification Code for ${phoneNumber}: ${code}`);
     return true;
