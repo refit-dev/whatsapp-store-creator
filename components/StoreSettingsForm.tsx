@@ -236,11 +236,12 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         <PaymentSettings
           storeId={store.id}
           initialSettings={{
-            payment_enabled: store.payment_enabled || false,
-            payment_method: store.payment_method || "direct",
-            upi_id: store.upi_id || undefined,
-            paytm_number: store.paytm_number || undefined,
-            payment_instructions: store.payment_instructions || undefined,
+            payment_enabled: (store as any).payment_enabled || false,
+            payment_method: (store as any).payment_method || "direct",
+            upi_id: (store as any).upi_id || undefined,
+            paytm_number: (store as any).paytm_number || undefined,
+            payment_instructions:
+              (store as any).payment_instructions || undefined,
           }}
         />
       )}

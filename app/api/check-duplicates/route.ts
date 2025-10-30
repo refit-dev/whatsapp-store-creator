@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
+import { DuplicateCheckResult } from "@/lib/duplicate-validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,11 +14,11 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = supabaseServer();
-    const result = {
+    const result: DuplicateCheckResult = {
       emailExists: false,
       mobileExists: false,
-      existingEmailUser: null,
-      existingMobileUser: null,
+      existingEmailUser: undefined,
+      existingMobileUser: undefined,
     };
 
     // Check for mobile number duplicates in stores table
