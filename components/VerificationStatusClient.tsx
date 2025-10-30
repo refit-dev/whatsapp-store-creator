@@ -6,17 +6,32 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 
 export function VerificationStatusClient() {
   const [user, setUser] = useState<any>(null);
+  const [store, setStore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = supabaseBrowser();
 
-    // Get current user
+    // Get current user and their store
     const getCurrentUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
+
+      // If user exists, get their store
+      if (user) {
+        const { data: storeData } = await supabase
+          .from("stores")
+          .select("*")
+          .eq("owner_id", user.id)
+          .order("created_at")
+          .limit(1)
+          .single();
+
+        setStore(storeData);
+      }
+
       setLoading(false);
     };
 
@@ -27,6 +42,20 @@ export function VerificationStatusClient() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user || null);
+      if (session?.user) {
+        // Fetch store for the new user
+        const { data: storeData } = await supabase
+          .from("stores")
+          .select("*")
+          .eq("owner_id", session.user.id)
+          .order("created_at")
+          .limit(1)
+          .single();
+
+        setStore(storeData);
+      } else {
+        setStore(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -59,5 +88,5 @@ export function VerificationStatusClient() {
     return null;
   }
 
-  return <VerificationStatus user={user} />;
+  return <VerificationStatus user={user} store={store} />;
 }

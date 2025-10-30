@@ -7,6 +7,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface VerificationStatusProps {
   user: any;
+  store?: any;
   onVerificationComplete?: () => void;
   showModal?: boolean;
   onClose?: () => void;
@@ -14,6 +15,7 @@ interface VerificationStatusProps {
 
 export function VerificationStatus({
   user,
+  store,
   onVerificationComplete,
   showModal = false,
   onClose,
@@ -203,7 +205,10 @@ export function VerificationStatus({
         {currentStep === "mobile" && (
           <MobileVerification
             phoneNumber={
-              user?.user_metadata?.mobile_number || user?.phone || ""
+              store?.whatsapp_e164 ||
+              user?.user_metadata?.mobile_number ||
+              user?.phone ||
+              ""
             }
             userId={user?.id}
             onVerified={handleMobileVerified}
