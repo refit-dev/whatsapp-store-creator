@@ -16,6 +16,8 @@ export function BillingClient() {
   const { subscription, status, daysRemaining, refreshSubscription } =
     useSubscription();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleUpgrade = async () => {
     setIsProcessing(true);
@@ -64,6 +66,44 @@ export function BillingClient() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!subscription?.id) {
+      alert("No active subscription to cancel.");
+      return;
+    }
+
+    setIsCancelling(true);
+    try {
+      const response = await fetch("/api/subscription/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscriptionId: subscription.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert(
+          result.message ||
+            "Subscription cancelled successfully. You can continue using the service until the end of your current billing period."
+        );
+        await refreshSubscription();
+        setShowCancelModal(false);
+      } else {
+        throw new Error(result.error || "Cancellation failed");
+      }
+    } catch (error) {
+      console.error("Cancellation error:", error);
+      alert(
+        "Failed to cancel subscription. Please try again or contact support."
+      );
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="max-w-4xl mx-auto">
@@ -100,6 +140,64 @@ export function BillingClient() {
         <div className="mb-6">
           <SubscriptionStatus />
         </div>
+
+        {/* Subscription Management - Only show for active paid subscriptions */}
+        {subscription && status === "active" && !subscription.is_trial && (
+          <div className="bg-white rounded-xl shadow-md p-8 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Subscription Management
+            </h2>
+
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-4">
+              <div>
+                <div className="font-semibold text-lg">Pro Plan</div>
+                <div className="text-gray-600">₹259/month</div>
+                <div className="text-sm text-gray-500">
+                  Active until{" "}
+                  {new Date(subscription.ends_at).toLocaleDateString()}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-green-600 font-medium mb-2">
+                  ✅ Active
+                </div>
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium"
+                >
+                  Cancel Subscription
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <div className="text-sm font-medium text-blue-900">
+                    Good to know
+                  </div>
+                  <div className="text-sm text-blue-700 mt-1">
+                    If you cancel your subscription, you'll continue to have
+                    access to all Pro features until the end of your current
+                    billing period. After that, your account will automatically
+                    switch to read-only mode.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Referral Banner */}
         <ReferralBanner />
@@ -225,6 +323,112 @@ export function BillingClient() {
           </div>
         )}
       </div>
+
+      {/* Cancellation Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Cancel Subscription?
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Are you sure you want to cancel your Pro subscription? This
+                action cannot be undone.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <svg
+                  className="w-5 h-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <div className="text-sm font-medium text-amber-900">
+                    What happens next:
+                  </div>
+                  <ul className="text-sm text-amber-700 mt-1 list-disc list-inside space-y-1">
+                    <li>
+                      Your Pro features remain active until{" "}
+                      {subscription
+                        ? new Date(subscription.ends_at).toLocaleDateString()
+                        : "the end of your billing period"}
+                    </li>
+                    <li>No further charges will be made</li>
+                    <li>You can reactivate anytime</li>
+                    <li>Your store data will be preserved</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                disabled={isCancelling}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+              >
+                Keep Subscription
+              </button>
+              <button
+                onClick={handleCancelSubscription}
+                disabled={isCancelling}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center"
+              >
+                {isCancelling ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Cancelling...
+                  </>
+                ) : (
+                  "Yes, Cancel"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Load Razorpay script */}
       <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>

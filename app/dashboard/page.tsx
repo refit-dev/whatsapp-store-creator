@@ -10,6 +10,7 @@ import { ShareStoreLink } from "@/components/ShareStoreLink";
 import { SubscriptionProvider } from "@/components/SubscriptionProvider";
 import { ReferralBanner } from "@/components/ReferralBanner";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
+import { VerificationStatusClient } from "@/components/VerificationStatusClient";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -37,13 +38,16 @@ export default async function DashboardPage() {
   if (!stores || stores.length === 0) {
     const handle = `store-${user.id.substring(0, 8)}`;
 
+    // Get mobile number from user metadata if available
+    const mobileNumber = user.user_metadata?.mobile_number || "";
+
     type StoreInsert = Database["public"]["Tables"]["stores"]["Insert"];
     const storeData: StoreInsert = {
       owner_id: user.id,
       handle,
       name: "My Store",
-      whatsapp_e164: "",
-      currency: "USD",
+      whatsapp_e164: mobileNumber,
+      currency: "INR", // Default to INR since most users will be Indian based on mobile number format
     };
 
     const { data: newStore } = await supabase
@@ -153,6 +157,7 @@ export default async function DashboardPage() {
           <div className="mb-6 space-y-4">
             <SubscriptionStatus />
             <ReferralBanner />
+            <VerificationStatusClient />
           </div>
 
           {/* Header with Store Info and Share Link */}

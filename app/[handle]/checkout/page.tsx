@@ -2,6 +2,7 @@ import { supabaseServer } from "@/lib/supabase-server";
 import { CartProvider } from "@/components/CartProvider";
 import { CartSummary } from "@/components/CartSummary";
 import { CheckoutForm } from "@/components/CheckoutForm";
+import { CustomerCheckout } from "@/components/CustomerCheckout";
 import Link from "next/link";
 
 export default async function CheckoutPage({
@@ -96,7 +97,19 @@ export default async function CheckoutPage({
           {/* Checkout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="order-2 lg:order-1">
-              <CheckoutForm store={cleanStore} />
+              <CustomerCheckout
+                storeId={store.id}
+                storeName={store.name}
+                storeHandle={store.handle}
+              />
+
+              {/* Fallback to old checkout for stores without payments enabled */}
+              <div className="mt-6">
+                <div className="text-sm text-gray-500 text-center mb-4">
+                  Or use traditional WhatsApp checkout:
+                </div>
+                <CheckoutForm store={cleanStore} />
+              </div>
             </div>
 
             <div className="order-1 lg:order-2">
