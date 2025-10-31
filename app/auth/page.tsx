@@ -97,16 +97,18 @@ export default function AuthPage() {
       }
     }
 
+    // Test signup without any custom metadata
     const { data, error } = await sb.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          mobile_number: mobileNumber
-            ? formatMobileNumber(mobileNumber)
-            : undefined,
-        },
-      },
+      // Temporarily remove custom metadata to test
+      // options: {
+      //   data: {
+      //     mobile_number: mobileNumber
+      //       ? formatMobileNumber(mobileNumber)
+      //       : undefined,
+      //   },
+      // },
     });
 
     setLoading(false);
@@ -128,6 +130,24 @@ export default function AuthPage() {
         setMessage(`Database error saving new user: ${error.message}`);
       }
     } else if (data.user) {
+      // Manually create user profile since we removed the trigger
+      try {
+        const { error: profileError } = await sb.from("user_profiles").insert({
+          id: data.user.id,
+          mobile_number: mobileNumber ? formatMobileNumber(mobileNumber) : null,
+          email_verified: false,
+          mobile_verified: false,
+        });
+
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
+          // Don't fail signup for this, just log it
+        }
+      } catch (profileError) {
+        console.error("Profile creation failed:", profileError);
+        // Don't fail signup for this
+      }
+
       // Check if email confirmation is required
       if (data.user.identities?.length === 0) {
         setMessage("User already exists. Please sign in instead.");
