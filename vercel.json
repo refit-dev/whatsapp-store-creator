@@ -1,0 +1,9 @@
+{
+  "functions": {
+    "app/api/*/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "regions": ["bom1", "iad1"],
+  "buildCommand": "pnpm build"
+}
