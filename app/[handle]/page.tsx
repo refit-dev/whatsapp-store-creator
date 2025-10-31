@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase-server";
 import { StorefrontClient } from "./StorefrontClient";
 
+// Force dynamic rendering - no caching
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface Product {
   id: string;
   title: string;
@@ -46,6 +50,7 @@ export default async function StorefrontPage({
 }: {
   params: { handle: string };
 }) {
+  // Force no caching for debugging
   const supabase = supabaseServer();
 
   const { data: store, error: storeError } = await supabase
@@ -53,6 +58,13 @@ export default async function StorefrontPage({
     .select("*")
     .eq("handle", params.handle)
     .single();
+
+  // Debug logging - remove after debugging
+  console.log("=== STORE DEBUG ===");
+  console.log("Handle requested:", params.handle);
+  console.log("Store data received:", store);
+  console.log("Store error:", storeError);
+  console.log("===================");
 
   if (storeError || !store) {
     console.error("Store fetch error:", storeError);
