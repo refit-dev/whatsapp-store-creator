@@ -1,22 +1,11 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+// Middleware disabled for Vercel Edge Runtime compatibility
+// Authentication is handled client-side in React components
 
-export async function middleware(req: NextRequest) {
-  // Simple auth check for dashboard routes
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    // Check for Supabase auth token in cookies
-    const token = req.cookies.get("sb-iazdsuodmyymclqltenc-auth-token");
-
-    if (!token || !token.value) {
-      const redirectUrl = new URL("/auth", req.url);
-      redirectUrl.searchParams.set("redirectedFrom", req.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
-  }
-
-  return NextResponse.next();
+export function middleware() {
+  // No-op middleware - just pass through all requests
+  return;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [],
 };
