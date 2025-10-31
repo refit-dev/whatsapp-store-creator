@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "./LogoutButton";
 
 export function DashboardNav() {
   return (
@@ -14,6 +15,7 @@ export function DashboardNav() {
       <div className="mt-8 pt-4 border-t border-gray-200">
         <div className="space-y-2">
           <NavLink href="/dashboard/contact-us">Contact Us</NavLink>
+          <LogoutButton />
         </div>
       </div>
     </nav>

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toLocaleString } from "@/lib/currency";
 import { CopyOrderButton } from "@/components/CopyOrderButton";
 import { OrdersManagement } from "@/components/OrdersManagement";
+import { LogoutButton } from "@/components/LogoutButton";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -74,12 +75,17 @@ export default async function OrdersPage() {
                 Track and manage customer orders
               </p>
             </div>
-            <Link
-              href="/dashboard"
-              className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-            >
-              Back to Dashboard
-            </Link>
+            <div className="flex gap-3">
+              <Link
+                href="/dashboard"
+                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+              >
+                Back to Dashboard
+              </Link>
+              <div className="border-l border-gray-200 pl-3">
+                <LogoutButton />
+              </div>
+            </div>
           </div>
         </div>
 

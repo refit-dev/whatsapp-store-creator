@@ -10,6 +10,7 @@ import { ShareStoreLink } from "@/components/ShareStoreLink";
 import { SubscriptionProvider } from "@/components/SubscriptionProvider";
 import { ReferralBanner } from "@/components/ReferralBanner";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
+import { LogoutButton } from "@/components/LogoutButton";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -167,7 +168,12 @@ export default async function DashboardPage() {
                 </h1>
                 <p className="text-gray-600 mt-1">Dashboard Overview</p>
               </div>
-              <ShareStoreLink handle={store.handle} />
+              <div className="flex items-center gap-4">
+                <ShareStoreLink handle={store.handle} />
+                <div className="border-l border-gray-200 pl-4">
+                  <LogoutButton />
+                </div>
+              </div>
             </div>
           </div>
 

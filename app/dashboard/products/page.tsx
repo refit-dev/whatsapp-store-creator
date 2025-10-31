@@ -5,6 +5,7 @@ import { getUser } from "@/lib/auth";
 import type { Database } from "@/types/supabase";
 import Link from "next/link";
 import { ProductsList } from "@/components/ProductsList";
+import { LogoutButton } from "@/components/LogoutButton";
 
 export default async function ProductsPage() {
   const user = await getUser();
@@ -13,27 +14,29 @@ export default async function ProductsPage() {
   }
 
   const cookieStore = cookies();
-  const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore });
-  
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  });
+
   // Get user's store
   const { data: stores } = await supabase
-    .from('stores')
-    .select('*')
-    .eq('owner_id', user.id)
+    .from("stores")
+    .select("*")
+    .eq("owner_id", user.id)
     .limit(1);
 
   const store = stores?.[0];
-  
+
   if (!store) {
     redirect("/dashboard");
   }
 
   // Get store's products
   const { data: products } = await supabase
-    .from('products')
-    .select('*')
-    .eq('store_id', store.id)
-    .order('created_at', { ascending: false });
+    .from("products")
+    .select("*")
+    .eq("store_id", store.id)
+    .order("created_at", { ascending: false });
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
@@ -58,12 +61,19 @@ export default async function ProductsPage() {
               >
                 + Add Product
               </Link>
+              <div className="border-l border-gray-200 pl-3">
+                <LogoutButton />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Products List */}
-        <ProductsList products={products || []} storeId={store.id} currency={store.currency || 'USD'} />
+        <ProductsList
+          products={products || []}
+          storeId={store.id}
+          currency={store.currency || "USD"}
+        />
       </div>
     </main>
   );
