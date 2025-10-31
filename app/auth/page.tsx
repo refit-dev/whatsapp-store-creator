@@ -112,6 +112,10 @@ export default function AuthPage() {
     setLoading(false);
 
     if (error) {
+      console.error("Signup error details:", error);
+      console.error("Error code:", error.status);
+      console.error("Error message:", error.message);
+
       if (
         error.message.includes("already") ||
         error.message.includes("exists")
@@ -121,7 +125,7 @@ export default function AuthPage() {
         );
         setIsSignUp(false); // Switch to sign in mode
       } else {
-        setMessage(error.message);
+        setMessage(`Database error saving new user: ${error.message}`);
       }
     } else if (data.user) {
       // Check if email confirmation is required
