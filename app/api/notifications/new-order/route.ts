@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const supabase = supabaseServer();
     const { data: store, error: storeError } = await supabase
       .from("stores")
-      .select("name, user_id, users(phone)")
+      .select("name, owner_id, whatsapp_e164")
       .eq("id", storeId)
       .single();
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       orderId,
       customerName,
       total,
-      storeOwnerPhone: store.users?.phone,
+      storeOwnerPhone: store.whatsapp_e164,
     });
 
     // You could also save notifications to database for tracking

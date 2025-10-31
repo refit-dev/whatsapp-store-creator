@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
     const result = {
       emailExists: false,
       mobileExists: false,
-      existingEmailUser: null,
-      existingMobileUser: null,
+      existingEmailUser: null as { storeName: string; storeId: string } | null,
+      existingMobileUser: null as { storeName: string; storeId: string } | null,
     };
 
     // Check for mobile number duplicates in stores table

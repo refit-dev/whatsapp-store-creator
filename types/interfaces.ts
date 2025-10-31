@@ -24,6 +24,12 @@ export interface Store extends Row<"stores"> {
   orders?: OrderWithRelations[];
   products?: ProductWithRelations[];
   members?: StoreMemberWithRelations[];
+  // Payment system fields
+  payment_enabled?: boolean;
+  payment_method?: string;
+  upi_id?: string;
+  paytm_number?: string;
+  payment_instructions?: string;
 }
 
 export interface Order extends Row<"orders"> {
