@@ -6,7 +6,6 @@ import {
   formatMobileNumber,
   validateMobileNumber,
 } from "@/lib/duplicate-validation";
-import { VerificationStatus } from "@/components/VerificationStatus";
 import Link from "next/link";
 
 export default function AuthPage() {
@@ -22,8 +21,6 @@ export default function AuthPage() {
   const [showDuplicateOptions, setShowDuplicateOptions] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [proceedAnyway, setProceedAnyway] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
 
   async function checkDuplicatesAndWarn() {
     if (!email || (!mobileNumber && isSignUp)) return;
@@ -97,27 +94,21 @@ export default function AuthPage() {
       }
     }
 
-    // Test signup without any custom metadata
     const { data, error } = await sb.auth.signUp({
       email,
       password,
-      // Temporarily remove custom metadata to test
-      // options: {
-      //   data: {
-      //     mobile_number: mobileNumber
-      //       ? formatMobileNumber(mobileNumber)
-      //       : undefined,
-      //   },
-      // },
+      options: {
+        data: {
+          mobile_number: mobileNumber
+            ? formatMobileNumber(mobileNumber)
+            : undefined,
+        },
+      },
     });
 
     setLoading(false);
 
     if (error) {
-      console.error("Signup error details:", error);
-      console.error("Error code:", error.status);
-      console.error("Error message:", error.message);
-
       if (
         error.message.includes("already") ||
         error.message.includes("exists")
@@ -127,37 +118,21 @@ export default function AuthPage() {
         );
         setIsSignUp(false); // Switch to sign in mode
       } else {
-        setMessage(`Database error saving new user: ${error.message}`);
+        setMessage(error.message);
       }
     } else if (data.user) {
-      // Manually create user profile since we removed the trigger
-      try {
-        const { error: profileError } = await sb.from("user_profiles").insert({
-          id: data.user.id,
-          mobile_number: mobileNumber ? formatMobileNumber(mobileNumber) : null,
-          email_verified: false,
-          mobile_verified: false,
-        });
-
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          // Don't fail signup for this, just log it
-        }
-      } catch (profileError) {
-        console.error("Profile creation failed:", profileError);
-        // Don't fail signup for this
-      }
-
       // Check if email confirmation is required
       if (data.user.identities?.length === 0) {
         setMessage("User already exists. Please sign in instead.");
         setIsSignUp(false);
       } else {
-        setCurrentUser(data.user);
-        setShowVerification(true);
-        setMessage(
-          "Account created! Please verify your email and mobile number."
-        );
+        setMessage("Account created! Redirecting to dashboard...");
+
+        // Use window.location to do a full page reload so server can pick up session
+        // Store will be auto-created in the dashboard
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
       }
     }
 
@@ -180,21 +155,11 @@ export default function AuthPage() {
     if (error) {
       setMessage(error.message);
     } else if (data.user) {
-      // Check if user needs verification
-      const emailVerified = data.user.user_metadata?.email_verified || false;
-      const mobileVerified = data.user.user_metadata?.mobile_verified || false;
-
-      if (!emailVerified || !mobileVerified) {
-        setCurrentUser(data.user);
-        setShowVerification(true);
-        setMessage("Please complete verification to continue.");
-      } else {
-        setMessage("Success! Redirecting to dashboard...");
-        // Use window.location to do a full page reload so server can pick up session
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 500);
-      }
+      setMessage("Success! Redirecting to dashboard...");
+      // Use window.location to do a full page reload so server can pick up session
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 500);
     }
   }
 
@@ -590,27 +555,6 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
-
-      {/* Verification Modal */}
-      {showVerification && currentUser && (
-        <VerificationStatus
-          user={currentUser}
-          showModal={true}
-          onVerificationComplete={() => {
-            setMessage("Verification complete! Redirecting to dashboard...");
-            setTimeout(() => {
-              window.location.href = "/dashboard";
-            }, 1500);
-          }}
-          onClose={() => {
-            setShowVerification(false);
-            // Allow user to skip verification but still go to dashboard
-            setTimeout(() => {
-              window.location.href = "/dashboard";
-            }, 500);
-          }}
-        />
-      )}
     </main>
   );
 }

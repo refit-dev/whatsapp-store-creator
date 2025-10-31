@@ -9,13 +9,7 @@ export async function POST(request: NextRequest) {
     const supabase = supabaseServer();
     const { data: store, error: storeError } = await supabase
       .from("stores")
-      .select(
-        `
-        name, 
-        owner_id, 
-        user_profiles!stores_owner_id_fkey(mobile_number)
-      `
-      )
+      .select("name, user_id, users(phone)")
       .eq("id", storeId)
       .single();
 
@@ -31,10 +25,7 @@ export async function POST(request: NextRequest) {
       orderId,
       customerName,
       total,
-      storeOwnerPhone:
-        Array.isArray(store.user_profiles) && store.user_profiles.length > 0
-          ? store.user_profiles[0].mobile_number
-          : null,
+      storeOwnerPhone: store.users?.phone,
     });
 
     // You could also save notifications to database for tracking

@@ -1,13 +1,8 @@
-export interface ExistingUserInfo {
-  storeName: string;
-  storeId: string;
-}
-
 export interface DuplicateCheckResult {
   emailExists: boolean;
   mobileExists: boolean;
-  existingEmailUser?: ExistingUserInfo;
-  existingMobileUser?: ExistingUserInfo;
+  existingEmailUser?: any;
+  existingMobileUser?: any;
 }
 
 export async function checkForDuplicates(

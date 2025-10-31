@@ -10,7 +10,6 @@ import { ShareStoreLink } from "@/components/ShareStoreLink";
 import { SubscriptionProvider } from "@/components/SubscriptionProvider";
 import { ReferralBanner } from "@/components/ReferralBanner";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
-import { VerificationStatusClient } from "@/components/VerificationStatusClient";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -157,7 +156,6 @@ export default async function DashboardPage() {
           <div className="mb-6 space-y-4">
             <SubscriptionStatus />
             <ReferralBanner />
-            <VerificationStatusClient />
           </div>
 
           {/* Header with Store Info and Share Link */}

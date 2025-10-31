@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { PaymentSettings } from "./PaymentSettings";
-import { MobileVerification } from "./MobileVerification";
 import type { Store } from "@/types/interfaces";
 
 interface StoreSettingsFormProps {
@@ -18,20 +17,15 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
   const [whatsappNumber, setWhatsappNumber] = useState(
     store?.whatsapp_e164 || ""
   );
-  const [originalWhatsappNumber, setOriginalWhatsappNumber] = useState(
-    store?.whatsapp_e164 || ""
-  );
   const [currency, setCurrency] = useState(store?.currency || "USD");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [showVerification, setShowVerification] = useState(false);
 
   useEffect(() => {
     if (store) {
       setName(store.name);
       setHandle(store.handle);
       setWhatsappNumber(store.whatsapp_e164 || "");
-      setOriginalWhatsappNumber(store.whatsapp_e164 || "");
       setCurrency(store.currency || "USD");
     }
   }, [store]);
@@ -53,8 +47,6 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
     setMessage("");
 
     try {
-      const phoneNumberChanged = whatsappNumber !== originalWhatsappNumber;
-
       if (store) {
         // Update existing store
         const { error } = await sb
@@ -68,27 +60,7 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
           .eq("id", store.id);
 
         if (error) throw error;
-
-        // If phone number changed, mark mobile as unverified and trigger verification
-        if (phoneNumberChanged && whatsappNumber) {
-          // Update user metadata to mark mobile as unverified
-          const { error: userError } = await sb.auth.updateUser({
-            data: {
-              mobile_verified: false,
-              mobile_number: whatsappNumber,
-            },
-          });
-
-          if (userError) {
-            console.error("Error updating user metadata:", userError);
-          }
-
-          setMessage("Store updated! Please verify your new WhatsApp number.");
-          setOriginalWhatsappNumber(whatsappNumber);
-          setShowVerification(true);
-        } else {
-          setMessage("Store updated successfully!");
-        }
+        setMessage("Store updated successfully!");
       } else {
         // Create new store
         const { error: storeError } = await sb.from("stores").insert({
@@ -101,29 +73,10 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
 
         if (storeError) throw storeError;
 
-        // For new stores, if WhatsApp number is provided, trigger verification
-        if (whatsappNumber) {
-          const { error: userError } = await sb.auth.updateUser({
-            data: {
-              mobile_verified: false,
-              mobile_number: whatsappNumber,
-            },
-          });
-
-          if (userError) {
-            console.error("Error updating user metadata:", userError);
-          }
-
-          setMessage(
-            "Store created successfully! Please verify your WhatsApp number."
-          );
-          setShowVerification(true);
-        } else {
-          setMessage("Store created successfully! Redirecting...");
-          setTimeout(() => {
-            window.location.href = "/dashboard";
-          }, 1500);
-        }
+        setMessage("Store created successfully! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1500);
       }
     } catch (error: any) {
       console.error("Error saving store:", error);
@@ -213,23 +166,11 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
             required
             placeholder="+12345678901"
             pattern="^\+?[1-9]\d{10,14}$"
-            className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              whatsappNumber !== originalWhatsappNumber
-                ? "border-orange-300 bg-orange-50"
-                : "border-gray-300"
-            }`}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <p className="mt-1 text-sm text-gray-500">
             Include country code (e.g., +1 for USA, +91 for India)
           </p>
-          {whatsappNumber !== originalWhatsappNumber && whatsappNumber && (
-            <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <p className="text-sm text-orange-800">
-                ⚠️ You've changed your WhatsApp number. You'll need to verify
-                this new number after saving.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Currency */}
@@ -295,33 +236,13 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         <PaymentSettings
           storeId={store.id}
           initialSettings={{
-            payment_enabled: (store as any).payment_enabled || false,
-            payment_method: (store as any).payment_method || "direct",
-            upi_id: (store as any).upi_id || undefined,
-            paytm_number: (store as any).paytm_number || undefined,
-            payment_instructions:
-              (store as any).payment_instructions || undefined,
+            payment_enabled: store.payment_enabled || false,
+            payment_method: store.payment_method || "direct",
+            upi_id: store.upi_id || undefined,
+            paytm_number: store.paytm_number || undefined,
+            payment_instructions: store.payment_instructions || undefined,
           }}
         />
-      )}
-
-      {/* Mobile Verification Modal */}
-      {showVerification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="max-w-md w-full">
-            <MobileVerification
-              phoneNumber={whatsappNumber}
-              userId={userId}
-              onVerified={(verifiedPhone) => {
-                setShowVerification(false);
-                setMessage("WhatsApp number verified successfully!");
-              }}
-              onCancel={() => {
-                setShowVerification(false);
-              }}
-            />
-          </div>
-        </div>
       )}
     </div>
   );
