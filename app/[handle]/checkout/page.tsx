@@ -11,10 +11,13 @@ export default async function CheckoutPage({
   params: { handle: string };
 }) {
   const supabase = supabaseServer();
-  const { data: stores, error: storeError } = await supabase
-    .from("store_public")
-    .select("*")
-    .eq("handle", params.handle);
+  const { data: store, error: storeError } = await supabase
+    .from("stores")
+    .select(
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_payments_enabled"
+    )
+    .eq("handle", params.handle)
+    .single();
 
   if (storeError) {
     console.error("Store fetch error:", storeError);
@@ -30,7 +33,6 @@ export default async function CheckoutPage({
     );
   }
 
-  const store = stores?.[0];
   if (!store) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -97,10 +99,21 @@ export default async function CheckoutPage({
           {/* Checkout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="order-2 lg:order-1">
+              {(() => {
+                console.log("=== CHECKOUT PAGE STORE DEBUG ===");
+                console.log("Store from database:", store);
+                console.log("Store ID:", store.id);
+                console.log("Store Name:", store.name);
+                console.log("Store Handle:", store.handle);
+                console.log("Store WhatsApp:", store.whatsapp_e164);
+                console.log("=================================");
+                return null;
+              })()}
               <CustomerCheckout
                 storeId={store.id}
                 storeName={store.name}
                 storeHandle={store.handle}
+                whatsappNumber={store.whatsapp_e164 || ""}
               />
 
               {/* Fallback to old checkout for stores without payments enabled */}

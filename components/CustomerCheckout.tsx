@@ -8,6 +8,7 @@ interface CustomerCheckoutProps {
   storeId: string;
   storeName: string;
   storeHandle: string;
+  whatsappNumber: string;
 }
 
 interface PaymentConfig {
@@ -22,7 +23,16 @@ export function CustomerCheckout({
   storeId,
   storeName,
   storeHandle,
+  whatsappNumber,
 }: CustomerCheckoutProps) {
+  // Debug logging - remove after debugging
+  console.log("=== CUSTOMER CHECKOUT DEBUG ===");
+  console.log("Store ID:", storeId);
+  console.log("Store Name:", storeName);
+  console.log("Store Handle:", storeHandle);
+  console.log("WhatsApp Number:", whatsappNumber);
+  console.log("===============================");
+
   const { items, subtotalCents, clearCart } = useCart();
   const total = Math.round(subtotalCents / 100); // Convert cents to rupees
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(
@@ -230,7 +240,19 @@ export function CustomerCheckout({
             After completing payment, click below to notify the store owner:
           </p>
           <a
-            href={`https://wa.me/+919876543210?text=${formatWhatsAppMessage()}`}
+            href={(() => {
+              const cleanNumber = whatsappNumber.replace(/\D/g, "");
+              const message = formatWhatsAppMessage();
+              const finalUrl = `https://wa.me/${cleanNumber}?text=${message}`;
+
+              console.log("=== WHATSAPP URL GENERATION ===");
+              console.log("Original WhatsApp number:", whatsappNumber);
+              console.log("Cleaned WhatsApp number:", cleanNumber);
+              console.log("Final WhatsApp URL:", finalUrl);
+              console.log("===============================");
+
+              return finalUrl;
+            })()}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"

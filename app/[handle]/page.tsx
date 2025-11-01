@@ -54,8 +54,8 @@ export default async function StorefrontPage({
   const supabase = supabaseServer();
 
   const { data: store, error: storeError } = await supabase
-    .from("store_public")
-    .select("*")
+    .from("stores")
+    .select("id, handle, name, logo_url, banner_url, currency, whatsapp_e164")
     .eq("handle", params.handle)
     .single();
 

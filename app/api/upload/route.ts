@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { z } from "zod";
 import { createServerClient } from "@/lib/db";
-
-const uploadSchema = z.object({
-  filename: z.string().min(1),
-  contentType: z.string().min(1),
-});
+import { DevImageService } from "@/lib/dev-image-service";
+import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -19,14 +14,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Validate environment
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return NextResponse.json(
-        { error: "Blob storage not configured" },
-        { status: 500 }
-      );
     }
 
     const formData = await request.formData();
@@ -52,21 +39,141 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Generate unique filename
+    // Generate unique filename with folder based on image type
     const timestamp = Date.now();
     const fileExtension = file.name.split(".").pop();
-    const filename = `products/${user.id}_${timestamp}.${fileExtension}`;
+
+    // Determine folder based on form data or default to products
+    const imageType = (formData.get("type") as string) || "products";
+    const folder =
+      imageType === "logo"
+        ? "store-logos"
+        : imageType === "banner"
+        ? "store-banners"
+        : "products";
+
+    const filename = `${folder}/${user.id}_${timestamp}.${fileExtension}`;
 
     try {
-      // Upload to Vercel Blob
-      const blob = await put(filename, file, {
-        access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+      // Check if we're in development mode and should use mock service
+      const isDevelopment = process.env.NODE_ENV === "development";
+      const useMockService = process.env.USE_MOCK_IMAGES === "true";
+
+      if (useMockService) {
+        console.log("Using mock image service (USE_MOCK_IMAGES=true)");
+        const result = await DevImageService.mockUpload(file, imageType);
+        return NextResponse.json(result);
+      }
+
+      console.log("Attempting to upload to Supabase Storage...");
+
+      // Convert file to buffer
+      const fileBuffer = await file.arrayBuffer();
+
+      console.log(`Uploading file: ${filename}`);
+
+      // Use service role for uploads to bypass RLS policies
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (!supabaseUrl || !supabaseServiceKey) {
+        return NextResponse.json(
+          {
+            error: `Missing Supabase configuration for uploads. Please check environment variables.`,
+          },
+          { status: 500 }
+        );
+      }
+
+      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
       });
 
+      // Try to upload using service role (bypasses RLS)
+      let uploadResult = await adminSupabase.storage
+        .from("store-images")
+        .upload(filename, fileBuffer, {
+          contentType: file.type,
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      // If upload fails because bucket doesn't exist, try to create it
+      if (uploadResult.error) {
+        console.log("Upload failed, checking if bucket needs to be created...");
+        console.log("Upload error:", uploadResult.error);
+
+        // Check if the error is because bucket doesn't exist
+        if (
+          uploadResult.error.message?.includes("bucket") ||
+          uploadResult.error.message?.includes("not found")
+        ) {
+          console.log(
+            "Attempting to create storage bucket with admin privileges..."
+          );
+
+          // Create the bucket using the same admin client
+          const { error: bucketError } =
+            await adminSupabase.storage.createBucket("store-images", {
+              public: true,
+              fileSizeLimit: 5242880, // 5MB
+              allowedMimeTypes: [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "image/gif",
+              ],
+            });
+
+          if (bucketError && !bucketError.message?.includes("already exists")) {
+            console.error("Error creating bucket:", bucketError);
+            return NextResponse.json(
+              {
+                error: `Storage bucket setup failed: ${bucketError.message}. Please visit /debug-storage to set up storage.`,
+              },
+              { status: 500 }
+            );
+          }
+
+          console.log(
+            "Storage bucket created or already exists, retrying upload..."
+          );
+
+          // Retry the upload after creating the bucket (using admin client)
+          uploadResult = await adminSupabase.storage
+            .from("store-images")
+            .upload(filename, fileBuffer, {
+              contentType: file.type,
+              cacheControl: "3600",
+              upsert: false,
+            });
+        }
+      }
+
+      // Check final upload result
+      if (uploadResult.error) {
+        console.error("Final upload error:", uploadResult.error);
+        return NextResponse.json(
+          { error: `Failed to upload file: ${uploadResult.error.message}` },
+          { status: 500 }
+        );
+      }
+
+      console.log("File uploaded successfully, getting public URL...");
+
+      // Get public URL using admin client
+      const { data: urlData } = adminSupabase.storage
+        .from("store-images")
+        .getPublicUrl(filename);
+
+      console.log(`Public URL: ${urlData.publicUrl}`);
+
       return NextResponse.json({
-        url: blob.url,
-        filename: blob.pathname,
+        url: urlData.publicUrl,
+        filename: filename,
         size: file.size,
         contentType: file.type,
       });

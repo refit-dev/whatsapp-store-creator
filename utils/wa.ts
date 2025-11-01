@@ -18,7 +18,7 @@ export function buildWhatsAppUrl({
   items,
   buyer,
   paymentLink,
-  currency
+  currency,
 }: {
   phoneE164: string;
   items: WhatsAppItem[];
@@ -26,8 +26,17 @@ export function buildWhatsAppUrl({
   paymentLink?: string;
   currency: string;
 }): string {
+  // Debug logging - remove after debugging
+  console.log("=== buildWhatsAppUrl DEBUG ===");
+  console.log("Input phoneE164:", phoneE164);
+  console.log("Input buyer:", buyer);
+  console.log("Input items:", items);
+  console.log("==============================");
+
   // Ensure wa.me uses digits only; accept + but strip for wa.me path
   const digitsOnly = phoneE164.replace(/[^0-9]/g, "");
+
+  console.log("Digits only result:", digitsOnly);
 
   const subtotal = items.reduce((sum, i) => sum + i.priceCents * i.qty, 0);
 
@@ -35,7 +44,11 @@ export function buildWhatsAppUrl({
     `🛒 New Order Request`,
     ``,
     ...items.map(
-      (item) => `${item.title} ×${item.qty} — ${formatMoney(item.priceCents * item.qty, currency)}`
+      (item) =>
+        `${item.title} ×${item.qty} — ${formatMoney(
+          item.priceCents * item.qty,
+          currency
+        )}`
     ),
     ``,
     `Total: ${formatMoney(subtotal, currency)}`,
@@ -47,5 +60,10 @@ export function buildWhatsAppUrl({
     ...(paymentLink ? ["", "Payment Link: " + paymentLink] : []),
   ];
   const text = encodeURIComponent(lines.join("\n"));
-  return `https://wa.me/${digitsOnly}?text=${text}`;
+  const finalUrl = `https://wa.me/${digitsOnly}?text=${text}`;
+
+  console.log("Final WhatsApp URL:", finalUrl);
+  console.log("==============================");
+
+  return finalUrl;
 }

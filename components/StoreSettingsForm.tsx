@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { PaymentSettings } from "./PaymentSettings";
+import { ImageUpload } from "./ImageUpload";
 import type { Store } from "@/types/interfaces";
 
 interface StoreSettingsFormProps {
@@ -18,6 +19,8 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
     store?.whatsapp_e164 || ""
   );
   const [currency, setCurrency] = useState(store?.currency || "USD");
+  const [logoUrl, setLogoUrl] = useState(store?.logo_url || null);
+  const [bannerUrl, setBannerUrl] = useState(store?.banner_url || null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -27,6 +30,8 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
       setHandle(store.handle);
       setWhatsappNumber(store.whatsapp_e164 || "");
       setCurrency(store.currency || "USD");
+      setLogoUrl(store.logo_url || null);
+      setBannerUrl(store.banner_url || null);
     }
   }, [store]);
 
@@ -56,6 +61,8 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
             handle,
             whatsapp_e164: whatsappNumber,
             currency,
+            logo_url: logoUrl,
+            banner_url: bannerUrl,
           })
           .eq("id", store.id);
 
@@ -69,6 +76,8 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
           handle,
           whatsapp_e164: whatsappNumber,
           currency,
+          logo_url: logoUrl,
+          banner_url: bannerUrl,
         });
 
         if (storeError) throw storeError;
@@ -199,6 +208,68 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
           </select>
         </div>
 
+        {/* Store Visual Identity Section */}
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Store Branding
+          </h3>
+
+          {/* Preview Section */}
+          {(logoUrl || bannerUrl) && (
+            <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Preview
+              </h4>
+              <div className="bg-white rounded-lg p-4 max-w-md">
+                {bannerUrl && (
+                  <img
+                    src={bannerUrl}
+                    alt="Store banner preview"
+                    className="w-full h-24 object-cover rounded-lg mb-3"
+                  />
+                )}
+                <div className="flex items-center gap-3">
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt="Store logo preview"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                  )}
+                  <div>
+                    <h5 className="font-semibold text-gray-900">
+                      {name || "Store Name"}
+                    </h5>
+                    <p className="text-sm text-gray-600">Browse our products</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {/* Logo Upload */}
+            <ImageUpload
+              label="Store Logo"
+              value={logoUrl}
+              onChange={setLogoUrl}
+              aspectRatio="square"
+              imageType="logo"
+              description="Upload your store logo. Recommended size: 200x200px. Will be displayed as a circle."
+            />
+
+            {/* Banner Upload */}
+            <ImageUpload
+              label="Store Banner"
+              value={bannerUrl}
+              onChange={setBannerUrl}
+              aspectRatio="banner"
+              imageType="banner"
+              description="Upload a banner image for your store. Recommended size: 1200x400px. This will be displayed at the top of your store page."
+            />
+          </div>
+        </div>
+
         {/* Message */}
         {message && (
           <div
@@ -213,13 +284,25 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         )}
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? "Saving..." : store ? "Update Store" : "Create Store"}
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Saving..." : store ? "Update Store" : "Create Store"}
+          </button>
+
+          {store && handle && (
+            <button
+              type="button"
+              onClick={() => window.open(`/${handle}`, "_blank")}
+              className="px-6 py-4 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-all shadow-lg hover:shadow-xl"
+            >
+              Preview Store
+            </button>
+          )}
+        </div>
 
         {store && (
           <a
