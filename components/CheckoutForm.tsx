@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCart } from "./CartProvider";
 import { buildWhatsAppUrl } from "@/utils/wa";
+import { isValidPhoneInternational } from "@/lib/validations";
 
 export function CheckoutForm({
   store,
@@ -33,6 +34,14 @@ export function CheckoutForm({
     console.log("======================================");
 
     if (!items.length) return;
+
+    // Validate phone number (India local 10-digit or international E.164 with +)
+    if (!isValidPhoneInternational(formData.phone)) {
+      alert(
+        "Please enter a valid phone number. For India: 10-digit starting with 6-9 or +91XXXXXXXXXX. For other countries: use international format with + and country code."
+      );
+      return;
+    }
 
     setLoading(true);
     try {
@@ -157,7 +166,9 @@ export function CheckoutForm({
               setFormData((d) => ({ ...d, phone: e.target.value }))
             }
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-            placeholder="+1 234 567 8900"
+            placeholder="+91 98765 43210 or +1 234 567 8900"
+            pattern="^(?:\+91[6-9]\d{9}|[6-9]\d{9}|\+[1-9]\d{9,14})$"
+            title="For India: 10-digit starting with 6-9 or +91XXXXXXXXXX. For others: + followed by country code and number (10-15 digits total)."
           />
         </div>
 

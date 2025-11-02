@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { useCart } from "./CartProvider";
+import { isValidPhoneInternational } from "@/lib/validations";
 
 interface CustomerCheckoutProps {
   storeId: string;
@@ -73,6 +74,13 @@ export function CustomerCheckout({
   const handlePlaceOrder = async () => {
     if (!customerInfo.name || !customerInfo.phone) {
       alert("Please fill in your name and phone number");
+      return;
+    }
+
+    if (!isValidPhoneInternational(customerInfo.phone)) {
+      alert(
+        "Please enter a valid phone number. For India: 10-digit starting with 6-9 or +91XXXXXXXXXX. For other countries: use international format with + and country code."
+      );
       return;
     }
 
@@ -320,6 +328,8 @@ export function CustomerCheckout({
               setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))
             }
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            pattern="^(?:\+91[6-9]\d{9}|[6-9]\d{9}|\+[1-9]\d{9,14})$"
+            title="For India: 10-digit starting with 6-9 or +91XXXXXXXXXX. For others: + followed by country code and number (10-15 digits total)."
             required
           />
         </div>
