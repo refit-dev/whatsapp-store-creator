@@ -117,22 +117,31 @@ export default function AuthPage() {
           "An account with this email already exists. Please sign in instead or use a different email."
         );
         setIsSignUp(false); // Switch to sign in mode
+      } else if (error.message.includes("Database error saving new user")) {
+        // Provide a friendlier explanation for a common Supabase issue
+        setMessage(
+          "We couldn't create your account due to a database policy or trigger error. If you own this project, check Supabase Auth → Logs and any triggers on auth.users. Then try again."
+        );
       } else {
         setMessage(error.message);
       }
     } else if (data.user) {
-      // Check if email confirmation is required
-      if (data.user.identities?.length === 0) {
-        setMessage("User already exists. Please sign in instead.");
-        setIsSignUp(false);
+      // If email confirmations are enabled, Supabase returns user but no session.
+      // Send the user to OTP confirmation page instead of dashboard.
+      const needsEmailConfirmation = !data.session;
+      if (needsEmailConfirmation) {
+        setMessage(
+          "Account created. We’ve sent a 6‑digit code to your email. Enter it to finish setup."
+        );
+        setTimeout(() => {
+          const params = new URLSearchParams({ email });
+          window.location.href = `/auth/confirm?${params.toString()}`;
+        }, 800);
       } else {
         setMessage("Account created! Redirecting to dashboard...");
-
-        // Use window.location to do a full page reload so server can pick up session
-        // Store will be auto-created in the dashboard
         setTimeout(() => {
           window.location.href = "/dashboard";
-        }, 1000);
+        }, 800);
       }
     }
 
@@ -153,7 +162,22 @@ export default function AuthPage() {
     setLoading(false);
 
     if (error) {
-      setMessage(error.message);
+      const msg = (error.message || "").toLowerCase();
+      if (
+        msg.includes("email not confirmed") ||
+        msg.includes("confirm your email")
+      ) {
+        setMessage(
+          "Email not confirmed. Enter the 6‑digit code we sent or resend it."
+        );
+        // Offer quick path to OTP confirmation page
+        setTimeout(() => {
+          const params = new URLSearchParams({ email });
+          window.location.href = `/auth/confirm?${params.toString()}`;
+        }, 600);
+      } else {
+        setMessage(error.message);
+      }
     } else if (data.user) {
       setMessage("Success! Redirecting to dashboard...");
       // Use window.location to do a full page reload so server can pick up session

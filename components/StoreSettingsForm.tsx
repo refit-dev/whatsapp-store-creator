@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { PaymentSettings } from "./PaymentSettings";
+import MobileVerification from "./MobileVerification";
 import { ImageUpload } from "./ImageUpload";
 import type { Store } from "@/types/interfaces";
 
@@ -303,6 +304,13 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
             </button>
           )}
         </div>
+
+        {store && (
+          <MobileVerification
+            storeId={store.id}
+            initialPhone={whatsappNumber}
+          />
+        )}
 
         {store && (
           <a

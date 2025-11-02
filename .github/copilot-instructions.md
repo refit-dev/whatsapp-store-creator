@@ -42,8 +42,8 @@ Systematically work through each item in the WhatsApp Micro-Store scaffold check
   - Fixed server/client component boundary issues
   - Verified build success
 - [ ] Ensure Documentation is Complete
-  - Update README
+  - [x] Update README
   - Add API documentation
-  - Include setup instructions
+  - [x] Include setup instructions
 
 Refer to the main README for setup and usage.

@@ -14,6 +14,8 @@ WHATSAPP_ACCESS_TOKEN=            # Business API Access Token
 WHATSAPP_PHONE_NUMBER_ID=         # Phone Number ID from WhatsApp Business
 WHATSAPP_BUSINESS_ACCOUNT_ID=     # Business Account ID
 WHATSAPP_VERIFY_TOKEN=            # Webhook Verify Token
+WHATSAPP_OTP_TEMPLATE_NAME=       # Approved template name for OTP (e.g., phone_verification_otp)
+WHATSAPP_OTP_TEMPLATE_LANG=       # Template language code (e.g., en)
 ```
 
 ## Payment Providers

@@ -25,6 +25,30 @@ export class WhatsAppAPI {
     this.phoneNumberId = phoneNumberId;
   }
 
+  async sendOtp(to: string, code: string) {
+    const templateName =
+      process.env.WHATSAPP_OTP_TEMPLATE_NAME || "phone_verification_otp";
+    const language = process.env.WHATSAPP_OTP_TEMPLATE_LANG || "en";
+
+    const template: WhatsAppMessageTemplate = {
+      name: templateName,
+      language,
+      components: [
+        {
+          type: "body",
+          parameters: [{ type: "text", text: code }],
+        },
+      ],
+    };
+
+    return this.sendRequest("messages", {
+      messaging_product: "whatsapp",
+      to,
+      type: "template",
+      template,
+    });
+  }
+
   private async sendRequest(endpoint: string, data: any) {
     const response = await fetch(
       `https://graph.facebook.com/v17.0/${this.phoneNumberId}/${endpoint}`,
