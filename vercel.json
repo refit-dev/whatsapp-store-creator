@@ -4,6 +4,6 @@
       "maxDuration": 10
     }
   },
-  "regions": ["bom1", "iad1"],
+  "regions": ["bom1"],
   "buildCommand": "pnpm build"
 }
