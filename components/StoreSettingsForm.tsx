@@ -256,7 +256,7 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
               onChange={setLogoUrl}
               aspectRatio="square"
               imageType="logo"
-              description="Upload your store logo. Recommended size: 200x200px. Will be displayed as a circle."
+              description="Upload your store logo. Recommended size: 200x200px (square). Will be displayed as a circle. For best results, use a square image with your logo centered."
             />
 
             {/* Banner Upload */}

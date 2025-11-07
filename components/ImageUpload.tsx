@@ -84,6 +84,8 @@ export function ImageUpload({
   const previewClassName =
     aspectRatio === "banner"
       ? "w-full h-32 object-cover rounded-lg"
+      : imageType === "logo"
+      ? "w-24 h-24 object-cover rounded-full border-2 border-gray-200 shadow-sm"
       : "w-24 h-24 object-cover rounded-lg";
 
   return (
