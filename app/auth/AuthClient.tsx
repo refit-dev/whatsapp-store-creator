@@ -7,11 +7,13 @@ import {
   validateMobileNumber,
 } from "@/lib/duplicate-validation";
 import Link from "next/link";
+import { CountryCodeSelector } from "@/components/CountryCodeSelector";
 
 export default function AuthClient() {
   const sb = supabaseBrowser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
   const [mobileNumber, setMobileNumber] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,10 @@ export default function AuthClient() {
     setShowDuplicateOptions(false);
 
     try {
-      const duplicates = await checkForDuplicates(email, mobileNumber);
+      const fullMobileNumber = mobileNumber
+        ? `${countryCode}${mobileNumber.replace(/\D/g, "")}`
+        : "";
+      const duplicates = await checkForDuplicates(email, fullMobileNumber);
 
       if (duplicates.emailExists || duplicates.mobileExists) {
         let warningMessage = "We found existing accounts:\n";
@@ -40,7 +45,7 @@ export default function AuthClient() {
         }
 
         if (duplicates.mobileExists) {
-          warningMessage += `• A store with mobile number "${mobileNumber}" already exists\n`;
+          warningMessage += `• A store with mobile number "${fullMobileNumber}" already exists\n`;
         }
 
         warningMessage += "\nWould you like to sign in instead?";
@@ -65,16 +70,23 @@ export default function AuthClient() {
       return;
     }
 
-    if (mobileNumber && !validateMobileNumber(mobileNumber)) {
+    const fullMobileNumberForValidation = mobileNumber
+      ? `${countryCode}${mobileNumber.replace(/\D/g, "")}`
+      : "";
+
+    if (mobileNumber && !validateMobileNumber(fullMobileNumberForValidation)) {
       setMessage(
-        "Please enter a valid mobile number (10 digits for Indian numbers)."
+        "Please enter a valid mobile number for the selected country."
       );
       setLoading(false);
       return;
     }
 
     if (!proceedAnyway && mobileNumber) {
-      const duplicates = await checkForDuplicates(email, mobileNumber);
+      const duplicates = await checkForDuplicates(
+        email,
+        fullMobileNumberForValidation
+      );
 
       if (duplicates.mobileExists) {
         let warningMessage =
@@ -91,13 +103,17 @@ export default function AuthClient() {
       }
     }
 
+    const fullMobileNumber = mobileNumber
+      ? `${countryCode}${mobileNumber.replace(/\D/g, "")}`
+      : "";
+
     const { data, error } = await sb.auth.signUp({
       email,
       password,
       options: {
         data: {
-          mobile_number: mobileNumber
-            ? formatMobileNumber(mobileNumber)
+          mobile_number: fullMobileNumber
+            ? formatMobileNumber(fullMobileNumber)
             : undefined,
         },
       },
@@ -270,26 +286,32 @@ export default function AuthClient() {
                   Mobile Number (WhatsApp){" "}
                   <span className="text-red-500">*</span>
                 </label>
-                <input
-                  id="mobile"
-                  type="tel"
-                  placeholder="+91 98765 43210 or 9876543210"
-                  value={mobileNumber}
-                  onChange={(e) => {
-                    setMobileNumber(e.target.value);
-                    setDuplicateWarning("");
-                    setShowDuplicateOptions(false);
-                    setProceedAnyway(false);
-                  }}
-                  onBlur={() => {
-                    if (isSignUp && mobileNumber) {
-                      checkDuplicatesAndWarn();
-                    }
-                  }}
-                  required
-                  disabled={loading || checkingDuplicates}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                />
+                <div className="flex">
+                  <CountryCodeSelector
+                    value={countryCode}
+                    onChange={setCountryCode}
+                  />
+                  <input
+                    id="mobile"
+                    type="tel"
+                    placeholder="98765 43210"
+                    value={mobileNumber}
+                    onChange={(e) => {
+                      setMobileNumber(e.target.value);
+                      setDuplicateWarning("");
+                      setShowDuplicateOptions(false);
+                      setProceedAnyway(false);
+                    }}
+                    onBlur={() => {
+                      if (isSignUp && mobileNumber) {
+                        checkDuplicatesAndWarn();
+                      }
+                    }}
+                    required
+                    disabled={loading || checkingDuplicates}
+                    className="flex-1 px-4 py-3 rounded-r-lg border border-l-0 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </div>
                 <p className="text-sm text-gray-500 mt-1">
                   This will be your store's WhatsApp number for receiving orders
                 </p>
