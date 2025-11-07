@@ -6,6 +6,7 @@ import type { Database } from "@/types/supabase";
 import { StoreSettingsForm } from "@/components/StoreSettingsForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
+import { DashboardWrapper } from "@/components/DashboardWrapper";
 
 export default async function StoreSettingsPage() {
   const user = await getUser();
@@ -28,45 +29,47 @@ export default async function StoreSettingsPage() {
   const store = stores?.[0];
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+    <DashboardWrapper>
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                Back to Dashboard
-              </Link>
-              <LogoutButton />
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Back to Dashboard
+                </Link>
+                <LogoutButton />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {store ? "Store Settings" : "Create Your Store"}
+              </h1>
+              <p className="text-gray-600">
+                {store
+                  ? "Manage your store details and settings"
+                  : "Set up your WhatsApp micro-store in minutes"}
+              </p>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {store ? "Store Settings" : "Create Your Store"}
-            </h1>
-            <p className="text-gray-600">
-              {store
-                ? "Manage your store details and settings"
-                : "Set up your WhatsApp micro-store in minutes"}
-            </p>
-          </div>
 
-          <StoreSettingsForm store={store} userId={user.id} />
+            <StoreSettingsForm store={store} userId={user.id} />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </DashboardWrapper>
   );
 }

@@ -11,6 +11,7 @@ import { SubscriptionProvider } from "@/components/SubscriptionProvider";
 import { ReferralBanner } from "@/components/ReferralBanner";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { LogoutButton } from "@/components/LogoutButton";
+import { DashboardWrapper } from "@/components/DashboardWrapper";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -87,7 +88,7 @@ export default async function DashboardPage() {
   // If user has no store, show onboarding
   if (!store) {
     return (
-      <SubscriptionProvider>
+      <DashboardWrapper>
         <main className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
             <div className="text-center mb-8">
@@ -145,12 +146,12 @@ export default async function DashboardPage() {
             </div>
           </div>
         </main>
-      </SubscriptionProvider>
+      </DashboardWrapper>
     );
   }
 
   return (
-    <SubscriptionProvider>
+    <DashboardWrapper>
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto p-6">
           {/* Subscription Status and Referral Banner */}
@@ -358,7 +359,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </main>
-    </SubscriptionProvider>
+    </DashboardWrapper>
   );
 }
 
