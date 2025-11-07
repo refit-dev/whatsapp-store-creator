@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSubscription } from "./SubscriptionProvider";
+import { useCurrency } from "./CurrencyProvider";
 
 interface AccessGuardProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export function AccessGuard({
   allowTrialAccess = true,
 }: AccessGuardProps) {
   const { status, daysRemaining, isLoading } = useSubscription();
+  const { prices } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export function AccessGuard({
             onClick={() => router.push("/dashboard/billing")}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors w-full"
           >
-            Upgrade to Pro - ₹259/month
+            Upgrade to Pro - {prices.monthly}/month
           </button>
           <p className="text-sm text-gray-500 mt-4">
             No credit card required to start

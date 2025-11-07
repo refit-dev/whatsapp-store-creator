@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
 import { BillingClient } from "./BillingClient";
 import { SubscriptionProvider } from "@/components/SubscriptionProvider";
+import { CurrencyProvider } from "@/components/CurrencyProvider";
 
 // Force no caching
 export const dynamic = "force-dynamic";
@@ -14,8 +15,10 @@ export default async function BillingPage() {
   }
 
   return (
-    <SubscriptionProvider>
-      <BillingClient />
-    </SubscriptionProvider>
+    <CurrencyProvider>
+      <SubscriptionProvider>
+        <BillingClient />
+      </SubscriptionProvider>
+    </CurrencyProvider>
   );
 }

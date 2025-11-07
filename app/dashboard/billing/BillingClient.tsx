@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useSubscription } from "@/components/SubscriptionProvider";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { ReferralBanner } from "@/components/ReferralBanner";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { CurrencySwitcher } from "@/components/CurrencySwitcher";
+import { formatPrice } from "@/lib/currency-utils";
 import Link from "next/link";
 
 declare global {
@@ -15,6 +18,7 @@ declare global {
 export function BillingClient() {
   const { subscription, status, daysRemaining, refreshSubscription } =
     useSubscription();
+  const { currency, prices } = useCurrency();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -128,12 +132,19 @@ export function BillingClient() {
             </svg>
             Back to Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Billing & Subscription
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage your subscription and billing details
-          </p>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Billing & Subscription
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Manage your subscription and billing details
+              </p>
+            </div>
+            <div className="md:w-48">
+              <CurrencySwitcher />
+            </div>
+          </div>
         </div>
 
         {/* Subscription Status */}
@@ -151,7 +162,7 @@ export function BillingClient() {
             <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg mb-4">
               <div>
                 <div className="font-semibold text-lg">Pro Plan</div>
-                <div className="text-gray-600">₹259/month</div>
+                <div className="text-gray-600">{prices.monthly}/month</div>
                 <div className="text-sm text-gray-500">
                   Active until{" "}
                   {new Date(subscription.ends_at).toLocaleDateString()}
@@ -213,7 +224,9 @@ export function BillingClient() {
             <div className="border-2 border-gray-200 rounded-xl p-6">
               <div className="text-center mb-4">
                 <h3 className="text-xl font-bold text-gray-900">Free Trial</h3>
-                <div className="text-3xl font-bold text-green-600 mt-2">₹0</div>
+                <div className="text-3xl font-bold text-green-600 mt-2">
+                  {currency === "USD" ? "$0" : "₹0"}
+                </div>
                 <div className="text-gray-600">for 30 days</div>
               </div>
 
@@ -255,7 +268,7 @@ export function BillingClient() {
               <div className="text-center mb-4">
                 <h3 className="text-xl font-bold text-gray-900">Pro Plan</h3>
                 <div className="text-3xl font-bold text-blue-600 mt-2">
-                  ₹259
+                  {prices.monthly}
                 </div>
                 <div className="text-gray-600">per month</div>
               </div>
@@ -288,6 +301,12 @@ export function BillingClient() {
                   ? "Upgrade Now"
                   : "Subscribe"}
               </button>
+
+              {currency === "USD" && (
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  Payment will be processed in INR (₹259) via Razorpay
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -312,7 +331,11 @@ export function BillingClient() {
                 </div>
                 <div className="text-right">
                   <div className="font-semibold">
-                    {subscription.is_trial ? "₹0.00" : "₹259.00"}
+                    {subscription.is_trial
+                      ? currency === "USD"
+                        ? "$0.00"
+                        : "₹0.00"
+                      : prices.monthly}
                   </div>
                   <div className="text-sm text-gray-600">
                     {subscription.status === "active" ? "Active" : "Expired"}

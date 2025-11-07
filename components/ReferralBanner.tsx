@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSubscription } from "./SubscriptionProvider";
+import { useCurrency } from "./CurrencyProvider";
 
 export function ReferralBanner() {
   const {
@@ -14,6 +15,7 @@ export function ReferralBanner() {
     status,
     daysRemaining,
   } = useSubscription();
+  const { currency, prices } = useCurrency();
   const [isCreatingCode, setIsCreatingCode] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -80,7 +82,7 @@ export function ReferralBanner() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:block text-right">
             <div className="text-sm opacity-90">After Trial</div>
-            <div className="text-xl font-bold">₹259/mo</div>
+            <div className="text-xl font-bold">{prices.monthly}/mo</div>
           </div>
           <button className="text-white/80 hover:text-white">
             <svg

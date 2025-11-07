@@ -3,6 +3,7 @@
 import { SubscriptionProvider } from "./SubscriptionProvider";
 import { AutoTrialInitializer } from "./AutoTrialInitializer";
 import { AccessGuard } from "./AccessGuard";
+import { CurrencyProvider } from "./CurrencyProvider";
 
 interface DashboardWrapperProps {
   children: React.ReactNode;
@@ -14,9 +15,11 @@ interface DashboardWrapperProps {
  */
 export function DashboardWrapper({ children }: DashboardWrapperProps) {
   return (
-    <SubscriptionProvider>
-      <AutoTrialInitializer />
-      <AccessGuard>{children}</AccessGuard>
-    </SubscriptionProvider>
+    <CurrencyProvider>
+      <SubscriptionProvider>
+        <AutoTrialInitializer />
+        <AccessGuard>{children}</AccessGuard>
+      </SubscriptionProvider>
+    </CurrencyProvider>
   );
 }

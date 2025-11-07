@@ -1,6 +1,7 @@
 "use client";
 
 import { useSubscription } from "./SubscriptionProvider";
+import { useCurrency } from "./CurrencyProvider";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -12,6 +13,7 @@ export function SubscriptionStatus() {
     isLoading,
     refreshSubscription,
   } = useSubscription();
+  const { prices } = useCurrency();
   const [isStartingTrial, setIsStartingTrial] = useState(false);
 
   const handleStartTrial = async () => {
@@ -107,7 +109,7 @@ export function SubscriptionStatus() {
               <h3 className="font-semibold text-blue-900">Pro Plan Active</h3>
             </div>
             <p className="text-blue-700 text-sm">
-              Renews in {daysRemaining} days • ₹259/month
+              Renews in {daysRemaining} days • {prices.monthly}/month
             </p>
           </div>
           <Link
