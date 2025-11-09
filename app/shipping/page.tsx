@@ -47,6 +47,12 @@ export default function ShippingPage() {
                   This page provides general guidelines, but specific shipping
                   terms are determined by each seller.
                 </p>
+                <p className="text-blue-800 mt-3 font-semibold">
+                  <strong>Disclaimer:</strong> watzy is not responsible for any
+                  physical delivery to any seller or their customers. All
+                  shipping and delivery arrangements are managed directly
+                  between sellers and buyers.
+                </p>
               </div>
             </section>
 
