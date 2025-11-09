@@ -308,7 +308,7 @@ export function SmartHomepage() {
                 required, works globally.
               </p>
               <p className="text-sm text-gray-400">
-                © 2025 watzy. All rights reserved.
+                © 2025 Ankit Nanda (HUF). All rights reserved.
               </p>
             </div>
 
