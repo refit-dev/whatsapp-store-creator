@@ -19,12 +19,14 @@ export function buildWhatsAppUrl({
   buyer,
   paymentLink,
   currency,
+  paymentMethod,
 }: {
   phoneE164: string;
   items: WhatsAppItem[];
   buyer: WhatsAppBuyer;
   paymentLink?: string;
   currency: string;
+  paymentMethod?: string;
 }): string {
   // Debug logging - remove after debugging
   console.log("=== buildWhatsAppUrl DEBUG ===");
@@ -40,6 +42,11 @@ export function buildWhatsAppUrl({
 
   const subtotal = items.reduce((sum, i) => sum + i.priceCents * i.qty, 0);
 
+  const paymentStatus =
+    paymentMethod === "online"
+      ? "✅ PAID ONLINE"
+      : "💰 Payment Pending (Pay on Delivery)";
+
   const lines = [
     `🛒 New Order Request`,
     ``,
@@ -52,7 +59,8 @@ export function buildWhatsAppUrl({
     ),
     ``,
     `Total: ${formatMoney(subtotal, currency)}`,
-    ...(buyer.notes ? ["Notes: " + buyer.notes] : []),
+    `Payment Status: ${paymentStatus}`,
+    ...(buyer.notes ? ["", "Notes: " + buyer.notes] : []),
     ``,
     `Buyer: ${buyer.name}`,
     `Phone: ${buyer.phone}`,
