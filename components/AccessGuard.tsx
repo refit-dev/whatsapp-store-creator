@@ -47,13 +47,13 @@ export function AccessGuard({
     }
   }, [status, isLoading, router, redirectPath, allowTrialAccess]);
 
-  // Show loading state while checking subscription
+  // Show minimal loading state only on first load
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8 shadow-sm text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking your subscription...</p>
+        <div className="bg-white rounded-lg p-6 shadow-sm text-center">
+          <div className="w-6 h-6 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );

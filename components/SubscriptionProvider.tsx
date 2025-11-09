@@ -29,7 +29,7 @@ interface SubscriptionContextType {
   maxReferrals: number;
   remainingReferrals: number;
   hasReachedReferralLimit: boolean;
-  refreshSubscription: () => Promise<void>;
+  refreshSubscription: (force?: boolean) => Promise<void>;
   createReferralCode: () => Promise<string | null>;
 }
 
@@ -51,8 +51,40 @@ export function SubscriptionProvider({
   const [remainingReferrals, setRemainingReferrals] = useState(6);
   const [hasReachedReferralLimit, setHasReachedReferralLimit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastFetch, setLastFetch] = useState<number>(0);
 
-  const refreshSubscription = async () => {
+  const refreshSubscription = async (force = false) => {
+    // Cache for 2 minutes to avoid excessive API calls
+    const now = Date.now();
+    const cacheTime = 2 * 60 * 1000; // 2 minutes
+
+    if (!force && lastFetch && now - lastFetch < cacheTime) {
+      // Use cached data if available and recent
+      return;
+    }
+
+    // Try to load from sessionStorage first for faster initial load
+    if (!force && !subscription) {
+      try {
+        const cached = sessionStorage.getItem("subscription-cache");
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (now - timestamp < cacheTime) {
+            setSubscription(data.subscription);
+            setReferralCode(data.referralCode);
+            setReferralCount(data.referralCount);
+            setRemainingReferrals(data.remainingReferrals);
+            setHasReachedReferralLimit(data.hasReachedReferralLimit);
+            setIsLoading(false);
+            setLastFetch(timestamp);
+            return;
+          }
+        }
+      } catch (e) {
+        // Ignore cache errors
+      }
+    }
+
     setIsLoading(true);
     try {
       const sb = supabaseBrowser();
@@ -64,6 +96,10 @@ export function SubscriptionProvider({
         setSubscription(null);
         setReferralCode(null);
         setReferralCount(0);
+        setRemainingReferrals(maxReferrals);
+        setHasReachedReferralLimit(false);
+        // Clear cache when user logs out
+        sessionStorage.removeItem("subscription-cache");
         return;
       }
 
@@ -105,6 +141,27 @@ export function SubscriptionProvider({
       setReferralCount(currentReferralCount);
       setRemainingReferrals(remaining);
       setHasReachedReferralLimit(limitReached);
+      setLastFetch(now);
+
+      // Cache the data in sessionStorage for faster subsequent loads
+      try {
+        const cacheData = {
+          subscription: subscriptions?.[0] || null,
+          referralCode: referralCodes?.[0]?.code || null,
+          referralCount: currentReferralCount,
+          remainingReferrals: remaining,
+          hasReachedReferralLimit: limitReached,
+        };
+        sessionStorage.setItem(
+          "subscription-cache",
+          JSON.stringify({
+            data: cacheData,
+            timestamp: now,
+          })
+        );
+      } catch (e) {
+        // Ignore storage errors
+      }
     } catch (error) {
       console.error("Error fetching subscription:", error);
     } finally {
@@ -159,8 +216,16 @@ export function SubscriptionProvider({
   };
 
   useEffect(() => {
+    // Initial load with cache check
     refreshSubscription();
-  }, []);
+
+    // Set up periodic refresh every 5 minutes (less frequent)
+    const interval = setInterval(() => {
+      refreshSubscription(); // This will use cache if recent
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array to run only once
 
   const value: SubscriptionContextType = {
     subscription,
