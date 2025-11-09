@@ -153,7 +153,7 @@ export default async function DashboardPage() {
   return (
     <DashboardWrapper>
       <main className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-7xl mx-auto p-4 md:p-6">
           {/* Subscription Status and Referral Banner */}
           <div className="mb-6 space-y-4">
             <SubscriptionStatus />
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Header with Store Info and Share Link */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-4 md:mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
@@ -169,12 +169,12 @@ export default async function DashboardPage() {
                 </h1>
                 <p className="text-gray-600 mt-1">Dashboard Overview</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                 <Link
                   href={`/${store.handle}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm touch-target"
                 >
                   <svg
                     className="w-4 h-4"
@@ -198,7 +198,7 @@ export default async function DashboardPage() {
                   View Store
                 </Link>
                 <ShareStoreLink handle={store.handle} />
-                <div className="border-l border-gray-200 pl-4">
+                <div className="hidden sm:block border-l border-gray-200 pl-4">
                   <LogoutButton />
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
             <StatsCard
               title="Total Orders"
               value={orders.length.toString()}
@@ -247,7 +247,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Quick Links */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
             <QuickLink
               href="/dashboard/products"
               title="Manage Products"
@@ -269,7 +269,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Recent Orders */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
             <h2 className="text-xl font-bold mb-4 text-gray-900">
               Recent Orders
             </h2>

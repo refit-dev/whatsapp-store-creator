@@ -413,7 +413,7 @@ export function UnifiedCheckout({
                 clearCart();
               }, 2000); // Small delay to ensure WhatsApp opens
             }}
-            className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"
+            className="w-full bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center touch-target text-base md:py-3 md:px-4"
           >
             <span className="mr-2">📱</span>
             Confirm Payment on WhatsApp
@@ -425,21 +425,21 @@ export function UnifiedCheckout({
 
   // Main checkout form
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <h3 className="text-xl font-semibold mb-6 text-gray-900">
+    <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
+      <h3 className="text-xl font-semibold mb-4 md:mb-6 text-gray-900">
         🛒 Complete Your Order
       </h3>
 
       {/* Order Summary */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 rounded-lg">
         <h4 className="font-medium mb-3 text-gray-800">Order Summary</h4>
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-gray-700">
+              <span className="text-gray-700 truncate mr-2">
                 {item.title} × {item.qty}
               </span>
-              <span className="text-gray-900 font-medium">
+              <span className="text-gray-900 font-medium whitespace-nowrap">
                 {currency === "INR" ? "₹" : "$"}
                 {Math.round((item.priceCents * item.qty) / 100)}
               </span>
@@ -458,11 +458,11 @@ export function UnifiedCheckout({
       </div>
 
       {/* Customer Information */}
-      <div className="space-y-4 mb-6">
+      <div className="space-y-4 mb-4 md:mb-6">
         <h4 className="font-medium text-gray-800">Your Information</h4>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Full Name *
           </label>
           <input
@@ -471,13 +471,13 @@ export function UnifiedCheckout({
             onChange={(e) =>
               setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Phone Number *
           </label>
           <input
@@ -487,13 +487,13 @@ export function UnifiedCheckout({
               setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))
             }
             placeholder="+91 98765 43210 or +1 234 567 8900"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Email (Optional)
           </label>
           <input
@@ -502,13 +502,13 @@ export function UnifiedCheckout({
             onChange={(e) =>
               setCustomerInfo((prev) => ({ ...prev, email: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Delivery Address
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Delivery Address *
           </label>
           <textarea
             value={customerInfo.address}
@@ -516,13 +516,13 @@ export function UnifiedCheckout({
               setCustomerInfo((prev) => ({ ...prev, address: e.target.value }))
             }
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base resize-none"
             placeholder="Street address, city, state, pincode..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Special Instructions (Optional)
           </label>
           <textarea
@@ -534,14 +534,14 @@ export function UnifiedCheckout({
               }))
             }
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base resize-none"
             placeholder="Any special requests..."
           />
         </div>
       </div>
 
       {/* Payment Method Selection */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h4 className="font-medium text-gray-800 mb-3">
           Choose Payment Method
         </h4>
@@ -549,7 +549,7 @@ export function UnifiedCheckout({
         <div className="space-y-3">
           {/* Pay Later (WhatsApp) Option */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`border rounded-lg p-4 cursor-pointer transition-all touch-target ${
               paymentMethod === "whatsapp"
                 ? "border-green-500 bg-green-50"
                 : "border-gray-300 hover:border-gray-400"
@@ -565,7 +565,7 @@ export function UnifiedCheckout({
                 onChange={(e) =>
                   setPaymentMethod(e.target.value as "online" | "whatsapp")
                 }
-                className="mr-3"
+                className="mr-3 w-5 h-5"
               />
               <div className="flex items-center">
                 <span className="text-2xl mr-3">💬</span>
@@ -630,7 +630,7 @@ export function UnifiedCheckout({
           <button
             onClick={handlePayNow}
             disabled={isLoading || !customerInfo.name || !customerInfo.phone}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium flex items-center justify-center"
+            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium flex items-center justify-center touch-target text-base md:py-3 md:px-4"
           >
             <span className="mr-2">💳</span>
             {isLoading
@@ -641,7 +641,7 @@ export function UnifiedCheckout({
           <button
             onClick={handleWhatsAppOrder}
             disabled={isLoading || !customerInfo.name || !customerInfo.phone}
-            className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium flex items-center justify-center"
+            className="w-full bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium flex items-center justify-center touch-target text-base md:py-3 md:px-4"
           >
             <span className="mr-2">📱</span>
             {isLoading ? "Sending..." : "Send Order to WhatsApp"}
