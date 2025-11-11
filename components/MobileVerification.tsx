@@ -48,7 +48,7 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send code");
-      setMessage("Code sent on WhatsApp. It expires in 10 minutes.");
+      setMessage("Code sent via SMS. It expires in 10 minutes.");
       fetchStatus();
     } catch (e: any) {
       setMessage(e.message || "Failed to send code");
@@ -85,18 +85,18 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
   return (
     <div className="mt-8 border-t border-gray-200 pt-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-        Verify WhatsApp Number
+        Verify Phone Number
       </h3>
       <p className="text-sm text-gray-600 mb-4">
-        Before your store goes live, verify your WhatsApp number. We’ll send a
-        6‑digit code to your WhatsApp via our business account.
+        Verify your phone number to enable store sharing. We'll send a 6‑digit
+        verification code via SMS.
       </p>
 
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              WhatsApp Number (E.164)
+              Phone Number (E.164 format)
             </label>
             <input
               type="tel"
@@ -105,6 +105,10 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
               placeholder="+12345678901"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Enter your number with country code (e.g., +1 for US, +91 for
+              India)
+            </p>
           </div>
           <button
             type="button"
@@ -153,21 +157,31 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
             }`}
           >
             {verified ? (
-              <p>
-                WhatsApp number is verified
-                {status.verifiedAt
-                  ? ` (since ${new Date(status.verifiedAt).toLocaleString()})`
-                  : "."}
-              </p>
+              <div>
+                <p className="font-semibold">✓ Phone number verified</p>
+                {status.verifiedAt && (
+                  <p className="text-sm mt-1">
+                    Verified on {new Date(status.verifiedAt).toLocaleString()}
+                  </p>
+                )}
+                <p className="text-sm mt-1">
+                  You can now share your store link!
+                </p>
+              </div>
             ) : (
-              <p>
-                Not verified yet.{" "}
-                {status.expiresAt
-                  ? `Current code expires at ${new Date(
-                      status.expiresAt
-                    ).toLocaleTimeString()}.`
-                  : "Send a code to begin."}
-              </p>
+              <div>
+                <p className="font-semibold">⚠ Phone verification required</p>
+                <p className="text-sm mt-1">
+                  {status.expiresAt
+                    ? `Current code expires at ${new Date(
+                        status.expiresAt
+                      ).toLocaleTimeString()}.`
+                    : "Send a code to begin verification."}
+                </p>
+                <p className="text-sm mt-1 font-medium">
+                  You must verify your phone before sharing your store.
+                </p>
+              </div>
             )}
           </div>
         )}

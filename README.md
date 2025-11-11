@@ -46,12 +46,16 @@ pnpm add -D @types/node @types/react @types/react-dom @types/stripe cypress
 
 ```sh
 # Copy env example
-cp .env.local.example .env.local
+cp .env.example .env.local
 
 # Fill in values:
 NEXT_PUBLIC_SUPABASE_URL=        # From Supabase API settings
 NEXT_PUBLIC_SUPABASE_ANON_KEY=   # From Supabase API settings
-SUPABASE_SERVICE_ROLE_KEY=       # From Supabase API settings
+
+# Required - Twilio SMS for phone verification:
+TWILIO_ACCOUNT_SID=              # From Twilio Console
+TWILIO_AUTH_TOKEN=               # From Twilio Console
+TWILIO_PHONE_NUMBER=             # Your Twilio phone number (E.164 format)
 
 # Optional - for payments:
 STRIPE_SECRET_KEY=               # From Stripe Dashboard > Developers > API keys
@@ -61,6 +65,8 @@ RAZORPAY_KEY_SECRET=            # From Razorpay Dashboard > Settings > API keys
 
 APP_URL=http://localhost:3000    # Your app URL
 ```
+
+**📱 Twilio Setup Required**: See [docs/twilio-sms-setup.md](docs/twilio-sms-setup.md) for detailed instructions.
 
 ### 4. Development
 
@@ -114,6 +120,13 @@ ngrok http 3000
 ```
 
 ## Important Notes
+
+### Phone Verification (Required)
+
+- **Twilio SMS verification is mandatory** for store owners
+- Users cannot share their store link until phone is verified
+- Setup guide: [docs/twilio-sms-setup.md](docs/twilio-sms-setup.md)
+- Costs ~$1.75/month for 100 verifications
 
 ### Email provider setup
 

@@ -197,7 +197,7 @@ export default async function DashboardPage() {
                   </svg>
                   View Store
                 </Link>
-                <ShareStoreLink handle={store.handle} />
+                <ShareStoreLink handle={store.handle} storeId={store.id} />
                 <div className="hidden sm:block border-l border-gray-200 pl-4">
                   <LogoutButton />
                 </div>

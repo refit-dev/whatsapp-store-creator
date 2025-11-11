@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Database } from "@/types/supabase";
-import { WhatsAppAPI } from "@/lib/whatsapp-api";
+import { TwilioSMS } from "@/lib/twilio-sms";
 
 export async function POST(req: Request) {
   const cookieStore = cookies();
@@ -54,6 +54,29 @@ export async function POST(req: Request) {
     );
   }
 
+  // Initialize Twilio SMS service
+  let smsService: TwilioSMS;
+  try {
+    smsService = new TwilioSMS();
+
+    // Validate phone number format
+    const isValid = await smsService.validatePhoneNumber(phoneToUse);
+    if (!isValid) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid phone number format. Please use E.164 format (e.g., +1234567890)",
+        },
+        { status: 400 }
+      );
+    }
+  } catch (e: any) {
+    return NextResponse.json(
+      { error: "SMS service not configured. Please contact support." },
+      { status: 500 }
+    );
+  }
+
   // Generate a 6-digit OTP
   const code = String(Math.floor(100000 + Math.random() * 900000));
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
@@ -68,13 +91,12 @@ export async function POST(req: Request) {
     attempts: 0,
   });
 
-  // Send via WhatsApp Business API using a template
+  // Send via Twilio SMS
   try {
-    const api = new WhatsAppAPI();
-    await api.sendOtp(phoneToUse, code);
+    await smsService.sendOtp(phoneToUse, code);
   } catch (e: any) {
     return NextResponse.json(
-      { error: e.message || "Failed to send OTP" },
+      { error: e.message || "Failed to send SMS" },
       { status: 500 }
     );
   }
