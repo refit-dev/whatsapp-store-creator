@@ -1,24 +1,25 @@
-'use client';
+"use client";
 
-import { CartProvider, useCart } from '@/components/CartProvider';
+import { CartProvider, useCart } from "@/components/CartProvider";
 
 function CartTester() {
   const { items, addItem, clearCart, subtotalCents } = useCart();
 
   const testAddItem = () => {
-    console.log('Testing cart - adding item');
+    console.log("Testing cart - adding item");
     addItem({
-      id: 'test-1',
-      title: 'Test Product',
+      id: "test-1",
+      title: "Test Product",
       priceCents: 1000,
+      storeHandle: "test-store",
     });
-    alert('Item added! Check console and page for count');
+    alert("Item added! Check console and page for count");
   };
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Cart Test Page</h1>
-      
+
       <div className="mb-4 p-4 bg-gray-100 rounded">
         <p>Cart Items: {items.length}</p>
         <p>Total Items: {items.reduce((sum, i) => sum + i.qty, 0)}</p>
@@ -32,7 +33,7 @@ function CartTester() {
         >
           Test Add Item
         </button>
-        
+
         <button
           onClick={clearCart}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
@@ -47,9 +48,10 @@ function CartTester() {
           <p className="text-gray-500">Cart is empty</p>
         ) : (
           <ul className="space-y-2">
-            {items.map(item => (
+            {items.map((item) => (
               <li key={item.id} className="p-2 bg-white border rounded">
-                {item.title} - Qty: {item.qty} - ${(item.priceCents * item.qty / 100).toFixed(2)}
+                {item.title} - Qty: {item.qty} - $
+                {((item.priceCents * item.qty) / 100).toFixed(2)}
               </li>
             ))}
           </ul>
@@ -61,7 +63,7 @@ function CartTester() {
 
 export default function TestCartPage() {
   return (
-    <CartProvider>
+    <CartProvider storeHandle="test-store">
       <CartTester />
     </CartProvider>
   );

@@ -35,7 +35,7 @@ export function StorefrontClient({
   handle,
 }: StorefrontClientProps) {
   return (
-    <CartProvider>
+    <CartProvider storeHandle={handle}>
       <main className="min-h-screen bg-gray-50">
         {/* Store Header */}
         <div className="bg-white border-b border-gray-200">
