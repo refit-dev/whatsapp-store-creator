@@ -26,28 +26,57 @@ export async function POST(req: Request) {
     );
   }
 
-  // Ensure user is owner/admin of the store
-  const { data: member } = await supabase
-    .from("store_members")
-    .select("role")
-    .eq("store_id", storeId)
-    .eq("user_id", user.id)
+  // Ensure user is owner or member of the store
+  const { data: store } = await supabase
+    .from("stores")
+    .select("owner_id")
+    .eq("id", storeId)
     .maybeSingle();
 
-  if (!member) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!store) {
+    return NextResponse.json({ error: "Store not found" }, { status: 404 });
+  }
+
+  // Check if user is the owner
+  const isOwner = store.owner_id === user.id;
+
+  // Check if user is a member (if not owner)
+  let isMember = false;
+  if (!isOwner) {
+    const { data: member } = await supabase
+      .from("store_members")
+      .select("role")
+      .eq("store_id", storeId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    isMember = !!member;
+  }
+
+  if (!isOwner && !isMember) {
+    return NextResponse.json(
+      { error: "Forbidden - You don't have access to this store" },
+      { status: 403 }
+    );
   }
 
   // Retrieve verification row
-  const { data: verif } = await supabase
+  const { data: verif, error: verifError } = await supabase
     .from("whatsapp_verifications")
     .select("otp_code, expires_at, attempts")
     .eq("store_id", storeId)
-    .single();
+    .maybeSingle();
+
+  if (verifError) {
+    console.error("Error fetching verification:", verifError);
+    return NextResponse.json(
+      { error: "Database error. Please try again." },
+      { status: 500 }
+    );
+  }
 
   if (!verif) {
     return NextResponse.json(
-      { error: "No OTP found. Please request a new code." },
+      { error: "No OTP found. Please request a new code first." },
       { status: 400 }
     );
   }

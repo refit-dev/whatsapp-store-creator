@@ -47,7 +47,13 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
         body: JSON.stringify({ storeId, phone }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to send code");
+      if (!res.ok) {
+        // Show detailed error if available
+        const errorMsg = data.details
+          ? `${data.error}\n\n${data.details}`
+          : data.error || "Failed to send code";
+        throw new Error(errorMsg);
+      }
       setMessage("Code sent via SMS. It expires in 10 minutes.");
       fetchStatus();
     } catch (e: any) {
@@ -120,10 +126,7 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
           </button>
         </div>
 
-        <form
-          onSubmit={verifyOtp}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Enter 6‑digit Code
@@ -135,18 +138,25 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
               maxLength={6}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canVerify && !loading) {
+                  e.preventDefault();
+                  verifyOtp(e as any);
+                }
+              }}
               placeholder="123456"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent tracking-widest text-center"
             />
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={(e) => verifyOtp(e as any)}
             disabled={loading || !canVerify}
             className="w-full md:w-auto px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
           >
             {loading ? "Verifying..." : "Verify"}
           </button>
-        </form>
+        </div>
 
         {status && (
           <div
@@ -187,8 +197,26 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
         )}
 
         {message && (
-          <div className="p-3 rounded-md bg-blue-50 text-blue-800 text-sm">
-            {message}
+          <div
+            className={`p-4 rounded-md text-sm ${
+              message.includes("Error") ||
+              message.includes("Failed") ||
+              message.includes("Trial")
+                ? "bg-red-50 text-red-800 border border-red-200"
+                : "bg-blue-50 text-blue-800 border border-blue-200"
+            }`}
+          >
+            <div className="whitespace-pre-line">{message}</div>
+            {message.includes("Trial") && (
+              <a
+                href="https://console.twilio.com/us1/develop/phone-numbers/manage/verified"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              >
+                Verify Number in Twilio →
+              </a>
+            )}
           </div>
         )}
       </div>

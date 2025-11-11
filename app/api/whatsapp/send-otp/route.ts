@@ -24,27 +24,49 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "storeId is required" }, { status: 400 });
   }
 
-  // Ensure user is owner/admin of the store
-  const { data: member } = await supabase
-    .from("store_members")
-    .select("role")
-    .eq("store_id", storeId)
-    .eq("user_id", user.id)
+  // Ensure user is owner or member of the store
+  const { data: store } = await supabase
+    .from("stores")
+    .select("owner_id")
+    .eq("id", storeId)
     .maybeSingle();
 
-  if (!member) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!store) {
+    return NextResponse.json({ error: "Store not found" }, { status: 404 });
+  }
+
+  // Check if user is the owner
+  const isOwner = store.owner_id === user.id;
+
+  // Check if user is a member (if not owner)
+  let isMember = false;
+  if (!isOwner) {
+    const { data: member } = await supabase
+      .from("store_members")
+      .select("role")
+      .eq("store_id", storeId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    isMember = !!member;
+  }
+
+  if (!isOwner && !isMember) {
+    return NextResponse.json(
+      { error: "Forbidden - You don't have access to this store" },
+      { status: 403 }
+    );
   }
 
   // Determine phone number to use
   let phoneToUse = phone;
   if (!phoneToUse) {
-    const { data: store } = await supabase
+    // Get the whatsapp number from the store
+    const { data: storeData } = await supabase
       .from("stores")
       .select("whatsapp_e164")
       .eq("id", storeId)
       .single();
-    phoneToUse = store?.whatsapp_e164 || undefined;
+    phoneToUse = storeData?.whatsapp_e164 || undefined;
   }
 
   if (!phoneToUse) {
@@ -95,10 +117,28 @@ export async function POST(req: Request) {
   try {
     await smsService.sendOtp(phoneToUse, code);
   } catch (e: any) {
-    return NextResponse.json(
-      { error: e.message || "Failed to send SMS" },
-      { status: 500 }
-    );
+    const errorMessage = e.message || "Failed to send SMS";
+
+    // Check if it's a Twilio trial account error
+    if (
+      errorMessage.includes("unverified") ||
+      errorMessage.includes("Trial accounts")
+    ) {
+      return NextResponse.json(
+        {
+          error: "Twilio Trial Account: Please verify your phone number first",
+          details: `1. Go to https://console.twilio.com/us1/develop/phone-numbers/manage/verified
+2. Click "Add a new number"
+3. Enter ${phoneToUse} and verify it
+4. Or upgrade your Twilio account to send to any number
+
+Trial accounts can only send SMS to verified numbers.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, expiresAt });
