@@ -30,14 +30,15 @@ export default async function StoreSettingsPage() {
 
   return (
     <DashboardWrapper>
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8">
+            {/* Header */}
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm sm:text-base"
                 >
                   <svg
                     className="w-4 h-4 mr-2"
@@ -54,12 +55,14 @@ export default async function StoreSettingsPage() {
                   </svg>
                   Back to Dashboard
                 </Link>
-                <LogoutButton />
+                <div className="self-start sm:self-auto">
+                  <LogoutButton />
+                </div>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {store ? "Store Settings" : "Create Your Store"}
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                {store ? "⚙️ Store Settings" : "🚀 Create Your Store"}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 {store
                   ? "Manage your store details and settings"
                   : "Set up your WhatsApp micro-store in minutes"}

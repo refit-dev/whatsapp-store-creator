@@ -97,151 +97,167 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Store Basic Settings */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Store Name */}
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Store Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={handleGenerateHandle}
-            required
-            placeholder="e.g., Sweet Bakery"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            The name that customers will see
-          </p>
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Basic Information Section */}
+        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            📋 Basic Information
+          </h3>
 
-        {/* Store Handle */}
-        <div>
-          <label
-            htmlFor="handle"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Store Handle (URL)
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              id="handle"
-              type="text"
-              value={handle}
-              onChange={(e) =>
-                setHandle(
-                  e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")
-                )
-              }
-              required
-              pattern="^[a-z0-9-]+$"
-              placeholder="sweet-bakery"
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button
-              type="button"
-              onClick={handleGenerateHandle}
-              className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
+          {/* Store Name */}
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Generate
-            </button>
+              Store Name *
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={handleGenerateHandle}
+              required
+              placeholder="e.g., Sweet Bakery"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+            <p className="mt-1.5 text-xs text-gray-500">
+              The name that customers will see
+            </p>
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            Your store will be at:{" "}
-            <span className="font-mono text-blue-600">/{handle}</span>
-          </p>
-        </div>
 
-        {/* WhatsApp Number */}
-        <div>
-          <label
-            htmlFor="whatsapp"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            WhatsApp Number
-          </label>
-          <input
-            id="whatsapp"
-            type="tel"
-            value={whatsappNumber}
-            onChange={(e) => setWhatsappNumber(e.target.value)}
-            required
-            placeholder="+12345678901"
-            pattern="^\+?[1-9]\d{10,14}$"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            Include country code (e.g., +1 for USA, +91 for India)
-          </p>
-        </div>
+          {/* Store Handle */}
+          <div>
+            <label
+              htmlFor="handle"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Store Handle (URL) *
+            </label>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                id="handle"
+                type="text"
+                value={handle}
+                onChange={(e) =>
+                  setHandle(
+                    e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")
+                  )
+                }
+                required
+                pattern="^[a-z0-9-]+$"
+                placeholder="sweet-bakery"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              <button
+                type="button"
+                onClick={handleGenerateHandle}
+                className="px-4 py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              >
+                Auto Generate
+              </button>
+            </div>
+            <p className="mt-1.5 text-xs text-gray-500">
+              Your store URL:{" "}
+              <span className="font-mono text-blue-600 font-medium">
+                /{handle || "your-store"}
+              </span>
+            </p>
+          </div>
 
-        {/* Currency */}
-        <div>
-          <label
-            htmlFor="currency"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Currency
-          </label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="USD">USD - US Dollar</option>
-            <option value="EUR">EUR - Euro</option>
-            <option value="GBP">GBP - British Pound</option>
-            <option value="INR">INR - Indian Rupee</option>
-            <option value="CAD">CAD - Canadian Dollar</option>
-            <option value="AUD">AUD - Australian Dollar</option>
-            <option value="JPY">JPY - Japanese Yen</option>
-            <option value="CNY">CNY - Chinese Yuan</option>
-          </select>
+          {/* WhatsApp Number & Currency in Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* WhatsApp Number */}
+            <div>
+              <label
+                htmlFor="whatsapp"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                WhatsApp Number *
+              </label>
+              <input
+                id="whatsapp"
+                type="tel"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                required
+                placeholder="+919876543210"
+                pattern="^\+?[1-9]\d{10,14}$"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              <p className="mt-1.5 text-xs text-gray-500">With country code</p>
+            </div>
+
+            {/* Currency */}
+            <div>
+              <label
+                htmlFor="currency"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Currency *
+              </label>
+              <select
+                id="currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              >
+                <option value="USD">🇺🇸 USD - US Dollar</option>
+                <option value="EUR">🇪🇺 EUR - Euro</option>
+                <option value="GBP">🇬🇧 GBP - British Pound</option>
+                <option value="INR">🇮🇳 INR - Indian Rupee</option>
+                <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+                <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+                <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Store Visual Identity Section */}
-        <div className="border-t border-gray-200 pt-6">
+        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Store Branding
+            🎨 Store Branding
           </h3>
 
           {/* Preview Section */}
           {(logoUrl || bannerUrl) && (
-            <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
-                Preview
-              </h4>
-              <div className="bg-white rounded-lg p-4 max-w-md">
+            <div className="mb-4 p-3 sm:p-4 border border-blue-200 rounded-lg bg-blue-50">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-medium text-blue-800">
+                  👀 Preview
+                </span>
+              </div>
+              <div className="bg-white rounded-lg overflow-hidden shadow-sm">
                 {bannerUrl && (
                   <img
                     src={bannerUrl}
                     alt="Store banner preview"
-                    className="w-full h-24 object-cover rounded-lg mb-3"
+                    className="w-full h-32 sm:h-40 object-cover"
                   />
                 )}
-                <div className="flex items-center gap-3">
-                  {logoUrl && (
-                    <img
-                      src={logoUrl}
-                      alt="Store logo preview"
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-                    />
-                  )}
-                  <div>
-                    <h5 className="font-semibold text-gray-900">
-                      {name || "Store Name"}
-                    </h5>
-                    <p className="text-sm text-gray-600">Browse our products</p>
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    {logoUrl && (
+                      <img
+                        src={logoUrl}
+                        alt="Store logo preview"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-gray-200 shadow-sm flex-shrink-0"
+                      />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h5 className="font-semibold text-gray-900 truncate">
+                        {name || "Store Name"}
+                      </h5>
+                      <p className="text-sm text-gray-600">
+                        Browse our products
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -274,42 +290,67 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         {/* Message */}
         {message && (
           <div
-            className={`p-4 rounded-lg ${
+            className={`p-4 rounded-lg border ${
               message.includes("Error")
-                ? "bg-red-50 text-red-800"
-                : "bg-green-50 text-green-800"
+                ? "bg-red-50 text-red-800 border-red-200"
+                : "bg-green-50 text-green-800 border-green-200"
             }`}
           >
-            {message}
+            <p className="font-medium">{message}</p>
           </div>
         )}
 
-        {/* Submit Button */}
-        <div className="flex gap-4">
+        {/* Submit Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 sm:py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-center"
           >
-            {loading ? "Saving..." : store ? "Update Store" : "Create Store"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Saving...
+              </span>
+            ) : (
+              <span>{store ? "💾 Update Store" : "🚀 Create Store"}</span>
+            )}
           </button>
 
           {store && handle && (
             <button
               type="button"
               onClick={() => window.open(`/${handle}`, "_blank")}
-              className="px-6 py-4 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-all shadow-lg hover:shadow-xl"
+              className="px-6 py-3.5 sm:py-4 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
             >
-              Preview Store
+              👁️ Preview Store
             </button>
           )}
         </div>
 
+        {/* Phone Verification Section */}
         {store && (
-          <MobileVerification
-            storeId={store.id}
-            initialPhone={whatsappNumber}
-          />
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-green-200">
+            <MobileVerification
+              storeId={store.id}
+              initialPhone={whatsappNumber}
+            />
+          </div>
         )}
 
         {store && (

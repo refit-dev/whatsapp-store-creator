@@ -89,47 +89,41 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
   const verified = status?.verified;
 
   return (
-    <div className="mt-8 border-t border-gray-200 pt-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-        Verify Phone Number
-      </h3>
-      <p className="text-sm text-gray-600 mb-4">
-        Verify your phone number to enable store sharing. We'll send a 6‑digit
-        verification code via SMS.
-      </p>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">📱</span>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Phone Verification
+          </h3>
+          <p className="text-sm text-gray-600">
+            Required to share your store link
+          </p>
+        </div>
+      </div>
 
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number (E.164 format)
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+12345678901"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Enter your number with country code (e.g., +1 for US, +91 for
-              India)
-            </p>
+        {/* Phone Display + Send Code */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          <div className="flex-1 px-4 py-3 bg-white rounded-lg border border-gray-300">
+            <p className="text-xs text-gray-500 mb-1">Phone Number</p>
+            <p className="font-mono text-gray-900">{phone || "Not set"}</p>
           </div>
           <button
             type="button"
             onClick={sendOtp}
             disabled={loading || !phone}
-            className="w-full md:w-auto px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow whitespace-nowrap"
           >
-            {loading ? "Sending..." : "Send Code"}
+            {loading ? "Sending..." : "📤 Send Code"}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <div className="md:col-span-2">
+        {/* Enter Code */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Enter 6‑digit Code
+              Enter 6-digit Code
             </label>
             <input
               type="text"
@@ -144,77 +138,87 @@ export default function MobileVerification({ storeId, initialPhone }: Props) {
                   verifyOtp(e as any);
                 }
               }}
-              placeholder="123456"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent tracking-widest text-center"
+              placeholder="000000"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent tracking-[0.5em] text-center text-lg font-mono"
             />
           </div>
           <button
             type="button"
             onClick={(e) => verifyOtp(e as any)}
             disabled={loading || !canVerify}
-            className="w-full md:w-auto px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow whitespace-nowrap self-end"
           >
-            {loading ? "Verifying..." : "Verify"}
+            {loading ? "Verifying..." : "✓ Verify"}
           </button>
         </div>
 
+        {/* Status Message */}
         {status && (
           <div
-            className={`p-4 rounded-lg ${
+            className={`p-4 rounded-lg border-2 ${
               verified
-                ? "bg-green-50 text-green-800"
-                : "bg-yellow-50 text-yellow-800"
+                ? "bg-green-50 text-green-800 border-green-300"
+                : "bg-yellow-50 text-yellow-800 border-yellow-300"
             }`}
           >
             {verified ? (
-              <div>
-                <p className="font-semibold">✓ Phone number verified</p>
-                {status.verifiedAt && (
-                  <p className="text-sm mt-1">
-                    Verified on {new Date(status.verifiedAt).toLocaleString()}
+              <div className="flex items-start gap-3">
+                <span className="text-2xl flex-shrink-0">✅</span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-base">Phone Verified!</p>
+                  {status.verifiedAt && (
+                    <p className="text-sm mt-0.5 opacity-90">
+                      {new Date(status.verifiedAt).toLocaleString()}
+                    </p>
+                  )}
+                  <p className="text-sm mt-1.5 font-medium">
+                    🎉 You can now share your store link
                   </p>
-                )}
-                <p className="text-sm mt-1">
-                  You can now share your store link!
-                </p>
+                </div>
               </div>
             ) : (
-              <div>
-                <p className="font-semibold">⚠ Phone verification required</p>
-                <p className="text-sm mt-1">
-                  {status.expiresAt
-                    ? `Current code expires at ${new Date(
-                        status.expiresAt
-                      ).toLocaleTimeString()}.`
-                    : "Send a code to begin verification."}
-                </p>
-                <p className="text-sm mt-1 font-medium">
-                  You must verify your phone before sharing your store.
-                </p>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl flex-shrink-0">⚠️</span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-base">
+                    Verification Required
+                  </p>
+                  <p className="text-sm mt-0.5">
+                    {status.expiresAt
+                      ? `Code expires at ${new Date(
+                          status.expiresAt
+                        ).toLocaleTimeString()}`
+                      : "Click 'Send Code' to get started"}
+                  </p>
+                  <p className="text-sm mt-1.5 font-medium">
+                    Store sharing is disabled until verified
+                  </p>
+                </div>
               </div>
             )}
           </div>
         )}
 
+        {/* Additional Messages */}
         {message && (
           <div
-            className={`p-4 rounded-md text-sm ${
+            className={`p-4 rounded-lg border-2 text-sm ${
               message.includes("Error") ||
               message.includes("Failed") ||
               message.includes("Trial")
-                ? "bg-red-50 text-red-800 border border-red-200"
-                : "bg-blue-50 text-blue-800 border border-blue-200"
+                ? "bg-red-50 text-red-800 border-red-300"
+                : "bg-blue-50 text-blue-800 border-blue-300"
             }`}
           >
-            <div className="whitespace-pre-line">{message}</div>
+            <div className="whitespace-pre-line leading-relaxed">{message}</div>
             {message.includes("Trial") && (
               <a
                 href="https://console.twilio.com/us1/develop/phone-numbers/manage/verified"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                className="inline-block mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors shadow-sm hover:shadow"
               >
-                Verify Number in Twilio →
+                🔗 Verify Number in Twilio
               </a>
             )}
           </div>
