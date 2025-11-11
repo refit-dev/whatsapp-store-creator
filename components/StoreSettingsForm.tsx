@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { PaymentSettings } from "./PaymentSettings";
+import { DeliverySettings } from "./DeliverySettings";
 import MobileVerification from "./MobileVerification";
 import { ImageUpload } from "./ImageUpload";
 import type { Store } from "@/types/interfaces";
@@ -374,6 +375,16 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
             paytm_number: store.paytm_number || undefined,
             payment_instructions: store.payment_instructions || undefined,
           }}
+        />
+      )}
+
+      {/* Delivery Settings - Only show for existing stores */}
+      {store && (
+        <DeliverySettings
+          storeId={store.id}
+          initialEnabled={store.delivery_enabled || false}
+          initialType={store.delivery_type || "none"}
+          initialSlots={store.delivery_slots || []}
         />
       )}
     </div>

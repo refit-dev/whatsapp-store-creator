@@ -30,6 +30,11 @@ export interface Store extends Row<"stores"> {
   upi_id?: string;
   paytm_number?: string;
   payment_instructions?: string;
+  // Delivery scheduling fields
+  delivery_enabled?: boolean;
+  delivery_type?: string;
+  delivery_slots?: string[];
+  monthly_target_cents?: number;
 }
 
 export interface Order extends Row<"orders"> {

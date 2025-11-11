@@ -22,6 +22,12 @@ interface PaymentConfig {
   payment_instructions?: string;
 }
 
+interface DeliveryConfig {
+  delivery_enabled: boolean;
+  delivery_type: string;
+  delivery_slots: string[];
+}
+
 export function UnifiedCheckout({
   storeId,
   storeName,
@@ -35,12 +41,18 @@ export function UnifiedCheckout({
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(
     null
   );
+  const [deliveryConfig, setDeliveryConfig] = useState<DeliveryConfig | null>(
+    null
+  );
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phone: "",
     email: "",
     address: "",
     specialInstructions: "",
+    deliverySlot: "",
+    deliveryDay: "",
+    deliveryTime: "",
   });
 
   const [paymentMethod, setPaymentMethod] = useState<
@@ -53,29 +65,122 @@ export function UnifiedCheckout({
 
   const supabase = supabaseBrowser();
 
-  // Load payment configuration
+  // Load payment and delivery configuration
   useEffect(() => {
-    const loadPaymentConfig = async () => {
+    const loadConfigs = async () => {
       const { data, error } = await supabase
         .from("stores")
         .select(
-          "payment_enabled, payment_method, upi_id, paytm_number, payment_instructions"
+          "payment_enabled, payment_method, upi_id, paytm_number, payment_instructions, delivery_enabled, delivery_type, delivery_slots"
         )
         .eq("id", storeId)
         .single();
 
       if (!error && data) {
-        setPaymentConfig(data);
-        // Only enable online payment if properly configured with payment details
-        if (data.payment_enabled && (data.upi_id || data.paytm_number)) {
-          // Don't auto-select, let user choose
-          // setPaymentMethod("online");
+        setPaymentConfig({
+          payment_enabled: data.payment_enabled,
+          payment_method: data.payment_method,
+          upi_id: data.upi_id,
+          paytm_number: data.paytm_number,
+          payment_instructions: data.payment_instructions,
+        });
+
+        // Parse delivery_slots if it's a string (JSONB from database)
+        let parsedSlots = data.delivery_slots || [];
+        if (typeof data.delivery_slots === "string") {
+          try {
+            parsedSlots = JSON.parse(data.delivery_slots);
+          } catch (e) {
+            console.error("Error parsing delivery_slots:", e);
+            parsedSlots = [];
+          }
         }
+
+        // Auto-migrate mixed old data to day_and_time format
+        let finalType = data.delivery_type || "none";
+        let finalSlots = Array.isArray(parsedSlots) ? parsedSlots : [];
+
+        if (finalSlots.length > 0 && !finalSlots[0]?.includes("|")) {
+          // Check if we have mixed days and time slots (old format)
+          const days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ];
+          const hasDays = finalSlots.some((slot) => days.includes(slot));
+          const hasTimeSlots = finalSlots.some(
+            (slot) =>
+              slot.includes("AM") || slot.includes("PM") || slot.includes("-")
+          );
+
+          if (hasDays && hasTimeSlots) {
+            // Mixed data detected - separate and convert to day_and_time format
+            const daySlots = finalSlots.filter((slot) => days.includes(slot));
+            const timeSlots = finalSlots.filter(
+              (slot) =>
+                slot.includes("AM") || slot.includes("PM") || slot.includes("-")
+            );
+
+            // Create combinations
+            finalSlots = daySlots.flatMap((day) =>
+              timeSlots.map((time) => `${day}|${time}`)
+            );
+            finalType = "day_and_time";
+
+            console.log("🔄 Auto-migrated mixed data:", {
+              daySlots,
+              timeSlots,
+              combinations: finalSlots.length,
+            });
+          }
+        }
+
+        setDeliveryConfig({
+          delivery_enabled: data.delivery_enabled || false,
+          delivery_type: finalType,
+          delivery_slots: finalSlots,
+        });
+
+        // Debug log
+        console.log("Delivery Config Loaded:", {
+          enabled: data.delivery_enabled,
+          type: finalType,
+          slots: finalSlots,
+        });
       }
     };
 
-    loadPaymentConfig();
+    loadConfigs();
   }, [storeId, supabase]);
+
+  // Helper to combine delivery slot info with notes
+  const getOrderNotes = () => {
+    let notes = "";
+
+    if (deliveryConfig?.delivery_type === "day_and_time") {
+      // Separate day and time dropdowns
+      if (customerInfo.deliveryDay && customerInfo.deliveryTime) {
+        notes += `Delivery: ${customerInfo.deliveryDay}, ${customerInfo.deliveryTime}\n\n`;
+      }
+    } else if (customerInfo.deliverySlot) {
+      // Single dropdown for days or time_slots
+      const label =
+        deliveryConfig?.delivery_type === "days"
+          ? "Delivery Day"
+          : "Delivery Time";
+      notes += `${label}: ${customerInfo.deliverySlot}\n\n`;
+    }
+
+    if (customerInfo.specialInstructions) {
+      notes += customerInfo.specialInstructions;
+    }
+
+    return notes.trim();
+  };
 
   const handlePayNow = async () => {
     if (!customerInfo.name || !customerInfo.phone) {
@@ -92,6 +197,23 @@ export function UnifiedCheckout({
 
     if (!customerInfo.address) {
       alert("Please provide a delivery address");
+      return;
+    }
+
+    // Check delivery slot if required
+    if (
+      deliveryConfig?.delivery_enabled &&
+      deliveryConfig.delivery_type !== "immediate" &&
+      deliveryConfig.delivery_slots.length > 0 &&
+      !customerInfo.deliverySlot
+    ) {
+      alert(
+        `Please select a ${
+          deliveryConfig.delivery_type === "days"
+            ? "delivery day"
+            : "delivery time slot"
+        }`
+      );
       return;
     }
 
@@ -113,7 +235,7 @@ export function UnifiedCheckout({
             name: customerInfo.name,
             phone: customerInfo.phone,
             address: customerInfo.address,
-            notes: customerInfo.specialInstructions,
+            notes: getOrderNotes(),
           },
           items: items.map((item) => ({
             productId: item.id,
@@ -156,7 +278,7 @@ export function UnifiedCheckout({
             name: customerInfo.name,
             phone: customerInfo.phone,
             address: customerInfo.address,
-            notes: customerInfo.specialInstructions,
+            notes: getOrderNotes(),
           },
           currency,
           paymentMethod: "online",
@@ -214,6 +336,24 @@ export function UnifiedCheckout({
     setIsLoading(true);
 
     try {
+      // Check delivery slot if required
+      if (
+        deliveryConfig?.delivery_enabled &&
+        deliveryConfig.delivery_type !== "immediate" &&
+        deliveryConfig.delivery_slots.length > 0 &&
+        !customerInfo.deliverySlot
+      ) {
+        alert(
+          `Please select a ${
+            deliveryConfig.delivery_type === "days"
+              ? "delivery day"
+              : "delivery time slot"
+          }`
+        );
+        setIsLoading(false);
+        return;
+      }
+
       // Create order with WhatsApp payment method
       const orderRes = await fetch("/api/orders", {
         method: "POST",
@@ -224,7 +364,7 @@ export function UnifiedCheckout({
             name: customerInfo.name,
             phone: customerInfo.phone,
             address: customerInfo.address,
-            notes: customerInfo.specialInstructions,
+            notes: getOrderNotes(),
           },
           items: items.map((item) => ({
             productId: item.id,
@@ -265,7 +405,7 @@ export function UnifiedCheckout({
           name: customerInfo.name,
           phone: customerInfo.phone,
           address: customerInfo.address,
-          notes: customerInfo.specialInstructions,
+          notes: getOrderNotes(),
         },
         paymentLink: undefined, // No payment link for WhatsApp orders
         currency: currency,
@@ -542,6 +682,142 @@ export function UnifiedCheckout({
           />
         </div>
 
+        {/* Delivery Slot Selection */}
+        {deliveryConfig?.delivery_enabled ? (
+          deliveryConfig.delivery_type !== "immediate" &&
+          deliveryConfig.delivery_slots.length > 0 ? (
+            <div className="space-y-4">
+              {deliveryConfig.delivery_type === "day_and_time" ? (
+                // Two Separate Dropdowns: Day AND Time
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Preferred Delivery Day *
+                    </label>
+                    <select
+                      value={customerInfo.deliveryDay}
+                      onChange={(e) =>
+                        setCustomerInfo((prev) => ({
+                          ...prev,
+                          deliveryDay: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
+                      required
+                    >
+                      <option value="">-- Select Day --</option>
+                      {(() => {
+                        // Extract unique days from "Monday|9AM-12PM" format
+                        const days = new Set<string>();
+                        deliveryConfig.delivery_slots.forEach((slot) => {
+                          const [day] = slot.split("|");
+                          if (day) days.add(day);
+                        });
+                        return Array.from(days).map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ));
+                      })()}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Preferred Delivery Time *
+                    </label>
+                    <select
+                      value={customerInfo.deliveryTime}
+                      onChange={(e) =>
+                        setCustomerInfo((prev) => ({
+                          ...prev,
+                          deliveryTime: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
+                      required
+                    >
+                      <option value="">-- Select Time --</option>
+                      {(() => {
+                        // Extract unique times from "Monday|9AM-12PM" format
+                        const times = new Set<string>();
+                        deliveryConfig.delivery_slots.forEach((slot) => {
+                          const [, time] = slot.split("|");
+                          if (time) times.add(time);
+                        });
+                        return Array.from(times).map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ));
+                      })()}
+                    </select>
+                  </div>
+                </>
+              ) : deliveryConfig.delivery_type === "days" ? (
+                // Only Day Selection
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Delivery Day *
+                  </label>
+                  <select
+                    value={customerInfo.deliverySlot}
+                    onChange={(e) =>
+                      setCustomerInfo((prev) => ({
+                        ...prev,
+                        deliverySlot: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
+                    required
+                  >
+                    <option value="">-- Select Day --</option>
+                    {deliveryConfig.delivery_slots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                // Time Slots Selection
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Delivery Time *
+                  </label>
+                  <select
+                    value={customerInfo.deliverySlot}
+                    onChange={(e) =>
+                      setCustomerInfo((prev) => ({
+                        ...prev,
+                        deliverySlot: e.target.value,
+                      }))
+                    }
+                    className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
+                    required
+                  >
+                    <option value="">-- Select Time Slot --</option>
+                    {deliveryConfig.delivery_slots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          ) : deliveryConfig.delivery_type === "immediate" ? (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-green-800">
+                <span className="text-xl">⚡</span>
+                <p className="text-sm font-medium">
+                  Immediate Delivery - Your order will be delivered ASAP!
+                </p>
+              </div>
+            </div>
+          ) : null
+        ) : null}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Special Instructions (Optional)
@@ -556,7 +832,7 @@ export function UnifiedCheckout({
             }
             rows={2}
             className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base resize-none"
-            placeholder="Any special requests..."
+            placeholder="Any special requests or delivery instructions..."
           />
         </div>
       </div>

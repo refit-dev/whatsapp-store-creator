@@ -13,7 +13,7 @@ export default async function CheckoutPage({
   const { data: store, error: storeError } = await supabase
     .from("stores")
     .select(
-      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_payments_enabled"
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_payments_enabled, delivery_enabled, delivery_type, delivery_slots"
     )
     .eq("handle", params.handle)
     .single();
