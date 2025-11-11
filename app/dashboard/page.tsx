@@ -206,7 +206,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-4">
             <StatsCard
               title="Total Orders"
               value={orders.length.toString()}
@@ -244,6 +244,19 @@ export default async function DashboardPage() {
               icon="📊"
               color="orange"
             />
+          </div>
+
+          {/* Conversion Rate Info */}
+          <div className="bg-blue-50 rounded-lg p-3 mb-6">
+            <p className="text-xs text-gray-600 leading-relaxed">
+              <span className="font-semibold text-gray-700">
+                Conversion Rate:
+              </span>{" "}
+              Percentage of orders that are paid.{" "}
+              <span className="text-gray-500">
+                Formula: (Paid Orders ÷ Total Orders) × 100
+              </span>
+            </p>
           </div>
 
           {/* Quick Links */}
