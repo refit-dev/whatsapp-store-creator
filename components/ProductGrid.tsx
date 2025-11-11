@@ -16,7 +16,7 @@ export function ProductGrid({
   }>;
   currency: string;
 }) {
-  const { addItem, items } = useCart();
+  const { addItem, items, storeHandle } = useCart();
 
   const handleAddToCart = (product: any) => {
     console.log("Adding to cart:", product.title);
@@ -24,6 +24,7 @@ export function ProductGrid({
       id: product.id,
       title: product.title,
       priceCents: product.price_cents,
+      storeHandle: storeHandle,
     });
   };
 
