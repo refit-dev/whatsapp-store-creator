@@ -103,23 +103,41 @@ export function UnifiedCheckout({
       const totalAmount = subtotalCents || 0;
       const isZeroValueOrder = totalAmount === 0;
 
-      // Create order with online payment method
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          store_id: storeId,
-          buyer_name: customerInfo.name,
-          buyer_phone: customerInfo.phone,
-          buyer_address: customerInfo.address,
-          items: items,
-          subtotal_cents: totalAmount,
-          total_cents: totalAmount,
-          status: isZeroValueOrder ? "paid" : "created", // Mark ₹0 orders as paid immediately
-        })
-        .select()
-        .single();
+      // Create order with online payment method via API (to trigger inventory reduction)
+      const orderRes = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeHandle: storeHandle,
+          buyer: {
+            name: customerInfo.name,
+            phone: customerInfo.phone,
+            address: customerInfo.address,
+            notes: customerInfo.specialInstructions,
+          },
+          items: items.map((item) => ({
+            productId: item.id,
+            title: item.title,
+            priceCents: item.priceCents,
+            qty: item.qty,
+          })),
+          paymentMethod: "online",
+        }),
+      });
 
-      if (orderError) throw orderError;
+      if (!orderRes.ok) {
+        const errorData = await orderRes.json();
+        throw new Error(errorData.error || "Failed to create order");
+      }
+      const order = await orderRes.json();
+
+      // Update status to paid if it's a zero value order
+      if (isZeroValueOrder) {
+        await supabase
+          .from("orders")
+          .update({ status: "paid" })
+          .eq("id", order.id);
+      }
 
       setOrderId(order.id);
       setOrderPlaced(true);
@@ -218,7 +236,10 @@ export function UnifiedCheckout({
         }),
       });
 
-      if (!orderRes.ok) throw new Error("Failed to create order");
+      if (!orderRes.ok) {
+        const errorData = await orderRes.json();
+        throw new Error(errorData.error || "Failed to create order");
+      }
       const order = await orderRes.json();
 
       // Mark order as opened and redirect to WhatsApp
@@ -264,9 +285,9 @@ export function UnifiedCheckout({
           );
         }, 500);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("WhatsApp order error:", error);
-      alert("Failed to send order. Please try again.");
+      alert(error.message || "Failed to send order. Please try again.");
     } finally {
       setIsLoading(false);
     }

@@ -33,14 +33,27 @@ export async function POST(req: Request) {
         return new NextResponse("Bad Request", { status: 400 });
       }
 
-      const supabase = createServerClient();
+      const supabase = createServerClient(true); // Use service role
 
-      await supabase
+      // Get order details before updating
+      const { data: order } = await supabase
         .from("orders")
-        .update({
-          status: "paid",
-        } as Database["public"]["Tables"]["orders"]["Update"])
-        .eq("id", orderId);
+        .select("id, status")
+        .eq("id", orderId)
+        .single();
+
+      if (order && order.status !== "paid") {
+        // Update order status
+        // Note: Inventory is already reduced when order is created
+        await supabase
+          .from("orders")
+          .update({
+            status: "paid",
+          } as Database["public"]["Tables"]["orders"]["Update"])
+          .eq("id", orderId);
+
+        console.log("✅ Order marked as paid:", orderId);
+      }
     }
 
     return NextResponse.json({ ok: true });

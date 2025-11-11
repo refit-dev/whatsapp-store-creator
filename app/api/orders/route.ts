@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createServerClient } from "@/lib/db";
+import { checkStockAvailability, reduceInventory } from "@/lib/inventory";
 import type { Database } from "@/types/supabase";
 
 const orderSchema = z.object({
@@ -18,6 +19,7 @@ const orderSchema = z.object({
       qty: z.number(),
     })
   ),
+  paymentMethod: z.string().optional(),
 });
 
 export async function POST(req: Request) {
@@ -45,6 +47,12 @@ export async function POST(req: Request) {
       return new NextResponse("Store not found", { status: 404 });
     }
 
+    // Check stock availability before creating order
+    const stockCheck = await checkStockAvailability(order.items);
+    if (!stockCheck.success) {
+      return NextResponse.json({ error: stockCheck.message }, { status: 400 });
+    }
+
     // Calculate totals
     const subtotalCents = order.items.reduce(
       (sum, item) => sum + item.priceCents * item.qty,
@@ -68,6 +76,19 @@ export async function POST(req: Request) {
       .single();
 
     if (error) throw error;
+
+    // Reduce inventory immediately for ALL orders
+    // Both WhatsApp and Online payment orders reduce stock when order is placed
+    // (Online payments go directly to seller, buyer shares screenshot)
+    console.log(
+      `📦 Reducing inventory for ${order.paymentMethod || "direct"} order:`,
+      newOrder.id
+    );
+    const inventoryResult = await reduceInventory(order.items);
+    if (!inventoryResult.success) {
+      console.error("⚠️ Inventory reduction failed:", inventoryResult.message);
+      // Don't fail the order, just log the error
+    }
 
     return NextResponse.json(newOrder);
   } catch (e) {
