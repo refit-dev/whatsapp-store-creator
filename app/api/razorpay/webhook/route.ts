@@ -28,6 +28,34 @@ export async function POST(req: Request) {
       console.log("✅ Order marked as paid:", orderId);
     }
 
+    // Check if this is a subscription payment event
+    const event = body.event;
+    if (
+      event === "subscription.charged" ||
+      event === "subscription.authenticated"
+    ) {
+      const subscriptionEntity = body.payload.subscription?.entity;
+      const paymentEntity = body.payload.payment?.entity;
+
+      if (subscriptionEntity && paymentEntity) {
+        const userId = subscriptionEntity.notes?.user_id;
+
+        if (userId) {
+          // Process referral reward if user was referred
+          const { data: rewardProcessed, error: rewardError } =
+            await supabase.rpc("process_referral_reward", {
+              referred_user_uuid: userId,
+            });
+
+          if (rewardError) {
+            console.error("Error processing referral reward:", rewardError);
+          } else if (rewardProcessed) {
+            console.log("✅ Referral reward granted for user:", userId);
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error(e);

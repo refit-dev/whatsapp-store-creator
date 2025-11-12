@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user's referral count
+    // Get user's referral count (only count those where reward was granted)
     const { data: referrals, error: referralError } = await supabase
       .from("referrals")
-      .select("id, created_at")
+      .select("id, created_at, reward_granted, payment_verified")
       .eq("referrer_id", user.id);
 
     if (referralError) {
@@ -39,22 +39,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const referralCount = referrals?.length || 0;
-    const maxReferrals = 6;
-    const remainingReferrals = Math.max(0, maxReferrals - referralCount);
-    const hasReachedLimit = referralCount >= maxReferrals;
+    const referralCount =
+      referrals?.filter((r) => r.reward_granted).length || 0;
+    const pendingReferrals =
+      referrals?.filter((r) => !r.payment_verified).length || 0;
+    const maxReferrals = 999; // No practical limit
+    const remainingReferrals = 999; // Unlimited
+    const hasReachedLimit = false; // No limit
 
-    // Calculate total free months earned
+    // Calculate total free months earned (only granted rewards)
     const freeMonthsEarned = referralCount;
-    const maxFreeMonths = 6;
 
     return NextResponse.json({
       referralCount,
+      pendingReferrals,
       maxReferrals,
       remainingReferrals,
       hasReachedLimit,
       freeMonthsEarned,
-      maxFreeMonths,
+      unlimited: true,
       referralHistory: referrals || [],
     });
   } catch (error) {

@@ -95,6 +95,21 @@ export async function POST(req: Request) {
       );
     }
 
+    // Process referral reward if user was referred
+    const { data: rewardProcessed, error: rewardError } = await supabase.rpc(
+      "process_referral_reward",
+      {
+        referred_user_uuid: user.id,
+      }
+    );
+
+    if (rewardError) {
+      console.error("Error processing referral reward:", rewardError);
+      // Don't fail the payment verification, just log the error
+    } else if (rewardProcessed) {
+      console.log("✅ Referral reward granted for user:", user.id);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Payment verified and subscription activated",

@@ -70,38 +70,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check referrer's current referral count (6-month limit)
-    const { data: referrerReferrals, error: countError } = await supabase
-      .from("referrals")
-      .select("id")
-      .eq("referrer_id", referrerId);
-
-    if (countError) {
-      return NextResponse.json(
-        { error: "Error checking referral limit" },
-        { status: 500 }
-      );
-    }
-
-    const referralCount = referrerReferrals?.length || 0;
-
-    if (referralCount >= 6) {
-      return NextResponse.json(
-        {
-          error: "Referrer has reached maximum referral limit (6 months free)",
-          canStillSignUp: true,
-        },
-        { status: 400 }
-      );
-    }
-
-    // Start transaction to create referral and extend subscription
+    // Create referral record (reward will be granted when referred user pays)
     const { data: referralResult, error: createReferralError } = await supabase
       .from("referrals")
       .insert({
         referrer_id: referrerId,
         referred_id: user.id,
-        referral_code_id: null, // We'll update this if needed
+        referral_code_id: null,
+        reward_granted: false,
+        payment_verified: false,
       })
       .select()
       .single();
@@ -113,40 +90,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extend referrer's subscription using the database function
-    const { data: extensionResult, error: extensionError } = await supabase.rpc(
-      "extend_subscription",
-      {
-        user_uuid: referrerId,
-        days: 30,
-      }
-    );
-
-    if (extensionError) {
-      // If extension fails, remove the referral record
-      await supabase.from("referrals").delete().eq("id", referralResult.id);
-
-      return NextResponse.json(
-        { error: "Failed to extend referrer subscription" },
-        { status: 500 }
-      );
-    }
-
-    // Check if extension was successful (function returns boolean)
-    if (!extensionResult) {
-      // Extension was limited due to 6-month cap
-      return NextResponse.json({
-        success: true,
-        message:
-          "Referral processed successfully. Referrer has reached the 6-month free limit.",
-        limitReached: true,
-      });
-    }
-
     return NextResponse.json({
       success: true,
       message:
-        "Referral processed successfully! Referrer received 1 month free.",
+        "Referral processed successfully! Referrer will receive 1 month free when you complete your first payment.",
       limitReached: false,
     });
   } catch (error) {

@@ -47,8 +47,8 @@ export function SubscriptionProvider({
   );
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
-  const [maxReferrals] = useState(6); // Maximum 6 months free through referrals
-  const [remainingReferrals, setRemainingReferrals] = useState(6);
+  const [maxReferrals] = useState(999); // No practical limit - unlimited referrals
+  const [remainingReferrals, setRemainingReferrals] = useState(999);
   const [hasReachedReferralLimit, setHasReachedReferralLimit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [lastFetch, setLastFetch] = useState<number>(0);
@@ -128,15 +128,16 @@ export function SubscriptionProvider({
 
       setReferralCode(referralCodes?.[0]?.code || null);
 
-      // Get referral count
+      // Get referral count (only count those where payment was verified and reward granted)
       const { data: referrals } = await sb
         .from("referrals")
         .select("id")
-        .eq("referrer_id", user.id);
+        .eq("referrer_id", user.id)
+        .eq("reward_granted", true);
 
       const currentReferralCount = referrals?.length || 0;
-      const remaining = Math.max(0, maxReferrals - currentReferralCount);
-      const limitReached = currentReferralCount >= maxReferrals;
+      const remaining = 999; // Unlimited
+      const limitReached = false; // No limit
 
       setReferralCount(currentReferralCount);
       setRemainingReferrals(remaining);

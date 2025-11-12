@@ -45,16 +45,9 @@ export function ReferralBanner() {
 
     const baseMessage = `🚀 Start your FREE WhatsApp Store today!\n\n✅ 14 days completely FREE\n✅ Create unlimited products\n✅ Take orders via WhatsApp\n✅ Professional dashboard\n\nUse my referral link to get started! 🎁\n\n${referralUrl}\n\n#WhatsAppBusiness #OnlineStore #Entrepreneur`;
 
-    const limitMessage = hasReachedReferralLimit
-      ? `\n\n(I've already earned my max free months, but you'll still get your 14-day trial!)`
-      : `\n\nUse my referral link and we both get an extra month FREE! 🎁`;
+    const limitMessage = `\n\nWhen you upgrade to a paid plan, I get 1 month FREE! Help us both grow! 🚀`;
 
-    const message = baseMessage.replace(
-      "Use my referral link to get started! 🎁",
-      hasReachedReferralLimit
-        ? "Use my referral link to get started! 🎁" + limitMessage
-        : "Use my referral link and we both get an extra month FREE! 🎁"
-    );
+    const message = baseMessage + limitMessage;
 
     await navigator.clipboard.writeText(message);
     setShowCopied(true);
@@ -73,8 +66,7 @@ export function ReferralBanner() {
           <div>
             <h3 className="font-bold text-lg">Get FREE Months!</h3>
             <p className="text-sm text-green-100">
-              {referralCount}/{maxReferrals} referrals • {remainingReferrals}{" "}
-              months remaining
+              Earn 1 month free for each paid referral • Unlimited!
             </p>
           </div>
         </div>
@@ -109,17 +101,12 @@ export function ReferralBanner() {
         <div className="px-4 pb-4 border-t border-white/20">
           <div className="pt-4">
             <p className="text-green-100 mb-4">
-              Share your referral link and get <strong>1 month FREE</strong> for
-              each friend who signs up!
+              Share your referral link and get <strong>1 month FREE</strong>{" "}
+              when your friend upgrades to a paid plan! Unlimited referrals
+              possible.
               {status === "trial" && (
                 <span className="block mt-1 text-yellow-200">
                   ⏰ You have {daysRemaining} days left in your free trial
-                </span>
-              )}
-              {hasReachedReferralLimit && (
-                <span className="block mt-1 text-orange-200 font-semibold">
-                  ℹ️ You've earned the maximum 6 months free! You can still
-                  share your code to help friends get started.
                 </span>
               )}
             </p>
@@ -168,20 +155,13 @@ export function ReferralBanner() {
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🎉</span>
                   <span className="font-semibold">
-                    {referralCount} successful referral
+                    {referralCount} successful paid referral
                     {referralCount !== 1 ? "s" : ""}!
                   </span>
-                  {hasReachedReferralLimit && (
-                    <span className="text-green-200 text-sm ml-2">
-                      (You're awesome! 🌟)
-                    </span>
-                  )}
                 </div>
                 <div className="text-sm opacity-90 mt-1">
-                  Earned: {referralCount} free months
-                  {!hasReachedReferralLimit &&
-                    ` • Remaining: ${remainingReferrals} months`}
-                  {hasReachedReferralLimit && " • Keep sharing to help others!"}
+                  Earned: {referralCount} free month
+                  {referralCount !== 1 ? "s" : ""}• Keep sharing to earn more!
                 </div>
               </div>
             )}

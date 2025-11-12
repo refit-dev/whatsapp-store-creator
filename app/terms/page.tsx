@@ -134,8 +134,8 @@ export default function TermsAndConditions() {
                 <li>Subscriptions automatically renew unless cancelled</li>
                 <li>You may cancel your subscription at any time</li>
                 <li>
-                  Referral programs may provide additional free months as
-                  specified
+                  Referral program: Earn 1 free month when a referred user
+                  upgrades to a paid plan (unlimited referrals)
                 </li>
               </ul>
             </section>
