@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the automatic 30-day trial system implemented for the WhatsApp Store Creator platform. The system ensures that all new users automatically receive a 30-day free trial upon signup, with access restrictions enforced after trial expiration.
+This document describes the automatic 14-day trial system implemented for the WhatsApp Store Creator platform. The system ensures that all new users automatically receive a 14-day free trial upon signup, with access restrictions enforced after trial expiration.
 
 ## Architecture
 
@@ -103,7 +103,7 @@ These pages remain accessible to expired users:
 
 ### Required Functions
 
-- `give_free_trial(user_uuid)`: RPC function that creates 30-day trial subscription
+- `give_free_trial(user_uuid)`: RPC function that creates 14-day trial subscription
 
 ### Sample Subscription Record
 
@@ -124,7 +124,7 @@ These pages remain accessible to expired users:
 
 ### Trial Duration
 
-- Default: 30 days from signup
+- Default: 14 days from signup
 - Configured in `give_free_trial` database function
 
 ### Access Control Settings

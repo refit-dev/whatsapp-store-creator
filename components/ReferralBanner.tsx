@@ -43,10 +43,10 @@ export function ReferralBanner() {
 
     const referralUrl = `${window.location.origin}?ref=${referralCode}`;
 
-    const baseMessage = `🚀 Start your FREE WhatsApp Store today!\n\n✅ 30 days completely FREE\n✅ Create unlimited products\n✅ Take orders via WhatsApp\n✅ Professional dashboard\n\nUse my referral link to get started! 🎁\n\n${referralUrl}\n\n#WhatsAppBusiness #OnlineStore #Entrepreneur`;
+    const baseMessage = `🚀 Start your FREE WhatsApp Store today!\n\n✅ 14 days completely FREE\n✅ Create unlimited products\n✅ Take orders via WhatsApp\n✅ Professional dashboard\n\nUse my referral link to get started! 🎁\n\n${referralUrl}\n\n#WhatsAppBusiness #OnlineStore #Entrepreneur`;
 
     const limitMessage = hasReachedReferralLimit
-      ? `\n\n(I've already earned my max free months, but you'll still get your 30-day trial!)`
+      ? `\n\n(I've already earned my max free months, but you'll still get your 14-day trial!)`
       : `\n\nUse my referral link and we both get an extra month FREE! 🎁`;
 
     const message = baseMessage.replace(

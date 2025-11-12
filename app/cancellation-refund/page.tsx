@@ -99,7 +99,7 @@ export default function CancellationRefundPage() {
                 <p>For watzy platform subscription fees:</p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>
-                    <strong>Free Trial:</strong> No charges during the 30-day
+                    <strong>Free Trial:</strong> No charges during the 14-day
                     free trial period
                   </li>
                   <li>

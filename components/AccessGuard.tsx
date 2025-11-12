@@ -69,7 +69,7 @@ export function AccessGuard({
             Trial Expired
           </h2>
           <p className="text-gray-600 mb-6">
-            Your 30-day free trial has ended. Upgrade to Pro to continue
+            Your 14-day free trial has ended. Upgrade to Pro to continue
             accessing your dashboard and managing your store.
           </p>
           <button

@@ -123,7 +123,7 @@ export default function TermsAndConditions() {
                 5. Subscription and Payments
               </h2>
               <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>New users receive a 30-day free trial</li>
+                <li>New users receive a 14-day free trial</li>
                 <li>
                   After the trial period, continued use requires a monthly
                   subscription of ₹259

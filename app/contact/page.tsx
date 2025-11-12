@@ -412,7 +412,7 @@ export default function ContactUs() {
                   How does the free trial work?
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  You get 30 days completely free when you sign up. No credit
+                  You get 14 days completely free when you sign up. No credit
                   card required. After the trial, it's ₹259/month.
                 </p>
               </div>

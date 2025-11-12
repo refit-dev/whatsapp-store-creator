@@ -227,7 +227,7 @@ export function BillingClient() {
                 <div className="text-3xl font-bold text-green-600 mt-2">
                   {currency === "USD" ? "$0" : "₹0"}
                 </div>
-                <div className="text-gray-600">for 30 days</div>
+                <div className="text-gray-600">for 14 days</div>
               </div>
 
               <ul className="space-y-3 mb-6">

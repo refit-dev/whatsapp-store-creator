@@ -58,7 +58,7 @@ export function SubscriptionStatus() {
               Start Your Free Trial
             </h3>
             <p className="text-blue-700 text-sm">
-              Get 30 days free access to all features
+              Get 14 days free access to all features
             </p>
           </div>
           <button
