@@ -118,6 +118,15 @@ export async function POST(request: NextRequest) {
           isActive = status === "true" || status === "yes" || status === "1";
         }
 
+        // Parse image URLs (support comma-separated URLs)
+        let imageUrls: string[] = [];
+        if (row["Image URL"]) {
+          imageUrls = row["Image URL"]
+            .split(",")
+            .map((url: string) => url.trim())
+            .filter((url: string) => url.length > 0);
+        }
+
         // Prepare product data
         const productData = {
           store_id: storeId,
@@ -128,7 +137,7 @@ export async function POST(request: NextRequest) {
           stock_qty: row["Stock Quantity"]
             ? parseInt(row["Stock Quantity"])
             : null,
-          image_urls: row["Image URL"] ? [row["Image URL"]] : [],
+          image_urls: imageUrls,
           is_active: isActive,
         };
 

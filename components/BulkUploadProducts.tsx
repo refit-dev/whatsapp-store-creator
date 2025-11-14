@@ -692,7 +692,20 @@ export function BulkUploadProducts({
                               </div>
                             </li>
                           </ul>
-                          <div className="mt-3 p-2 bg-amber-100 rounded border border-amber-300">
+                          <div className="mt-3 p-3 bg-blue-50 rounded border border-blue-300">
+                            <p className="text-xs text-blue-900 font-medium mb-1">
+                              ✨ Multiple Images Per Product
+                            </p>
+                            <p className="text-xs text-blue-800">
+                              To add multiple images for a product, separate
+                              URLs with commas:
+                              <br />
+                              <code className="bg-white px-1 py-0.5 rounded text-xs">
+                                &quot;https://example.com/image1.jpg,https://example.com/image2.jpg&quot;
+                              </code>
+                            </p>
+                          </div>
+                          <div className="mt-2 p-2 bg-amber-100 rounded border border-amber-300">
                             <p className="text-xs text-amber-900 font-medium">
                               ⚠️ Important: Make sure your image links are
                               PUBLIC and accessible to anyone!

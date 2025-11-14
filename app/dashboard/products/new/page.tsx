@@ -3,7 +3,8 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { getUser } from "@/lib/auth";
 import type { Database } from "@/types/supabase";
-import { ProductForm } from "@/components/ProductForm";
+import { ProductFormWithUpload } from "@/components/ProductFormWithUpload";
+import Link from "next/link";
 
 export default async function NewProductPage() {
   const user = await getUser();
@@ -12,16 +13,18 @@ export default async function NewProductPage() {
   }
 
   const cookieStore = cookies();
-  const supabase = createServerComponentClient<Database>({ cookies: () => cookieStore });
-  
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  });
+
   const { data: stores } = await supabase
-    .from('stores')
-    .select('*')
-    .eq('owner_id', user.id)
+    .from("stores")
+    .select("*")
+    .eq("owner_id", user.id)
     .limit(1);
 
   const store = stores?.[0];
-  
+
   if (!store) {
     redirect("/dashboard");
   }
@@ -29,13 +32,39 @@ export default async function NewProductPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <Link
+          href="/dashboard/products"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Products
+        </Link>
+
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Product</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Add New Product
+            </h1>
             <p className="text-gray-600">Add a new product to your store</p>
           </div>
 
-          <ProductForm storeId={store.id} currency={store.currency || 'USD'} />
+          <ProductFormWithUpload
+            storeId={store.id}
+            currency={store.currency || "USD"}
+          />
         </div>
       </div>
     </main>

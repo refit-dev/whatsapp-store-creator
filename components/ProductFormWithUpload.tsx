@@ -36,62 +36,96 @@ export function ProductFormWithUpload({
   const [stockQty, setStockQty] = useState(
     product?.stock_qty?.toString() || ""
   );
-  const [imageUrl, setImageUrl] = useState(product?.image_urls?.[0] || "");
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    product?.image_urls || []
+  );
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
 
   // Upload image to Vercel Blob Storage
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    // Validate file
-    if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
-      setMessage("Error: Image must be less than 5MB");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setMessage("Error: Please upload an image file");
-      return;
-    }
+    const uploadedUrls: string[] = [];
+    const errors: string[] = [];
 
     setUploading(true);
     setMessage("");
 
-    try {
-      // Create FormData for upload
-      const formData = new FormData();
-      formData.append("file", file);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-      // Upload to Vercel Blob via our API
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Upload failed");
+      // Validate file
+      if (file.size > 5 * 1024 * 1024) {
+        errors.push(`${file.name}: Image must be less than 5MB`);
+        continue;
       }
 
-      const data = await response.json();
-      setImageUrl(data.url);
-      setMessage("✓ Image uploaded successfully!");
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      if (error.message.includes("Blob storage not configured")) {
-        setMessage(
-          "⚠️ Image storage not configured. Please set up Vercel Blob in your environment variables."
-        );
-      } else {
-        setMessage(`Error uploading image: ${error.message}`);
+      if (!file.type.startsWith("image/")) {
+        errors.push(`${file.name}: Must be an image file`);
+        continue;
       }
-    } finally {
-      setUploading(false);
+
+      try {
+        // Create FormData for upload
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Upload to Vercel Blob via our API
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Upload failed");
+        }
+
+        const data = await response.json();
+        uploadedUrls.push(data.url);
+      } catch (error: any) {
+        console.error("Upload error:", error);
+        if (error.message.includes("Blob storage not configured")) {
+          errors.push(
+            "Image storage not configured. Please set up Vercel Blob."
+          );
+          break;
+        } else {
+          errors.push(`${file.name}: ${error.message}`);
+        }
+      }
     }
+
+    if (uploadedUrls.length > 0) {
+      setImageUrls([...imageUrls, ...uploadedUrls]);
+      setMessage(
+        `✓ ${uploadedUrls.length} image${
+          uploadedUrls.length !== 1 ? "s" : ""
+        } uploaded successfully!`
+      );
+    }
+
+    if (errors.length > 0) {
+      setMessage((prev) =>
+        prev
+          ? `${prev}\n⚠️ Errors: ${errors.join(", ")}`
+          : `⚠️ Errors: ${errors.join(", ")}`
+      );
+    }
+
+    setUploading(false);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    setImageUrls(imageUrls.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +139,7 @@ export function ProductFormWithUpload({
         description: description || null,
         price_cents: Math.round(parseFloat(price) * 100),
         currency,
-        image_urls: imageUrl ? [imageUrl] : [],
+        image_urls: imageUrls,
         is_active: isActive,
         stock_qty: stockQty ? parseInt(stockQty) : null,
         store_id: storeId,
@@ -224,17 +258,52 @@ export function ProductFormWithUpload({
       {/* Image Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Product Image
+          Product Images {imageUrls.length > 0 && `(${imageUrls.length})`}
         </label>
 
-        {/* Image Preview */}
-        {imageUrl && (
+        {/* Image Previews */}
+        {imageUrls.length > 0 && (
           <div className="mb-4">
-            <img
-              src={imageUrl}
-              alt="Product preview"
-              className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
-            />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {imageUrls.map((url, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Product ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                  {index === 0 && (
+                    <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                      Main
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Remove image"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              First image will be the main product image. Drag to reorder
+              (coming soon).
+            </p>
           </div>
         )}
 
@@ -246,6 +315,7 @@ export function ProductFormWithUpload({
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageUpload}
               className="hidden"
               disabled={uploading}
@@ -294,33 +364,12 @@ export function ProductFormWithUpload({
                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                     />
                   </svg>
-                  Upload Image
+                  {imageUrls.length > 0 ? "Add More Images" : "Upload Images"}
                 </span>
               )}
             </button>
             <p className="mt-2 text-xs text-gray-500">
-              JPG, PNG, WebP up to 5MB
-            </p>
-          </div>
-
-          {/* OR Divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-sm text-gray-500">OR</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
-          </div>
-
-          {/* URL Input */}
-          <div>
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="Paste image URL (optional)"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Or paste a direct link to your image
+              Select multiple images (JPG, PNG, WebP up to 5MB each)
             </p>
           </div>
         </div>
