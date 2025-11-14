@@ -1,0 +1,5 @@
+Product Name,Description,Price,Stock Quantity,Image URL,Active Status
+Chocolate Croissant,Freshly baked chocolate croissant with premium dark chocolate,3.99,50,https://example.com/croissant.jpg,TRUE
+Plain Croissant,Classic buttery croissant baked fresh daily,2.99,100,,TRUE
+Blueberry Muffin,Homemade blueberry muffin with real blueberries,2.50,75,https://example.com/muffin.jpg,TRUE
+Coffee Americano,Rich and bold coffee made from premium beans,4.50,,,TRUE

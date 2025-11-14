@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ProductsList } from "@/components/ProductsList";
 import { LogoutButton } from "@/components/LogoutButton";
 import { DashboardWrapper } from "@/components/DashboardWrapper";
+import { BulkUploadProducts } from "@/components/BulkUploadProducts";
 
 export default async function ProductsPage() {
   const user = await getUser();
@@ -52,13 +53,17 @@ export default async function ProductsPage() {
                   Manage your store inventory
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <Link
                   href="/dashboard"
                   className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
                 >
                   Back to Dashboard
                 </Link>
+                <BulkUploadProducts
+                  storeId={store.id}
+                  currency={store.currency || "USD"}
+                />
                 <Link
                   href="/dashboard/products/new"
                   className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"

@@ -172,7 +172,8 @@ export function DeliverySettings({
               Enable Delivery Scheduling
             </span>
             <p className="text-sm text-gray-600">
-              Let customers choose delivery time/day
+              Set your delivery days and time slots - customers pick their
+              preferred slot during checkout
             </p>
           </div>
         </label>
