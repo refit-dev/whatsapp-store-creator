@@ -35,13 +35,14 @@ export default async function StoreSettingsPage() {
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8">
             {/* Header */}
             <div className="mb-6 sm:mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              {/* Top Navigation Bar */}
+              <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-200">
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm sm:text-base"
+                  className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium group"
                 >
                   <svg
-                    className="w-4 h-4 mr-2"
+                    className="w-4 h-4 transition-transform group-hover:-translate-x-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -53,20 +54,23 @@ export default async function StoreSettingsPage() {
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  Back to Dashboard
+                  <span className="hidden sm:inline">Back to Dashboard</span>
+                  <span className="sm:hidden">Back</span>
                 </Link>
-                <div className="self-start sm:self-auto">
-                  <LogoutButton />
-                </div>
+                <LogoutButton />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                {store ? "⚙️ Store Settings" : "🚀 Create Your Store"}
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600">
-                {store
-                  ? "Manage your store details and settings"
-                  : "Set up your WhatsApp micro-store in minutes"}
-              </p>
+
+              {/* Page Title */}
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                  {store ? "⚙️ Store Settings" : "🚀 Create Your Store"}
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600">
+                  {store
+                    ? "Manage your store details and settings"
+                    : "Set up your WhatsApp micro-store in minutes"}
+                </p>
+              </div>
             </div>
 
             <StoreSettingsFormTabbed store={store} userId={user.id} />

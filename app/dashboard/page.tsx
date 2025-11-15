@@ -212,6 +212,7 @@ export default async function DashboardPage() {
               value={orders.length.toString()}
               icon="📦"
               color="blue"
+              href="/dashboard/orders"
             />
             <StatsCard
               title="Paid Orders"
@@ -220,6 +221,7 @@ export default async function DashboardPage() {
                 .length.toString()}
               icon="✅"
               color="green"
+              href="/dashboard/orders"
             />
             <StatsCard
               title="Total Revenue"
@@ -229,6 +231,7 @@ export default async function DashboardPage() {
               )}
               icon="💰"
               color="purple"
+              href="/dashboard/orders"
             />
             <StatsCard
               title="Conversion Rate"
@@ -243,6 +246,7 @@ export default async function DashboardPage() {
               }%`}
               icon="📊"
               color="orange"
+              href="/dashboard/orders"
             />
           </div>
 
@@ -381,11 +385,13 @@ function StatsCard({
   value,
   icon,
   color,
+  href,
 }: {
   title: string;
   value: string;
   icon: string;
   color: "blue" | "green" | "purple" | "orange";
+  href: string;
 }) {
   const colorClasses = {
     blue: "from-blue-500 to-blue-600",
@@ -395,15 +401,25 @@ function StatsCard({
   };
 
   return (
-    <div
-      className={`bg-gradient-to-br ${colorClasses[color]} rounded-xl shadow-md p-6 text-white`}
+    <Link
+      href={href}
+      className={`bg-gradient-to-br ${colorClasses[color]} rounded-xl shadow-md hover:shadow-xl p-6 text-white transition-all transform hover:scale-105 cursor-pointer group block`}
     >
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium opacity-90">{title}</h3>
-        <span className="text-2xl">{icon}</span>
+        <h3 className="text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
+          {title}
+        </h3>
+        <span className="text-2xl group-hover:scale-110 transition-transform">
+          {icon}
+        </span>
       </div>
-      <p className="text-3xl font-bold">{value}</p>
-    </div>
+      <p className="text-3xl font-bold group-hover:text-4xl transition-all">
+        {value}
+      </p>
+      <div className="mt-2 text-xs opacity-0 group-hover:opacity-90 transition-opacity">
+        Click to view details →
+      </div>
+    </Link>
   );
 }
 

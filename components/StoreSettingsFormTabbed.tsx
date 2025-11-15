@@ -13,11 +13,20 @@ interface StoreSettingsFormProps {
   userId: string;
 }
 
-type TabType = "basic" | "branding" | "status" | "verification" | "payment" | "delivery";
+type TabType =
+  | "basic"
+  | "branding"
+  | "status"
+  | "verification"
+  | "payment"
+  | "delivery";
 
-export function StoreSettingsFormTabbed({ store, userId }: StoreSettingsFormProps) {
+export function StoreSettingsFormTabbed({
+  store,
+  userId,
+}: StoreSettingsFormProps) {
   const sb = supabaseBrowser();
-  
+
   const [activeTab, setActiveTab] = useState<TabType>("basic");
   const [name, setName] = useState(store?.name || "");
   const [handle, setHandle] = useState(store?.handle || "");
@@ -104,10 +113,15 @@ export function StoreSettingsFormTabbed({ store, userId }: StoreSettingsFormProp
     { id: "basic" as TabType, label: "Basic", icon: "📋", show: true },
     { id: "branding" as TabType, label: "Branding", icon: "🎨", show: true },
     { id: "status" as TabType, label: "Status", icon: "🔄", show: !!store },
-    { id: "verification" as TabType, label: "Verify", icon: "✓", show: !!store },
+    {
+      id: "verification" as TabType,
+      label: "Verify",
+      icon: "✓",
+      show: !!store,
+    },
     { id: "payment" as TabType, label: "Payment", icon: "💳", show: !!store },
     { id: "delivery" as TabType, label: "Delivery", icon: "🚚", show: !!store },
-  ].filter(tab => tab.show);
+  ].filter((tab) => tab.show);
 
   return (
     <div className="space-y-4">
@@ -196,7 +210,10 @@ export function StoreSettingsFormTabbed({ store, userId }: StoreSettingsFormProp
                   </button>
                 </div>
                 <p className="mt-1.5 text-xs text-gray-500">
-                  Your URL: <span className="font-mono text-blue-600">/{handle || "your-store"}</span>
+                  Your URL:{" "}
+                  <span className="font-mono text-blue-600">
+                    /{handle || "your-store"}
+                  </span>
                 </p>
               </div>
 
@@ -256,7 +273,11 @@ export function StoreSettingsFormTabbed({ store, userId }: StoreSettingsFormProp
                   disabled={loading}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
                 >
-                  {loading ? "Saving..." : store ? "💾 Save Changes" : "🚀 Create Store"}
+                  {loading
+                    ? "Saving..."
+                    : store
+                    ? "💾 Save Changes"
+                    : "🚀 Create Store"}
                 </button>
                 {store && handle && (
                   <button
@@ -294,18 +315,32 @@ export function StoreSettingsFormTabbed({ store, userId }: StoreSettingsFormProp
               {/* Preview */}
               {(logoUrl || bannerUrl) && (
                 <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-                  <p className="text-sm font-semibold text-blue-800 mb-3">👀 Preview</p>
+                  <p className="text-sm font-semibold text-blue-800 mb-3">
+                    👀 Preview
+                  </p>
                   <div className="bg-white rounded-lg overflow-hidden shadow-sm">
                     {bannerUrl && (
-                      <img src={bannerUrl} alt="Banner" className="w-full h-32 object-cover" />
+                      <img
+                        src={bannerUrl}
+                        alt="Banner"
+                        className="w-full h-32 object-cover"
+                      />
                     )}
                     <div className="p-4 flex items-center gap-3">
                       {logoUrl && (
-                        <img src={logoUrl} alt="Logo" className="w-12 h-12 rounded-full object-cover border-2 border-gray-200" />
+                        <img
+                          src={logoUrl}
+                          alt="Logo"
+                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                        />
                       )}
                       <div>
-                        <h5 className="font-semibold text-gray-900">{name || "Store Name"}</h5>
-                        <p className="text-sm text-gray-600">Browse our products</p>
+                        <h5 className="font-semibold text-gray-900">
+                          {name || "Store Name"}
+                        </h5>
+                        <p className="text-sm text-gray-600">
+                          Browse our products
+                        </p>
                       </div>
                     </div>
                   </div>

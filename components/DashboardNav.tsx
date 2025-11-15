@@ -138,7 +138,7 @@ export function DashboardNav({ storeHandle }: DashboardNavProps) {
               <span className="mr-3">💬</span>
               Contact Us
             </NavLink>
-            <div className="px-4 py-2">
+            <div className="px-2 py-2">
               <LogoutButton />
             </div>
           </div>

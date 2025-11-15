@@ -31,10 +31,11 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={loading}
-      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:border-red-300 text-gray-700 hover:text-red-600 rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium group"
+      title="Sign out of your account"
     >
       <svg
-        className="w-4 h-4 mr-2"
+        className="w-4 h-4 transition-transform group-hover:translate-x-0.5"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -46,7 +47,7 @@ export function LogoutButton() {
           d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
         />
       </svg>
-      {loading ? "Signing out..." : "Logout"}
+      <span>{loading ? "Signing out..." : "Logout"}</span>
     </button>
   );
 }
