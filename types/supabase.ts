@@ -13,7 +13,7 @@ export interface Database {
       users: {
         Row: { id: string; email: string; created_at: string | null };
         Insert: { id?: string; email: string; created_at?: string | null };
-        Update: Partial<Database['public']['Tables']['users']['Insert']>;
+        Update: Partial<Database["public"]["Tables"]["users"]["Insert"]>;
       };
       stores: {
         Row: {
@@ -26,16 +26,17 @@ export interface Database {
           whatsapp_e164: string;
           currency: string;
           is_payments_enabled: boolean | null;
-          payment_provider: 'none' | 'stripe' | 'razorpay' | null;
+          payment_provider: "none" | "stripe" | "razorpay" | null;
+          is_active: boolean | null;
           created_at: string | null;
         };
-        Insert: Partial<Database['public']['Tables']['stores']['Row']> & {
+        Insert: Partial<Database["public"]["Tables"]["stores"]["Row"]> & {
           handle: string;
           name: string;
           whatsapp_e164: string;
           currency: string;
         };
-        Update: Partial<Database['public']['Tables']['stores']['Row']>;
+        Update: Partial<Database["public"]["Tables"]["stores"]["Row"]>;
       };
       products: {
         Row: {
@@ -51,12 +52,12 @@ export interface Database {
           stock_qty: number | null;
           created_at: string | null;
         };
-        Insert: Partial<Database['public']['Tables']['products']['Row']> & {
+        Insert: Partial<Database["public"]["Tables"]["products"]["Row"]> & {
           title: string;
           price_cents: number;
           currency: string;
         };
-        Update: Partial<Database['public']['Tables']['products']['Row']>;
+        Update: Partial<Database["public"]["Tables"]["products"]["Row"]>;
       };
       orders: {
         Row: {
@@ -70,10 +71,10 @@ export interface Database {
           discount_cents: number | null;
           total_cents: number;
           payment_link_url: string | null;
-          status: 'created' | 'opened_whatsapp' | 'paid' | 'cancelled' | null;
+          status: "created" | "opened_whatsapp" | "paid" | "cancelled" | null;
           created_at: string | null;
         };
-        Insert: Partial<Database['public']['Tables']['orders']['Row']> & {
+        Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & {
           store_id: string;
           buyer_name: string;
           buyer_phone: string;
@@ -82,22 +83,34 @@ export interface Database {
           subtotal_cents: number;
           total_cents: number;
         };
-        Update: Partial<Database['public']['Tables']['orders']['Row']>;
+        Update: Partial<Database["public"]["Tables"]["orders"]["Row"]>;
       };
       store_members: {
-        Row: { store_id: string; user_id: string; role: 'owner' | 'admin' };
-        Insert: { store_id: string; user_id: string; role: 'owner' | 'admin' };
-        Update: Partial<Database['public']['Tables']['store_members']['Row']>;
+        Row: { store_id: string; user_id: string; role: "owner" | "admin" };
+        Insert: { store_id: string; user_id: string; role: "owner" | "admin" };
+        Update: Partial<Database["public"]["Tables"]["store_members"]["Row"]>;
       };
       order_events: {
-        Row: { id: string; order_id: string; event: string; created_at: string | null };
+        Row: {
+          id: string;
+          order_id: string;
+          event: string;
+          created_at: string | null;
+        };
         Insert: { order_id: string; event: string; created_at?: string | null };
-        Update: Partial<Database['public']['Tables']['order_events']['Row']>;
+        Update: Partial<Database["public"]["Tables"]["order_events"]["Row"]>;
       };
     };
     Views: {
       store_public: {
-        Row: { id: string; handle: string; name: string; logo_url: string | null; banner_url: string | null; currency: string };
+        Row: {
+          id: string;
+          handle: string;
+          name: string;
+          logo_url: string | null;
+          banner_url: string | null;
+          currency: string;
+        };
       };
     };
   };

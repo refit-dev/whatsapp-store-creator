@@ -3,7 +3,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { getUser } from "@/lib/auth";
 import type { Database } from "@/types/supabase";
-import { StoreSettingsForm } from "@/components/StoreSettingsForm";
+import { StoreSettingsFormTabbed } from "@/components/StoreSettingsFormTabbed";
 import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
 import { DashboardWrapper } from "@/components/DashboardWrapper";
@@ -69,7 +69,7 @@ export default async function StoreSettingsPage() {
               </p>
             </div>
 
-            <StoreSettingsForm store={store} userId={user.id} />
+            <StoreSettingsFormTabbed store={store} userId={user.id} />
           </div>
         </div>
       </main>

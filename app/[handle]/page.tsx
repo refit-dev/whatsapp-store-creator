@@ -55,7 +55,9 @@ export default async function StorefrontPage({
 
   const { data: store, error: storeError } = await supabase
     .from("stores")
-    .select("id, handle, name, logo_url, banner_url, currency, whatsapp_e164")
+    .select(
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active"
+    )
     .eq("handle", params.handle)
     .single();
 
@@ -69,6 +71,44 @@ export default async function StorefrontPage({
   if (storeError || !store) {
     console.error("Store fetch error:", storeError);
     return notFound();
+  }
+
+  // Check if store is inactive
+  if (store.is_active === false) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="mx-auto w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+            <svg
+              className="w-10 h-10 text-amber-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+            Store Temporarily Closed
+          </h1>
+          <p className="text-gray-600 mb-6">
+            <strong>{store.name}</strong> is currently taking a break. Please
+            check back later!
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-900">
+              💡 <strong>Tip:</strong> Contact the store owner directly if you
+              need urgent assistance.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { data, error: productsError } = await supabase
@@ -93,6 +133,7 @@ export default async function StorefrontPage({
     banner_url: store.banner_url,
     currency: store.currency,
     whatsapp_e164: store.whatsapp_e164,
+    is_active: store.is_active,
   };
 
   // Pass data to client component
