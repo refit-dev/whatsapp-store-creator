@@ -28,6 +28,14 @@ export interface Database {
           is_payments_enabled: boolean | null;
           payment_provider: "none" | "stripe" | "razorpay" | null;
           is_active: boolean | null;
+          approval_status: "pending" | "approved" | "rejected" | null;
+          rejection_reason: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          is_blocked: boolean | null;
+          blocked_at: string | null;
+          blocked_by: string | null;
+          block_reason: string | null;
           created_at: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["stores"]["Row"]> & {
@@ -37,6 +45,48 @@ export interface Database {
           currency: string;
         };
         Update: Partial<Database["public"]["Tables"]["stores"]["Row"]>;
+      };
+      image_reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          store_id: string;
+          image_url: string;
+          review_status: "pending" | "approved" | "flagged" | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          flag_reason: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          store_id: string;
+          image_url: string;
+          review_status?: "pending" | "approved" | "flagged" | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          flag_reason?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["image_reviews"]["Row"]>;
+      };
+      admins: {
+        Row: {
+          id: string;
+          user_id: string;
+          email: string;
+          created_at: string | null;
+          is_active: boolean | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          email: string;
+          created_at?: string | null;
+          is_active?: boolean | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["admins"]["Row"]>;
       };
       products: {
         Row: {

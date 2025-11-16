@@ -12,6 +12,7 @@ import { ReferralBanner } from "@/components/ReferralBanner";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { LogoutButton } from "@/components/LogoutButton";
 import { DashboardWrapper } from "@/components/DashboardWrapper";
+import { StoreApprovalBanner } from "@/components/StoreApprovalBanner";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -27,6 +28,25 @@ export default async function DashboardPage() {
   const supabase = createServerComponentClient<Database>({
     cookies: () => cookieStore,
   });
+
+  // Check if user is an admin - if so, redirect to admin panel
+  const { data: adminData, error: adminError } = await supabase
+    .from("admins")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .single();
+
+  console.log("=== ADMIN CHECK ===");
+  console.log("User ID:", user.id);
+  console.log("Admin Data:", adminData);
+  console.log("Admin Error:", adminError);
+  console.log("==================");
+
+  if (adminData) {
+    console.log("Redirecting to admin panel");
+    redirect("/admin");
+  }
 
   // Get user's store first
   let { data: stores } = await supabase
@@ -160,6 +180,9 @@ export default async function DashboardPage() {
             <ReferralBanner />
           </div>
 
+          {/* Store Approval Status Banner */}
+          <StoreApprovalBanner store={store} />
+
           {/* Header with Store Info and Share Link */}
           <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-4 md:mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -198,9 +221,7 @@ export default async function DashboardPage() {
                   View Store
                 </Link>
                 <ShareStoreLink handle={store.handle} storeId={store.id} />
-                <div className="hidden sm:block border-l border-gray-200 pl-4">
-                  <LogoutButton />
-                </div>
+                <LogoutButton />
               </div>
             </div>
           </div>

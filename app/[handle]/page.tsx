@@ -56,7 +56,7 @@ export default async function StorefrontPage({
   const { data: store, error: storeError } = await supabase
     .from("stores")
     .select(
-      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active"
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active, approval_status, is_blocked, block_reason"
     )
     .eq("handle", params.handle)
     .single();
@@ -71,6 +71,64 @@ export default async function StorefrontPage({
   if (storeError || !store) {
     console.error("Store fetch error:", storeError);
     return notFound();
+  }
+
+  // Check if store is blocked
+  if (store.is_blocked) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+            <span className="text-4xl">🚫</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+            Store Blocked
+          </h1>
+          <p className="text-gray-600 mb-6">
+            This store has been blocked due to policy violations and is no
+            longer accessible.
+          </p>
+          {store.block_reason && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-gray-700 mb-4">
+              <p className="font-medium text-red-900 mb-1">Reason:</p>
+              <p>{store.block_reason}</p>
+            </div>
+          )}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+            If you are the store owner, please contact support for more
+            information.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if store is not approved
+  if (store.approval_status !== "approved") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="mx-auto w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-6">
+            <span className="text-4xl">⏳</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+            {store.approval_status === "rejected"
+              ? "Store Not Available"
+              : "Store Under Review"}
+          </h1>
+          <p className="text-gray-600 mb-6">
+            {store.approval_status === "rejected"
+              ? "This store has been rejected and is not available for public access."
+              : "This store is currently under review by our team. It will be available soon!"}
+          </p>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm text-gray-700">
+            {store.approval_status === "rejected"
+              ? "If you are the store owner, please check your dashboard for more information."
+              : "Store owners will be notified via email once the review is complete."}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Check if store is inactive
