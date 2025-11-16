@@ -150,6 +150,52 @@ export interface Database {
         Insert: { order_id: string; event: string; created_at?: string | null };
         Update: Partial<Database["public"]["Tables"]["order_events"]["Row"]>;
       };
+      login_attempts: {
+        Row: {
+          id: string;
+          email: string;
+          ip_address: string | null;
+          user_agent: string | null;
+          attempt_time: string;
+          success: boolean;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          attempt_time?: string;
+          success?: boolean;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["login_attempts"]["Row"]>;
+      };
+      api_requests: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          ip_address: string | null;
+          endpoint: string;
+          method: string;
+          user_agent: string | null;
+          request_time: string;
+          response_status: number | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          ip_address?: string | null;
+          endpoint: string;
+          method: string;
+          user_agent?: string | null;
+          request_time?: string;
+          response_status?: number | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["api_requests"]["Row"]>;
+      };
     };
     Views: {
       store_public: {

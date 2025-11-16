@@ -6,6 +6,12 @@ import {
   formatMobileNumber,
   validateMobileNumber,
 } from "@/lib/duplicate-validation";
+import {
+  checkLoginLock,
+  recordLoginAttempt,
+  formatLockoutMessage,
+  getRemainingAttempts,
+} from "@/lib/login-attempt-limiter";
 import Link from "next/link";
 import { CountryCodeSelector } from "@/components/CountryCodeSelector";
 
@@ -163,34 +169,69 @@ export default function AuthClient() {
     setLoading(true);
     setMessage("");
 
-    const { data, error } = await sb.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // Check if account is locked before attempting login
+      const lockStatus = await checkLoginLock(email);
 
-    setLoading(false);
-
-    if (error) {
-      const msg = (error.message || "").toLowerCase();
-      if (
-        msg.includes("email not confirmed") ||
-        msg.includes("confirm your email")
-      ) {
-        setMessage(
-          "Email not confirmed. Enter the 6‑digit code we sent or resend it."
-        );
-        setTimeout(() => {
-          const params = new URLSearchParams({ email });
-          window.location.href = `/auth/confirm?${params.toString()}`;
-        }, 600);
-      } else {
-        setMessage(error.message);
+      if (lockStatus.isLocked) {
+        setMessage(formatLockoutMessage(lockStatus.remainingMinutes));
+        setLoading(false);
+        return;
       }
-    } else if (data.user) {
-      setMessage("Success! Redirecting to dashboard...");
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 500);
+
+      const { data, error } = await sb.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        // Record failed login attempt
+        await recordLoginAttempt(email, false);
+
+        // Check if this failure causes a lockout
+        const newLockStatus = await checkLoginLock(email);
+
+        const msg = (error.message || "").toLowerCase();
+        if (
+          msg.includes("email not confirmed") ||
+          msg.includes("confirm your email")
+        ) {
+          setMessage(
+            "Email not confirmed. Enter the 6‑digit code we sent or resend it."
+          );
+          setTimeout(() => {
+            const params = new URLSearchParams({ email });
+            window.location.href = `/auth/confirm?${params.toString()}`;
+          }, 600);
+        } else {
+          // Show remaining attempts if getting close to lockout
+          if (newLockStatus.attemptCount >= 3 && !newLockStatus.isLocked) {
+            const remaining = await getRemainingAttempts(email);
+            setMessage(
+              `${error.message}\n\n⚠️ Warning: ${remaining} attempt${
+                remaining !== 1 ? "s" : ""
+              } remaining before temporary lockout.`
+            );
+          } else if (newLockStatus.isLocked) {
+            setMessage(formatLockoutMessage(newLockStatus.remainingMinutes));
+          } else {
+            setMessage(error.message);
+          }
+        }
+      } else if (data.user) {
+        // Record successful login attempt
+        await recordLoginAttempt(email, true);
+
+        setMessage("Success! Redirecting to dashboard...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 500);
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setMessage(error?.message || "An error occurred during login");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -319,12 +360,22 @@ export default function AuthClient() {
             )}
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                {!isSignUp && (
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Forgot?
+                  </Link>
+                )}
+              </div>
               <input
                 id="password"
                 type="password"
