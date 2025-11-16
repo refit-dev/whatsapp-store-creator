@@ -126,7 +126,7 @@ export function StoreSettingsFormTabbed({
   return (
     <div className="space-y-4">
       {/* Horizontal Scrollable Tab Navigation */}
-      <div className="bg-white border border-gray-200 rounded-lg p-2 overflow-x-auto scrollbar-hide">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-2 overflow-x-auto scrollbar-hide">
         <div className="flex gap-1.5 min-w-max">
           {tabs.map((tab) => (
             <button
@@ -136,7 +136,7 @@ export function StoreSettingsFormTabbed({
               className={`flex items-center gap-1.5 px-4 py-2.5 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-600 hover:bg-gray-100"
+                  : "bg-white text-gray-600 hover:bg-gray-100 shadow-sm border border-gray-200"
               }`}
             >
               <span>{tab.icon}</span>
