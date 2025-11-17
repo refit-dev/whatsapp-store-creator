@@ -1,5 +1,26 @@
 import { createServerClient } from "@/lib/db";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+
+interface SecurityCheck {
+  bucket_name: string;
+  is_public: boolean;
+  size_limit: number | null;
+  allowed_types: string[] | null;
+  total_files: number;
+  security_status: string;
+}
+
+interface FileAudit {
+  id: string;
+  name: string;
+  bucket_id: string;
+  content_type: string | null;
+  file_size: string | null;
+  created_at: string;
+  file_type_status: string;
+  disposition_status: string;
+}
 
 export default async function SecurityTestPage() {
   const supabase = createServerClient();
@@ -26,20 +47,36 @@ export default async function SecurityTestPage() {
   }
 
   // Check storage security configuration
-  const { data: securityCheck } = await supabase
-    .rpc("check_storage_security")
-    .single();
+  let securityCheck: SecurityCheck | null = null;
+  try {
+    const { data } = await supabase.rpc("check_storage_security").single();
+    securityCheck = data as SecurityCheck;
+  } catch (error) {
+    console.error("Failed to fetch security check:", error);
+  }
 
   // Get recent uploaded files audit
-  const { data: fileAudit } = await supabase
-    .from("storage_security_audit")
-    .select("*")
-    .limit(20);
+  let fileAudit: FileAudit[] = [];
+  try {
+    const { data } = await supabase
+      .from("storage_security_audit")
+      .select("*")
+      .limit(20);
+    fileAudit = (data as FileAudit[]) || [];
+  } catch (error) {
+    console.error("Failed to fetch file audit:", error);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
+          <Link
+            href="/admin"
+            className="text-blue-600 hover:text-blue-700 mb-4 inline-block"
+          >
+            ← Back to Admin Dashboard
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900">
             Security Configuration Test
           </h1>
@@ -245,7 +282,7 @@ export default async function SecurityTestPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {fileAudit.map((file: any) => (
+                  {fileAudit.map((file) => (
                     <tr key={file.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm">
                         <div className="max-w-xs truncate" title={file.name}>
