@@ -89,7 +89,7 @@ async function scanWithClamAV(buffer: Buffer): Promise<ScanResult> {
 
   try {
     const formData = new FormData();
-    const blob = new Blob([buffer]);
+    const blob = new Blob([new Uint8Array(buffer)]);
     formData.append("file", blob, "upload.bin");
 
     const response = await fetch(`${apiUrl}/scan`, {
@@ -145,7 +145,7 @@ async function scanWithVirusTotal(buffer: Buffer): Promise<ScanResult> {
   try {
     // Upload file for scanning
     const formData = new FormData();
-    const blob = new Blob([buffer]);
+    const blob = new Blob([new Uint8Array(buffer)]);
     formData.append("file", blob);
 
     const uploadResponse = await fetch(
