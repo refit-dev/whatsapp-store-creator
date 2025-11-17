@@ -1,8 +1,10 @@
 {
   "ignoreBinPackage": false,
   "skipMissing": false,
-  "ignoreMatches": [
-    "@types/*",
+  "ignores": [
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
     "typescript",
     "eslint",
     "eslint-config-next",
@@ -46,13 +48,6 @@
     "*.ts": "typescript",
     "*.tsx": "typescript"
   },
-  "detectors": [
-    "requireCallExpression",
-    "importDeclaration"
-  ],
-  "specials": [
-    "bin",
-    "eslint",
-    "prettier"
-  ]
+  "detectors": ["requireCallExpression", "importDeclaration"],
+  "specials": ["bin", "eslint", "prettier"]
 }
