@@ -19,7 +19,8 @@ type TabType =
   | "status"
   | "verification"
   | "payment"
-  | "delivery";
+  | "delivery"
+  | "account";
 
 export function StoreSettingsFormTabbed({
   store,
@@ -121,6 +122,7 @@ export function StoreSettingsFormTabbed({
     },
     { id: "payment" as TabType, label: "Payment", icon: "💳", show: !!store },
     { id: "delivery" as TabType, label: "Delivery", icon: "🚚", show: !!store },
+    { id: "account" as TabType, label: "Account", icon: "🗑️", show: true },
   ].filter((tab) => tab.show);
 
   return (
@@ -446,6 +448,121 @@ export function StoreSettingsFormTabbed({
               initialType={store.delivery_type || "none"}
               initialSlots={store.delivery_slots || []}
             />
+          </div>
+        )}
+
+        {/* Account/Delete Account Tab */}
+        {activeTab === "account" && (
+          <div className="p-4 sm:p-6">
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-start gap-3 pb-4 border-b">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🗑️</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Account Management
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Manage your account settings and data
+                  </p>
+                </div>
+              </div>
+
+              {/* Danger Zone */}
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-6 w-6 text-red-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-red-900 mb-2">
+                      Danger Zone
+                    </h4>
+                    <p className="text-red-800 mb-4">
+                      Permanently delete your account and all associated data.
+                      This action cannot be undone.
+                    </p>
+
+                    <div className="bg-white border border-red-300 rounded-lg p-4 mb-4">
+                      <h5 className="font-semibold text-gray-900 mb-2">
+                        What will be deleted:
+                      </h5>
+                      <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                        <li>All your stores and products</li>
+                        <li>All customer orders and data</li>
+                        <li>All uploaded images and files</li>
+                        <li>Your account and login credentials</li>
+                        <li>Payment and subscription history</li>
+                      </ul>
+                    </div>
+
+                    <a
+                      href="/dashboard/account/delete"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      Delete My Account
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Help Section */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h5 className="font-semibold text-blue-900 mb-2">
+                  Need help instead?
+                </h5>
+                <p className="text-blue-800 text-sm mb-3">
+                  If you're experiencing issues, we're here to help! Consider
+                  contacting support before deleting your account.
+                </p>
+                <a
+                  href="/dashboard/contact-us"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                  Contact Support
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </div>
