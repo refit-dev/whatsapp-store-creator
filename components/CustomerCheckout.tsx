@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { useCart } from "./CartProvider";
 import { isValidPhoneInternational } from "@/lib/validations";
+import { sanitizeText, sanitizePhone, sanitizeEmail } from "@/lib/sanitize";
 
 interface CustomerCheckoutProps {
   storeId: string;
@@ -87,15 +88,32 @@ export function CustomerCheckout({
     setIsLoading(true);
 
     try {
+      // Sanitize all customer inputs
+      const sanitizedName = sanitizeText(customerInfo.name).substring(0, 100);
+      const sanitizedPhone = sanitizePhone(customerInfo.phone).substring(0, 20);
+      const sanitizedEmail = customerInfo.email
+        ? sanitizeEmail(customerInfo.email).substring(0, 100)
+        : null;
+      const sanitizedAddress = customerInfo.address
+        ? sanitizeText(customerInfo.address).substring(0, 500)
+        : null;
+
+      // Validate sanitized data
+      if (!sanitizedName || !sanitizedPhone) {
+        alert("Invalid name or phone number after sanitization");
+        setIsLoading(false);
+        return;
+      }
+
       // Create order
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
           store_id: storeId,
-          customer_name: customerInfo.name,
-          customer_phone: customerInfo.phone,
-          customer_email: customerInfo.email || null,
-          customer_address: customerInfo.address || null,
+          customer_name: sanitizedName,
+          customer_phone: sanitizedPhone,
+          customer_email: sanitizedEmail,
+          customer_address: sanitizedAddress,
           items: items,
           total_amount: total,
           status: "pending_payment",
@@ -111,14 +129,14 @@ export function CustomerCheckout({
       setShowPaymentDetails(true);
       clearCart();
 
-      // Send WhatsApp notification to store owner
+      // Send WhatsApp notification to store owner (use sanitized data)
       await fetch("/api/notifications/new-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           storeId,
           orderId: order.id,
-          customerName: customerInfo.name,
+          customerName: sanitizedName,
           total,
         }),
       });

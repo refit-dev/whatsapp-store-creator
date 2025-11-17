@@ -1,6 +1,12 @@
 "use client";
 import { useState, useRef } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import {
+  sanitizeText,
+  sanitizeRichText,
+  sanitizeNumber,
+  sanitizeUrl,
+} from "@/lib/sanitize";
 
 interface ProductFormProps {
   storeId: string;
@@ -134,14 +140,43 @@ export function ProductFormWithUpload({
     setMessage("");
 
     try {
+      // Sanitize all inputs
+      const sanitizedTitle = sanitizeText(title).substring(0, 200);
+      const sanitizedDescription = description
+        ? sanitizeRichText(description).substring(0, 2000)
+        : null;
+      const sanitizedPrice = sanitizeNumber(parseFloat(price) * 100, {
+        min: 0,
+        integer: true,
+      });
+      const sanitizedStock = stockQty
+        ? sanitizeNumber(parseInt(stockQty), { min: 0, integer: true })
+        : null;
+      const sanitizedImageUrls = imageUrls
+        .map((url) => sanitizeUrl(url))
+        .filter(Boolean);
+
+      // Validate required fields
+      if (!sanitizedTitle) {
+        setMessage("Product title is required");
+        setLoading(false);
+        return;
+      }
+
+      if (sanitizedPrice <= 0) {
+        setMessage("Product price must be greater than 0");
+        setLoading(false);
+        return;
+      }
+
       const productData = {
-        title,
-        description: description || null,
-        price_cents: Math.round(parseFloat(price) * 100),
+        title: sanitizedTitle,
+        description: sanitizedDescription,
+        price_cents: sanitizedPrice,
         currency,
-        image_urls: imageUrls,
+        image_urls: sanitizedImageUrls,
         is_active: isActive,
-        stock_qty: stockQty ? parseInt(stockQty) : null,
+        stock_qty: sanitizedStock,
         store_id: storeId,
       };
 

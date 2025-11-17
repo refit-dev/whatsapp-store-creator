@@ -4,9 +4,25 @@ import { DevImageService } from "@/lib/dev-image-service";
 import { createClient } from "@supabase/supabase-js";
 import { validateFile, validateFileBuffer } from "@/lib/file-validation";
 import { scanFile } from "@/lib/virus-scanner";
+import {
+  handleCorsPreflightRequest,
+  setCorsHeaders,
+  validateCorsOrigin,
+} from "@/lib/cors";
+
+export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
+  const response = handleCorsPreflightRequest(request);
+  return response || new NextResponse(null, { status: 200 });
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    // Validate CORS origin
+    const corsError = validateCorsOrigin(request);
+    if (corsError) {
+      return corsError;
+    }
+
     // Check authentication
     const supabase = createServerClient();
     const {
@@ -15,7 +31,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const response = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+      return setCorsHeaders(response, request.headers.get("origin"));
     }
 
     const formData = await request.formData();
@@ -247,25 +267,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       console.log(`Public URL: ${urlData.publicUrl}`);
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         url: urlData.publicUrl,
         filename: filename,
         size: file.size,
         contentType: file.type,
       });
+
+      return setCorsHeaders(response, request.headers.get("origin"));
     } catch (uploadError) {
       console.error("Upload error:", uploadError);
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: "Failed to upload file" },
         { status: 500 }
       );
+      return setCorsHeaders(response, request.headers.get("origin"));
     }
   } catch (error) {
     console.error("API error:", error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
+    return setCorsHeaders(response, request.headers.get("origin"));
   }
 }
 

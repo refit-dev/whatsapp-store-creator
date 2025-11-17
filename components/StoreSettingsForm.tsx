@@ -6,6 +6,13 @@ import { DeliverySettings } from "./DeliverySettings";
 import MobileVerification from "./MobileVerification";
 import { ImageUpload } from "./ImageUpload";
 import type { Store } from "@/types/interfaces";
+import {
+  sanitizeText,
+  sanitizeHandle,
+  sanitizePhone,
+  sanitizeCurrency,
+  sanitizeUrl,
+} from "@/lib/sanitize";
 
 interface StoreSettingsFormProps {
   store: Store | undefined;
@@ -54,18 +61,28 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
     setMessage("");
 
     try {
+      // Sanitize all inputs before saving
+      const sanitizedData = {
+        name: sanitizeText(name).substring(0, 100),
+        handle: sanitizeHandle(handle),
+        whatsapp_e164: sanitizePhone(whatsappNumber),
+        currency: sanitizeCurrency(currency),
+        logo_url: logoUrl ? sanitizeUrl(logoUrl) : null,
+        banner_url: bannerUrl ? sanitizeUrl(bannerUrl) : null,
+      };
+
+      // Validate required fields
+      if (!sanitizedData.name || !sanitizedData.handle) {
+        setMessage("Store name and handle are required");
+        setLoading(false);
+        return;
+      }
+
       if (store) {
         // Update existing store
         const { error } = await sb
           .from("stores")
-          .update({
-            name,
-            handle,
-            whatsapp_e164: whatsappNumber,
-            currency,
-            logo_url: logoUrl,
-            banner_url: bannerUrl,
-          })
+          .update(sanitizedData)
           .eq("id", store.id);
 
         if (error) throw error;
@@ -74,12 +91,7 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         // Create new store
         const { error: storeError } = await sb.from("stores").insert({
           owner_id: userId,
-          name,
-          handle,
-          whatsapp_e164: whatsappNumber,
-          currency,
-          logo_url: logoUrl,
-          banner_url: bannerUrl,
+          ...sanitizedData,
         });
 
         if (storeError) throw storeError;

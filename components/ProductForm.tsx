@@ -1,6 +1,12 @@
 "use client";
 import { useState, useRef } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import {
+  sanitizeText,
+  sanitizeRichText,
+  sanitizeNumber,
+  sanitizeUrl,
+} from "@/lib/sanitize";
 
 interface ProductFormProps {
   storeId: string;
@@ -113,17 +119,45 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
     setMessage("");
 
     try {
-      // Auto-convert Google Drive links
-      const finalImageUrl = imageUrl ? convertGoogleDriveLink(imageUrl) : "";
+      // Sanitize all inputs
+      const sanitizedTitle = sanitizeText(title).substring(0, 200);
+      const sanitizedDescription = description
+        ? sanitizeRichText(description).substring(0, 2000)
+        : null;
+      const sanitizedPrice = sanitizeNumber(parseFloat(price) * 100, {
+        min: 0,
+        integer: true,
+      });
+      const sanitizedStock = stockQty
+        ? sanitizeNumber(parseInt(stockQty), { min: 0, integer: true })
+        : null;
+
+      // Validate required fields
+      if (!sanitizedTitle) {
+        setMessage("Product title is required");
+        setLoading(false);
+        return;
+      }
+
+      if (sanitizedPrice <= 0) {
+        setMessage("Product price must be greater than 0");
+        setLoading(false);
+        return;
+      }
+
+      // Auto-convert and sanitize Google Drive links
+      const finalImageUrl = imageUrl
+        ? sanitizeUrl(convertGoogleDriveLink(imageUrl))
+        : "";
 
       const productData = {
-        title,
-        description: description || null,
-        price_cents: Math.round(parseFloat(price) * 100),
+        title: sanitizedTitle,
+        description: sanitizedDescription,
+        price_cents: sanitizedPrice,
         currency,
         image_urls: finalImageUrl ? [finalImageUrl] : [],
         is_active: isActive,
-        stock_qty: stockQty ? parseInt(stockQty) : null,
+        stock_qty: sanitizedStock,
         store_id: storeId,
       };
 

@@ -1,11 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizeText, sanitizeEmail, escapeHtml } from "@/lib/sanitize";
+import {
+  handleCorsPreflightRequest,
+  setCorsHeaders,
+  validateCorsOrigin,
+} from "@/lib/cors";
+
+export async function OPTIONS(request: NextRequest) {
+  const response = handleCorsPreflightRequest(request);
+  return response || new NextResponse(null, { status: 200 });
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate CORS origin
+    const corsError = validateCorsOrigin(request);
+    if (corsError) {
+      return corsError;
+    }
+
     const { name, email, subject, message } = await request.json();
 
-    // Validate the form data
-    if (!name || !email || !subject || !message) {
+    // Sanitize all inputs
+    const sanitizedName = sanitizeText(name).substring(0, 100);
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedSubject = sanitizeText(subject).substring(0, 200);
+    const sanitizedMessage = sanitizeText(message).substring(0, 5000);
+
+    // Validate the form data after sanitization
+    if (
+      !sanitizedName ||
+      !sanitizedEmail ||
+      !sanitizedSubject ||
+      !sanitizedMessage
+    ) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
@@ -14,18 +42,18 @@ export async function POST(request: NextRequest) {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(sanitizedEmail)) {
       return NextResponse.json(
         { error: "Invalid email format" },
         { status: 400 }
       );
     }
 
-    // Create email content
+    // Create email content with escaped HTML to prevent XSS
     const emailContent = {
       to: "hello@watzy.app",
-      from: email,
-      subject: `Contact Form: ${subject}`,
+      from: sanitizedEmail,
+      subject: `Contact Form: ${escapeHtml(sanitizedSubject)}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">
@@ -34,19 +62,21 @@ export async function POST(request: NextRequest) {
           
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #1f2937; margin-top: 0;">Contact Details</h3>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
+            <p><strong>Name:</strong> ${escapeHtml(sanitizedName)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(sanitizedEmail)}</p>
+            <p><strong>Subject:</strong> ${escapeHtml(sanitizedSubject)}</p>
           </div>
           
           <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
             <h3 style="color: #1f2937; margin-top: 0;">Message</h3>
-            <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
+            <p style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(
+              sanitizedMessage
+            )}</p>
           </div>
           
           <div style="margin-top: 20px; padding: 15px; background-color: #dbeafe; border-radius: 8px; border-left: 4px solid #3b82f6;">
             <p style="margin: 0; color: #1e40af;">
-              <strong>Reply to:</strong> ${email}<br>
+              <strong>Reply to:</strong> ${escapeHtml(sanitizedEmail)}<br>
               <strong>Submitted:</strong> ${new Date().toLocaleString()}
             </p>
           </div>
@@ -55,14 +85,14 @@ export async function POST(request: NextRequest) {
       text: `
 New Contact Form Submission
 
-Name: ${name}
-Email: ${email}
-Subject: ${subject}
+Name: ${sanitizedName}
+Email: ${sanitizedEmail}
+Subject: ${sanitizedSubject}
 
 Message:
-${message}
+${sanitizedMessage}
 
-Reply to: ${email}
+Reply to: ${sanitizedEmail}
 Submitted: ${new Date().toLocaleString()}
       `,
     };
@@ -79,7 +109,7 @@ Submitted: ${new Date().toLocaleString()}
     // Simulate email sending success
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         message:
@@ -87,11 +117,14 @@ Submitted: ${new Date().toLocaleString()}
       },
       { status: 200 }
     );
+
+    return setCorsHeaders(response, request.headers.get("origin"));
   } catch (error) {
     console.error("Contact form error:", error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "Failed to send message. Please try again later." },
       { status: 500 }
     );
+    return setCorsHeaders(response, request.headers.get("origin"));
   }
 }
