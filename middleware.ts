@@ -52,6 +52,16 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Force HTTPS in production
+  if (
+    process.env.NODE_ENV === "production" &&
+    request.headers.get("x-forwarded-proto") !== "https"
+  ) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https:";
+    return NextResponse.redirect(url, 301); // Permanent redirect
+  }
+
   // Handle actual requests
   const response = NextResponse.next();
 
@@ -69,11 +79,50 @@ export function middleware(request: NextRequest) {
     );
   }
 
-  // Add security headers (defense in depth)
+  // Add comprehensive security headers
   response.headers.set("X-DNS-Prefetch-Control", "on");
+
+  // HSTS - Force HTTPS for 1 year, include subdomains, allow preloading
   response.headers.set(
     "Strict-Transport-Security",
-    "max-age=31536000; includeSubDomains"
+    "max-age=31536000; includeSubDomains; preload"
+  );
+
+  // Prevent clickjacking attacks
+  response.headers.set("X-Frame-Options", "SAMEORIGIN");
+
+  // Prevent MIME type sniffing
+  response.headers.set("X-Content-Type-Options", "nosniff");
+
+  // Enable XSS protection in older browsers
+  response.headers.set("X-XSS-Protection", "1; mode=block");
+
+  // Control referrer information
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Content Security Policy (CSP)
+  response.headers.set(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co https://vercel.live wss://*.supabase.co",
+      "frame-src 'self' https://vercel.live",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "upgrade-insecure-requests",
+    ].join("; ")
+  );
+
+  // Permissions Policy (formerly Feature Policy)
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
   );
 
   return response;
