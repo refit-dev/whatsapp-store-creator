@@ -25,13 +25,17 @@ CREATE TABLE IF NOT EXISTS virus_scans (
 );
 
 -- Add indexes for common queries
-CREATE INDEX idx_virus_scans_user_id ON virus_scans(user_id);
-CREATE INDEX idx_virus_scans_infected ON virus_scans(infected);
-CREATE INDEX idx_virus_scans_created_at ON virus_scans(created_at DESC);
-CREATE INDEX idx_virus_scans_scanner ON virus_scans(scanner);
+CREATE INDEX IF NOT EXISTS idx_virus_scans_user_id ON virus_scans(user_id);
+CREATE INDEX IF NOT EXISTS idx_virus_scans_infected ON virus_scans(infected);
+CREATE INDEX IF NOT EXISTS idx_virus_scans_created_at ON virus_scans(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_virus_scans_scanner ON virus_scans(scanner);
 
 -- RLS Policies
 ALTER TABLE virus_scans ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Admins can view all virus scans" ON virus_scans;
+DROP POLICY IF EXISTS "System can insert virus scans" ON virus_scans;
 
 -- Admin users can view all scans
 CREATE POLICY "Admins can view all virus scans"
