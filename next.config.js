@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+
+// Webpack Bundle Analyzer configuration
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
@@ -69,4 +75,5 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Wrap with bundle analyzer
+module.exports = withBundleAnalyzer(nextConfig);

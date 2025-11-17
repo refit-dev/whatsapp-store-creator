@@ -112,5 +112,29 @@ export async function GET(request: NextRequest) {
 
 // Handle OPTIONS for CORS preflight
 export async function OPTIONS(request: NextRequest) {
-  return handleCorsPreflightRequest(request);
+  const origin = request.headers.get("origin");
+
+  // validateCorsOrigin returns error response or null (success)
+  const corsError = validateCorsOrigin(request);
+  if (corsError) {
+    return corsError;
+  }
+
+  const response = new NextResponse(null, { status: 200 });
+
+  if (origin) {
+    response.headers.set("Access-Control-Allow-Origin", origin);
+    response.headers.set("Access-Control-Allow-Credentials", "true");
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Requested-With"
+    );
+    response.headers.set("Access-Control-Max-Age", "86400");
+  }
+
+  return response;
 }

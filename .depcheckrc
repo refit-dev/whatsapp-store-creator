@@ -1,0 +1,58 @@
+{
+  "ignoreBinPackage": false,
+  "skipMissing": false,
+  "ignoreMatches": [
+    "@types/*",
+    "typescript",
+    "eslint",
+    "eslint-config-next",
+    "autoprefixer",
+    "postcss",
+    "tailwindcss",
+    "@next/bundle-analyzer",
+    "depcheck",
+    "@supabase/auth-helpers-nextjs",
+    "@supabase/supabase-js",
+    "@vercel/analytics",
+    "@vercel/blob",
+    "@vercel/speed-insights",
+    "next",
+    "react",
+    "react-dom",
+    "clsx",
+    "razorpay",
+    "stripe",
+    "twilio",
+    "zod",
+    "cypress",
+    "tsx"
+  ],
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "cypress",
+    ".vercel",
+    "coverage"
+  ],
+  "parsers": {
+    "*.js": "es6",
+    "*.jsx": "jsx",
+    "*.ts": "typescript",
+    "*.tsx": "typescript"
+  },
+  "detectors": [
+    "requireCallExpression",
+    "importDeclaration"
+  ],
+  "specials": [
+    "bin",
+    "eslint",
+    "prettier"
+  ]
+}
