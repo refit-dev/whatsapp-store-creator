@@ -1,4 +1,9 @@
 import { useState, useRef } from "react";
+import {
+  validateFile,
+  formatFileSize,
+  ALLOWED_EXTENSIONS,
+} from "@/lib/file-validation";
 
 export interface ImageUploadProps {
   label: string;
@@ -29,16 +34,14 @@ export function ImageUpload({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setUploadError("Please select an image file");
-      return;
-    }
-
-    // Validate file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setUploadError("File size must be less than 5MB");
+    // Validate file using comprehensive validation
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      setUploadError(validation.error || "Invalid file");
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
@@ -115,7 +118,7 @@ export function ImageUpload({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp"
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -132,10 +135,34 @@ export function ImageUpload({
               ? "Change Image"
               : "Upload Image"}
           </button>
+          <p className="text-xs text-gray-500 mt-1">
+            Allowed: JPG, PNG, WebP (Max 5MB)
+          </p>
         </div>
 
         {/* Error Message */}
-        {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+        {uploadError && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{uploadError}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Description */}
         {description && <p className="text-sm text-gray-500">{description}</p>}

@@ -97,9 +97,9 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
+          Store Management
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
@@ -130,6 +130,61 @@ export default async function AdminDashboard() {
             </div>
             <span className="text-2xl">📋</span>
           </Link>
+
+          <Link
+            href="/admin/images"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">Image Moderation</h3>
+              <p className="text-sm text-gray-600">
+                Review uploaded product images
+              </p>
+            </div>
+            <span className="text-2xl">🖼️</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Security Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          🔒 Security & Monitoring
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link
+            href="/admin/security/virus-scans"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:shadow-md transition-all"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">Virus Scans</h3>
+              <p className="text-sm text-gray-600">Monitor malware detection</p>
+            </div>
+            <span className="text-2xl">🛡️</span>
+          </Link>
+
+          <Link
+            href="/admin/security/test"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:shadow-md transition-all"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">Security Test</h3>
+              <p className="text-sm text-gray-600">
+                Verify security configuration
+              </p>
+            </div>
+            <span className="text-2xl">🧪</span>
+          </Link>
+
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div>
+              <h3 className="font-medium text-gray-900">File Protection</h3>
+              <p className="text-sm text-gray-600">
+                Multi-layer security active
+              </p>
+            </div>
+            <span className="text-2xl">✅</span>
+          </div>
         </div>
       </div>
 

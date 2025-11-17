@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/db";
 import { DevImageService } from "@/lib/dev-image-service";
 import { createClient } from "@supabase/supabase-js";
+import { validateFile, validateFileBuffer } from "@/lib/file-validation";
+import { scanFile } from "@/lib/virus-scanner";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -23,18 +25,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
+    // Validate file type, size, and extension
+    const clientValidation = validateFile(file);
+    if (!clientValidation.valid) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 5MB." },
-        { status: 400 }
-      );
-    }
-
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json(
-        { error: "Only image files are allowed" },
+        { error: clientValidation.error },
         { status: 400 }
       );
     }
@@ -69,7 +64,88 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       // Convert file to buffer
       const fileBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(fileBuffer);
 
+      // Server-side validation: Check file content (magic bytes)
+      const serverValidation = await validateFileBuffer(
+        buffer,
+        file.name,
+        file.type
+      );
+
+      if (!serverValidation.valid) {
+        return NextResponse.json(
+          { error: serverValidation.error },
+          { status: 400 }
+        );
+      }
+
+      // Virus/malware scanning
+      console.log("Scanning file for viruses/malware...");
+      const scanResult = await scanFile(buffer);
+
+      if (scanResult.infected) {
+        console.warn("⚠️ Infected file detected:", scanResult);
+
+        // Log the scan result to database for admin review
+        try {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+          if (supabaseUrl && supabaseServiceKey) {
+            const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
+            await adminSupabase.from("virus_scans").insert({
+              user_id: user.id,
+              filename: file.name,
+              file_size: file.size,
+              mime_type: file.type,
+              scanner: scanResult.scanner,
+              infected: true,
+              threats: scanResult.threats,
+              scan_time_ms: scanResult.scanTime,
+            });
+          }
+        } catch (logError) {
+          console.error("Failed to log virus scan:", logError);
+        }
+
+        return NextResponse.json(
+          {
+            error: `File rejected: Security scan detected threats - ${scanResult.threats?.join(
+              ", "
+            )}. Please ensure you're uploading a clean image file.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Log clean scan result (optional, for audit trail)
+      if (process.env.LOG_ALL_SCANS === "true") {
+        try {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+          if (supabaseUrl && supabaseServiceKey) {
+            const adminSupabase = createClient(supabaseUrl, supabaseServiceKey);
+            await adminSupabase.from("virus_scans").insert({
+              user_id: user.id,
+              filename: file.name,
+              file_size: file.size,
+              mime_type: file.type,
+              scanner: scanResult.scanner,
+              infected: false,
+              threats: null,
+              scan_time_ms: scanResult.scanTime,
+            });
+          }
+        } catch (logError) {
+          console.error("Failed to log clean scan:", logError);
+        }
+      }
+
+      console.log(
+        `✓ File passed security scan (${scanResult.scanner}, ${scanResult.scanTime}ms)`
+      );
       console.log(`Uploading file: ${filename}`);
 
       // Use service role for uploads to bypass RLS policies
@@ -95,7 +171,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // Try to upload using service role (bypasses RLS)
       let uploadResult = await adminSupabase.storage
         .from("store-images")
-        .upload(filename, fileBuffer, {
+        .upload(filename, buffer, {
           contentType: file.type,
           cacheControl: "3600",
           upsert: false,
@@ -122,9 +198,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
               fileSizeLimit: 5242880, // 5MB
               allowedMimeTypes: [
                 "image/jpeg",
+                "image/jpg",
                 "image/png",
                 "image/webp",
-                "image/gif",
               ],
             });
 
@@ -145,7 +221,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           // Retry the upload after creating the bucket (using admin client)
           uploadResult = await adminSupabase.storage
             .from("store-images")
-            .upload(filename, fileBuffer, {
+            .upload(filename, buffer, {
               contentType: file.type,
               cacheControl: "3600",
               upsert: false,
