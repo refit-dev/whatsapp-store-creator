@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase-server";
+import { getUser } from "@/lib/auth";
 import { StorefrontClient } from "./StorefrontClient";
 
 // Force dynamic rendering - no caching
@@ -53,10 +54,13 @@ export default async function StorefrontPage({
   // Force no caching for debugging
   const supabase = supabaseServer();
 
+  // Check if current user is authenticated
+  const currentUser = await getUser();
+
   const { data: store, error: storeError } = await supabase
     .from("stores")
     .select(
-      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active, approval_status, is_blocked, block_reason"
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active, approval_status, is_blocked, block_reason, user_id"
     )
     .eq("handle", params.handle)
     .single();
@@ -72,6 +76,9 @@ export default async function StorefrontPage({
     console.error("Store fetch error:", storeError);
     return notFound();
   }
+
+  // Check if current user is the store owner
+  const isOwner = currentUser && store.user_id === currentUser.id;
 
   // Check if store is blocked
   if (store.is_blocked) {
@@ -103,8 +110,8 @@ export default async function StorefrontPage({
     );
   }
 
-  // Check if store is not approved
-  if (store.approval_status !== "approved") {
+  // Check if store is not approved (but allow owner to preview)
+  if (store.approval_status !== "approved" && !isOwner) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
@@ -131,8 +138,8 @@ export default async function StorefrontPage({
     );
   }
 
-  // Check if store is inactive
-  if (store.is_active === false) {
+  // Check if store is inactive (but allow owner to preview)
+  if (store.is_active === false && !isOwner) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
@@ -194,12 +201,35 @@ export default async function StorefrontPage({
     is_active: store.is_active,
   };
 
+  // Show preview banner if owner is viewing non-approved or inactive store
+  const showPreviewBanner =
+    isOwner &&
+    (store.approval_status !== "approved" || store.is_active === false);
+  const previewMessage =
+    store.approval_status === "pending"
+      ? "⏳ Preview Mode: Your store is under review and not yet public"
+      : store.approval_status === "rejected"
+      ? "❌ Preview Mode: Your store was rejected and is not public"
+      : store.is_active === false
+      ? "🔒 Preview Mode: Your store is inactive and not public"
+      : "";
+
   // Pass data to client component
   return (
-    <StorefrontClient
-      store={cleanStore}
-      products={products}
-      handle={params.handle}
-    />
+    <>
+      {showPreviewBanner && (
+        <div className="bg-amber-500 text-white px-4 py-3 text-center font-medium sticky top-0 z-50 shadow-lg">
+          {previewMessage}
+          <span className="ml-2 text-sm opacity-90">
+            • Only you can see this page
+          </span>
+        </div>
+      )}
+      <StorefrontClient
+        store={cleanStore}
+        products={products}
+        handle={params.handle}
+      />
+    </>
   );
 }
