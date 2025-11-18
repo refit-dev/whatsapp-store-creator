@@ -204,6 +204,8 @@ export function AllOrdersTable({
                   className={`ml-2 inline-block px-2 py-1 rounded-full text-xs font-medium shrink-0 ${
                     order.status === "paid"
                       ? "bg-green-100 text-green-800"
+                      : order.status === "customer_confirmed"
+                      ? "bg-indigo-100 text-indigo-800"
                       : order.status === "opened_whatsapp"
                       ? "bg-blue-100 text-blue-800"
                       : order.status === "cancelled"
@@ -211,7 +213,9 @@ export function AllOrdersTable({
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {order.status}
+                  {order.status === "customer_confirmed"
+                    ? "confirmed"
+                    : order.status}
                 </span>
               </div>
 
@@ -340,6 +344,8 @@ export function AllOrdersTable({
                     className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                       order.status === "paid"
                         ? "bg-green-100 text-green-800"
+                        : order.status === "customer_confirmed"
+                        ? "bg-indigo-100 text-indigo-800"
                         : order.status === "opened_whatsapp"
                         ? "bg-blue-100 text-blue-800"
                         : order.status === "cancelled"
@@ -347,7 +353,9 @@ export function AllOrdersTable({
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {order.status}
+                    {order.status === "customer_confirmed"
+                      ? "confirmed"
+                      : order.status}
                   </span>
                 </td>
                 <td className="px-6 py-4">

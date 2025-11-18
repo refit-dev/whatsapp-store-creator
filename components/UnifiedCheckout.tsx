@@ -5,6 +5,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 import { useCart } from "./CartProvider";
 import { buildWhatsAppUrl } from "@/utils/wa";
 import { isValidPhoneInternational } from "@/lib/validations";
+import { ConfirmWhatsAppButton } from "./ConfirmWhatsAppButton";
 
 interface UnifiedCheckoutProps {
   storeId: string;
@@ -62,6 +63,7 @@ export function UnifiedCheckout({
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [whatsappOpened, setWhatsappOpened] = useState(false);
 
   const supabase = supabaseBrowser();
 
@@ -418,12 +420,9 @@ export function UnifiedCheckout({
       if (typeof window !== "undefined") {
         window.open(waUrl, "_blank");
 
-        // Show success message
-        setTimeout(() => {
-          alert(
-            "Order sent to WhatsApp! The store owner will contact you shortly."
-          );
-        }, 500);
+        // Show confirmation UI
+        setWhatsappOpened(true);
+        setOrderId(order.id);
       }
     } catch (error: any) {
       console.error("WhatsApp order error:", error);
@@ -480,6 +479,52 @@ export function UnifiedCheckout({
         <p className="text-gray-600">
           Add some products to proceed with checkout.
         </p>
+      </div>
+    );
+  }
+
+  // Show WhatsApp confirmation UI after order is created and WhatsApp is opened
+  if (whatsappOpened && orderId) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-4">💬</div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            WhatsApp Opened!
+          </h3>
+          <p className="text-gray-600">Your order details have been prepared</p>
+        </div>
+
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 mb-6">
+          <div className="flex gap-3">
+            <div className="text-2xl">📝</div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-gray-900 mb-2">Next Steps:</h4>
+              <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+                <li>Send the pre-filled message in WhatsApp</li>
+                <li>Wait for the store to confirm your order</li>
+                <li>Click the button below after sending</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        {/* Import and use the confirmation button */}
+        <ConfirmWhatsAppButton
+          orderId={orderId}
+          onConfirmed={() => {
+            // Optional: redirect or show success message
+            setTimeout(() => {
+              window.location.href = `/${storeHandle}`;
+            }, 2000);
+          }}
+        />
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            Order ID: <span className="font-mono">{orderId.slice(0, 8)}</span>
+          </p>
+        </div>
       </div>
     );
   }
