@@ -196,6 +196,54 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["api_requests"]["Row"]>;
       };
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          icon: string | null;
+          parent_id: string | null;
+          level: number;
+          sort_order: number | null;
+          is_active: boolean | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          description?: string | null;
+          icon?: string | null;
+          parent_id?: string | null;
+          level?: number;
+          sort_order?: number | null;
+          is_active?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["categories"]["Row"]>;
+      };
+      store_categories: {
+        Row: {
+          id: string;
+          store_id: string;
+          category_id: string;
+          is_primary: boolean | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          store_id: string;
+          category_id: string;
+          is_primary?: boolean | null;
+          created_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["store_categories"]["Row"]
+        >;
+      };
     };
     Views: {
       store_public: {

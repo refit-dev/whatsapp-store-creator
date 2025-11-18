@@ -6,6 +6,7 @@ import { DeliverySettings } from "./DeliverySettings";
 import { StoreStatusToggle } from "./StoreStatusToggle";
 import MobileVerification from "./MobileVerification";
 import { ImageUpload } from "./ImageUpload";
+import CategorySelector from "./CategorySelector";
 import type { Store } from "@/types/interfaces";
 
 interface StoreSettingsFormProps {
@@ -16,6 +17,7 @@ interface StoreSettingsFormProps {
 type TabType =
   | "basic"
   | "branding"
+  | "categories"
   | "status"
   | "verification"
   | "payment"
@@ -37,6 +39,9 @@ export function StoreSettingsFormTabbed({
   const [currency, setCurrency] = useState(store?.currency || "USD");
   const [logoUrl, setLogoUrl] = useState(store?.logo_url || null);
   const [bannerUrl, setBannerUrl] = useState(store?.banner_url || null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesMessage, setCategoriesMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -48,8 +53,26 @@ export function StoreSettingsFormTabbed({
       setCurrency(store.currency || "USD");
       setLogoUrl(store.logo_url || null);
       setBannerUrl(store.banner_url || null);
+      loadStoreCategories();
     }
   }, [store]);
+
+  const loadStoreCategories = async () => {
+    if (!store?.id) return;
+
+    try {
+      const { data } = await sb
+        .from("store_categories")
+        .select("category_id")
+        .eq("store_id", store.id);
+
+      if (data) {
+        setSelectedCategories(data.map((sc) => sc.category_id));
+      }
+    } catch (error) {
+      console.error("Error loading store categories:", error);
+    }
+  };
 
   const handleGenerateHandle = () => {
     if (name) {
@@ -59,6 +82,35 @@ export function StoreSettingsFormTabbed({
         .replace(/\s+/g, "-")
         .substring(0, 30);
       setHandle(generated);
+    }
+  };
+
+  const handleSaveCategories = async () => {
+    if (!store?.id) return;
+
+    setCategoriesLoading(true);
+    setCategoriesMessage("");
+
+    try {
+      const response = await fetch("/api/store-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeId: store.id,
+          categoryIds: selectedCategories,
+          primaryCategoryId: selectedCategories[0], // First selected is primary
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save categories");
+
+      setCategoriesMessage("✓ Categories saved successfully!");
+      setTimeout(() => setCategoriesMessage(""), 3000);
+    } catch (error) {
+      console.error("Error saving categories:", error);
+      setCategoriesMessage("Error: Failed to save categories");
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
@@ -113,6 +165,12 @@ export function StoreSettingsFormTabbed({
   const tabs = [
     { id: "basic" as TabType, label: "Basic", icon: "📋", show: true },
     { id: "branding" as TabType, label: "Branding", icon: "🎨", show: true },
+    {
+      id: "categories" as TabType,
+      label: "Categories",
+      icon: "🏷️",
+      show: !!store,
+    },
     { id: "status" as TabType, label: "Status", icon: "🔄", show: !!store },
     {
       id: "verification" as TabType,
@@ -388,6 +446,67 @@ export function StoreSettingsFormTabbed({
               </button>
             </div>
           </form>
+        )}
+
+        {/* Categories Tab */}
+        {activeTab === "categories" && (
+          <div className="p-4 sm:p-6">
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-start gap-3 pb-4 border-b">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🏷️</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Store Categories
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Help customers discover your store by selecting relevant
+                    categories
+                  </p>
+                </div>
+              </div>
+
+              {/* Category Selector */}
+              <CategorySelector
+                selectedCategories={selectedCategories}
+                onCategoryChange={setSelectedCategories}
+                maxSelection={3}
+                showSubcategories={false}
+                mode="settings"
+              />
+
+              {/* Message */}
+              {categoriesMessage && (
+                <div
+                  className={`p-4 rounded-lg ${
+                    categoriesMessage.includes("Error")
+                      ? "bg-red-50 text-red-800 border border-red-200"
+                      : "bg-green-50 text-green-800 border border-green-200"
+                  }`}
+                >
+                  {categoriesMessage}
+                </div>
+              )}
+
+              {/* Save Button */}
+              <button
+                type="button"
+                onClick={handleSaveCategories}
+                disabled={categoriesLoading || selectedCategories.length === 0}
+                className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3.5 rounded-lg font-semibold hover:from-green-700 hover:to-teal-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {categoriesLoading ? "Saving..." : "💾 Save Categories"}
+              </button>
+
+              {selectedCategories.length === 0 && (
+                <p className="text-sm text-gray-500 text-center">
+                  Select at least one category to help customers find your store
+                </p>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Store Status Tab */}
