@@ -6,8 +6,16 @@ import Link from "next/link";
 type Store = Database["public"]["Tables"]["stores"]["Row"];
 
 export function StoreApprovalBanner({ store }: { store: Store }) {
+  // Don't show banner if store is approved
   if (store.approval_status === "approved") {
-    return null; // Don't show anything if approved
+    return null;
+  }
+
+  // Don't show banner if store is newly created and not yet set up
+  // Only show after user has added at least store name beyond default "My Store"
+  const isNewStore = store.name === "My Store" || !store.name;
+  if (isNewStore && store.approval_status === "pending") {
+    return null; // Don't show pending banner for brand new stores
   }
 
   if (store.approval_status === "rejected") {

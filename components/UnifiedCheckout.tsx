@@ -279,6 +279,7 @@ export function UnifiedCheckout({
           buyer: {
             name: customerInfo.name,
             phone: customerInfo.phone,
+            email: customerInfo.email, // Include email if provided
             address: customerInfo.address,
             notes: getOrderNotes(),
           },
@@ -323,6 +324,11 @@ export function UnifiedCheckout({
   const handleWhatsAppOrder = async () => {
     if (!customerInfo.name || !customerInfo.phone) {
       alert("Please fill in your name and phone number");
+      return;
+    }
+
+    if (!customerInfo.address || customerInfo.address.trim() === "") {
+      alert("Please fill in your delivery address");
       return;
     }
 
@@ -406,6 +412,7 @@ export function UnifiedCheckout({
         buyer: {
           name: customerInfo.name,
           phone: customerInfo.phone,
+          email: customerInfo.email, // Include email if provided
           address: customerInfo.address,
           notes: getOrderNotes(),
         },

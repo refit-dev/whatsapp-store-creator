@@ -9,6 +9,7 @@ export type WhatsAppItem = {
 export type WhatsAppBuyer = {
   name: string;
   phone: string;
+  email?: string;
   address: string;
   notes?: string;
 };
@@ -64,6 +65,7 @@ export function buildWhatsAppUrl({
     ``,
     `Buyer: ${buyer.name}`,
     `Phone: ${buyer.phone}`,
+    ...(buyer.email ? ["Email: " + buyer.email] : []),
     ...(buyer.address ? ["Address: " + buyer.address] : []),
     ...(paymentLink ? ["", "Payment Link: " + paymentLink] : []),
   ];
