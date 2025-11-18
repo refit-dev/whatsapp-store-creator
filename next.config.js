@@ -8,14 +8,41 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
+
+  // Optimize for modern browsers - reduces JavaScript bundle size
+  swcMinify: true,
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+
+  // Modern JavaScript target - reduces polyfills
+  experimental: {
+    modern: true,
+  },
+
   images: {
     formats: ["image/webp", "image/avif"],
     domains: ["dwxbvqvogdrmjnumjwzk.supabase.co"], // Add your Supabase storage domain
+    // Enable image optimization
+    minimumCacheTTL: 60,
   },
-  webpack: (config) => {
+
+  webpack: (config, { isServer }) => {
     // Supabase client libs use some dynamic requires that trigger Webpack's
     // exprContextCritical warnings. They are safe here; silence them.
     config.module.exprContextCritical = false;
+
+    // Optimize bundle size
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
     return config;
   },
   async headers() {

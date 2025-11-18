@@ -1,0 +1,19 @@
+# Browserslist configuration for modern browsers
+# This reduces JavaScript bundle size by avoiding unnecessary polyfills
+
+# Production browsers (>0.5% market share, modern browsers only)
+production:
+  >0.5%
+  last 2 Chrome versions
+  last 2 Firefox versions
+  last 2 Safari versions
+  last 2 Edge versions
+  not dead
+  not IE 11
+  not op_mini all
+
+# Development (use same as production for consistency)
+development:
+  last 1 Chrome version
+  last 1 Firefox version
+  last 1 Safari version
