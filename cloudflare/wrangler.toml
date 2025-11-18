@@ -1,0 +1,13 @@
+name = "watzy-cdn-proxy"
+main = "./worker/index.js"
+type = "javascript"
+
+[env.production]
+account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+zone_id = "YOUR_ZONE_ID"
+workers_dev = false
+route = "example.com/*"
+compatibility_date = "2025-11-18"
+
+[vars]
+ORIGIN = "https://your-origin.example"

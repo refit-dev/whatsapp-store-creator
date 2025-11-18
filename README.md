@@ -89,6 +89,13 @@ pnpm cypress:open
 2. Add environment variables from `.env.local`
 3. Deploy!
 
+### Cloudflare (optional)
+
+You can add Cloudflare in front of your deployment for DDoS protection, WAF and optional edge caching.
+
+- There's an example Worker and Wrangler config in `cloudflare/`.
+- See `docs/cloudflare-setup.md` for step-by-step instructions and recommendations.
+
 ### Configure Webhooks
 
 #### Stripe Webhooks
