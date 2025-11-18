@@ -125,6 +125,7 @@ export default async function OrdersPage() {
           <AllOrdersTable
             initialOrders={orders as Order[]}
             currency={store.currency || "USD"}
+            storeId={store.id}
           />
         </div>
       </main>

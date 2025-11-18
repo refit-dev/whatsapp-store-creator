@@ -11,9 +11,10 @@ addEventListener("fetch", (event) => {
 
 async function handleRequest(request) {
   const url = new URL(request.url);
-  // Replace origin with configured var
-  const ORIGIN = ORIGIN || "https://your-origin.example"; // replaced by wrangler var
-  const originUrl = new URL(ORIGIN);
+  // Replace origin with configured var (env variable from wrangler.toml)
+  const originHost =
+    typeof ORIGIN !== "undefined" ? ORIGIN : "https://your-origin.example";
+  const originUrl = new URL(originHost);
   originUrl.pathname = url.pathname;
   originUrl.search = url.search;
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toLocaleString } from "@/lib/currency";
 import { CopyOrderButton } from "./CopyOrderButton";
+import OrderCancelModal from "./OrderCancelModal";
 import Link from "next/link";
 
 interface Order {
@@ -27,15 +28,19 @@ interface Order {
 interface AllOrdersTableProps {
   initialOrders: Order[];
   currency: string;
+  storeId: string;
 }
 
 export function AllOrdersTable({
   initialOrders,
   currency,
+  storeId,
 }: AllOrdersTableProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -46,6 +51,26 @@ export function AllOrdersTable({
       console.error("Error refreshing:", error);
       setIsRefreshing(false);
     }
+  };
+
+  const handleCancelClick = (order: Order) => {
+    setSelectedOrder(order);
+    setShowCancelModal(true);
+  };
+
+  const handleCancelSuccess = () => {
+    setShowCancelModal(false);
+    setSelectedOrder(null);
+    // Refresh to show updated status
+    window.location.reload();
+  };
+
+  const canCancelOrder = (order: Order) => {
+    return (
+      order.status !== "cancelled" &&
+      order.status !== "delivered" &&
+      order.status !== "completed"
+    );
   };
 
   // Filter orders based on status
@@ -211,8 +236,16 @@ export function AllOrdersTable({
                 </div>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
                 <CopyOrderButton order={order} currency={currency} />
+                {canCancelOrder(order) && (
+                  <button
+                    onClick={() => handleCancelClick(order)}
+                    className="px-3 py-2 text-sm bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium"
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -305,13 +338,39 @@ export function AllOrdersTable({
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <CopyOrderButton order={order} currency={currency} />
+                  <div className="flex items-center gap-2">
+                    <CopyOrderButton order={order} currency={currency} />
+                    {canCancelOrder(order) && (
+                      <button
+                        onClick={() => handleCancelClick(order)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        title="Cancel this order"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Cancel Modal */}
+      {showCancelModal && selectedOrder && (
+        <OrderCancelModal
+          orderId={selectedOrder.id}
+          storeId={storeId}
+          orderTotal={(selectedOrder.total_cents || 0) / 100}
+          paymentStatus={selectedOrder.status}
+          onClose={() => {
+            setShowCancelModal(false);
+            setSelectedOrder(null);
+          }}
+          onSuccess={handleCancelSuccess}
+        />
+      )}
     </div>
   );
 }
