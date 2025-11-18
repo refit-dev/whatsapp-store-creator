@@ -8,8 +8,11 @@ compatibility_date = "2025-11-18"
 account_id = "768710f7100fc1dfa3328293d25e775f"
 zone_id = "f20e595dd5745286c67faca41b6119c1"
 workers_dev = false
-route = "watzy.app/*"
+routes = [
+  { pattern = "watzy.app/*", zone_id = "f20e595dd5745286c67faca41b6119c1" },
+  { pattern = "www.watzy.app/*", zone_id = "f20e595dd5745286c67faca41b6119c1" }
+]
 
 [env.production.vars]
 # This should point to your Vercel deployment
-ORIGIN = "https://whatsapp-store-creator-43mzh2gf9-watzy.vercel.app"
+ORIGIN = "https://whatsapp-store-creator-159iqp9t0-watzy.vercel.app"
