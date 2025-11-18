@@ -5,62 +5,78 @@
  * This is an optional edge proxy you can use to put Cloudflare in front of your Vercel origin.
  */
 
-addEventListener("fetch", (event) => {
-  event.respondWith(handleRequest(event.request));
-});
+export default {
+  async fetch(request, env, ctx) {
+    return handleRequest(request, env, ctx);
+  },
+};
 
-async function handleRequest(request) {
-  const url = new URL(request.url);
-  // Replace origin with configured var (env variable from wrangler.toml)
-  const originHost =
-    typeof ORIGIN !== "undefined" ? ORIGIN : "https://your-origin.example";
-  const originUrl = new URL(originHost);
-  originUrl.pathname = url.pathname;
-  originUrl.search = url.search;
+async function handleRequest(request, env, ctx) {
+  try {
+    const url = new URL(request.url);
+    // Get origin from environment variables
+    const originHost = env.ORIGIN || "https://your-origin.example";
+    const originUrl = new URL(originHost);
+    originUrl.pathname = url.pathname;
+    originUrl.search = url.search;
 
-  // Build a new request to the origin
-  const originRequest = new Request(originUrl.toString(), {
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    redirect: "manual",
-  });
+    // Build a new request to the origin
+    const originRequest = new Request(originUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+      redirect: "manual",
+    });
 
-  // Edge caching options: use Cache API
-  const cache = caches.default;
-  const cacheKey = new Request(originUrl.toString(), { method: "GET" });
+    // Edge caching options: use Cache API
+    const cache = caches.default;
+    const cacheKey = new Request(originUrl.toString(), { method: "GET" });
 
-  if (request.method === "GET") {
-    // try cache first
-    const cached = await cache.match(cacheKey);
-    if (cached) {
-      const resp = new Response(cached.body, cached);
-      addSecurityHeaders(resp);
-      return resp;
+    if (request.method === "GET") {
+      // try cache first
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        const resp = new Response(cached.body, cached);
+        addSecurityHeaders(resp);
+        return resp;
+      }
     }
+
+    // Forward request to origin
+    const originResponse = await fetch(originRequest);
+
+    // Clone response for caching
+    const response = new Response(originResponse.body, {
+      status: originResponse.status,
+      statusText: originResponse.statusText,
+      headers: originResponse.headers,
+    });
+
+    // Apply caching policy for successful GET responses
+    if (request.method === "GET" && response.status === 200) {
+      // You can customize cache TTL via Cache-Control header on origin or set here
+      // Example: cache for 60 seconds at edge
+      response.headers.set("Cache-Control", "public, max-age=60");
+      ctx.waitUntil(eventualCachePut(cache, cacheKey, response.clone()));
+    }
+
+    addSecurityHeaders(response);
+
+    return response;
+  } catch (error) {
+    // Return error response with details
+    return new Response(
+      JSON.stringify({
+        error: "Worker proxy error",
+        message: error.message,
+        stack: error.stack,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
-
-  // Forward request to origin
-  const originResponse = await fetch(originRequest);
-
-  // Clone response for caching
-  const response = new Response(originResponse.body, {
-    status: originResponse.status,
-    statusText: originResponse.statusText,
-    headers: originResponse.headers,
-  });
-
-  // Apply caching policy for successful GET responses
-  if (request.method === "GET" && response.status === 200) {
-    // You can customize cache TTL via Cache-Control header on origin or set here
-    // Example: cache for 60 seconds at edge
-    response.headers.set("Cache-Control", "public, max-age=60");
-    eventualCachePut(cache, cacheKey, response.clone());
-  }
-
-  addSecurityHeaders(response);
-
-  return response;
 }
 
 // async helper to put in cache without blocking the response
