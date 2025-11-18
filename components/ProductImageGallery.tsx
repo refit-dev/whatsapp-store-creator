@@ -49,8 +49,8 @@ export function ProductImageGallery({
 
   return (
     <div className="relative w-full">
-      {/* Main Image Container */}
-      <div className="relative w-full aspect-square bg-white rounded-2xl overflow-hidden shadow-lg">
+      {/* Main Image Container - Shorter on mobile */}
+      <div className="relative w-full aspect-[4/3] md:aspect-square bg-white rounded-lg md:rounded-2xl overflow-hidden shadow-lg">
         <img
           src={images[currentIndex]}
           alt={`${productName} - Image ${currentIndex + 1}`}
@@ -117,14 +117,14 @@ export function ProductImageGallery({
         )}
       </div>
 
-      {/* Thumbnail Navigation */}
+      {/* Thumbnail Navigation - Hidden on mobile for cleaner look */}
       {images.length > 1 && (
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+        <div className="mt-2 md:mt-3 hidden md:flex gap-2 overflow-x-auto pb-2">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all ${
                 index === currentIndex
                   ? "border-blue-600 ring-2 ring-blue-200"
                   : "border-gray-200 hover:border-gray-400"
@@ -140,17 +140,15 @@ export function ProductImageGallery({
         </div>
       )}
 
-      {/* Dot Indicators (Alternative for few images) */}
-      {images.length > 1 && images.length <= 5 && (
-        <div className="mt-4 flex justify-center gap-2">
+      {/* Dot Indicators - Mobile only, cleaner */}
+      {images.length > 1 && (
+        <div className="mt-3 flex md:hidden justify-center gap-1.5">
           {images.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex
-                  ? "bg-blue-600 w-6"
-                  : "bg-gray-300 hover:bg-gray-400"
+              className={`w-1.5 h-1.5 rounded-full transition-all ${
+                index === currentIndex ? "bg-blue-600 w-4" : "bg-gray-300"
               }`}
               aria-label={`Go to image ${index + 1}`}
             />

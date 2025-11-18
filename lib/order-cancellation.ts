@@ -4,9 +4,10 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export type CancellationReason =
   | "out_of_stock"
@@ -38,17 +39,26 @@ export interface CancelOrderResult {
  * Cancel an order and process refund if payment was made
  */
 export async function cancelOrder(
-  params: CancelOrderParams
+  params: CancelOrderParams,
+  supabaseClient?: SupabaseClient
 ): Promise<CancelOrderResult> {
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // Use service role client to bypass RLS
+  const supabase =
+    supabaseClient ||
+    createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
 
   try {
     // 1. Verify store ownership
     const { data: store, error: storeError } = await supabase
       .from("stores")
-      .select("id, user_id")
+      .select("id, owner_id")
       .eq("id", params.storeId)
-      .eq("user_id", params.userId)
+      .eq("owner_id", params.userId)
       .single();
 
     if (storeError || !store) {

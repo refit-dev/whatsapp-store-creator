@@ -241,9 +241,22 @@ export function AllOrdersTable({
                 {canCancelOrder(order) && (
                   <button
                     onClick={() => handleCancelClick(order)}
-                    className="px-3 py-2 text-sm bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 font-medium shadow-sm hover:shadow"
                   >
-                    Cancel Order
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Cancel
                   </button>
                 )}
               </div>
@@ -343,9 +356,22 @@ export function AllOrdersTable({
                     {canCancelOrder(order) && (
                       <button
                         onClick={() => handleCancelClick(order)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow"
                         title="Cancel this order"
                       >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
                         Cancel
                       </button>
                     )}

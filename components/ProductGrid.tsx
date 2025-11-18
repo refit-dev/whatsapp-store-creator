@@ -65,21 +65,21 @@ export function ProductGrid({
             </div>
 
             {/* Product Info */}
-            <div className="p-4 md:p-5">
-              <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-1">
+            <div className="p-3 md:p-5">
+              <h3 className="font-bold text-base md:text-lg mb-1 md:mb-2 text-gray-900 line-clamp-1">
                 {product.title}
               </h3>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[40px]">
+              <p className="text-gray-600 text-xs md:text-sm mb-3 md:mb-4 line-clamp-2 min-h-[32px] md:min-h-[40px]">
                 {product.description}
               </p>
 
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="flex items-center justify-between gap-2 md:gap-3">
+                <p className="text-xl md:text-2xl font-bold text-gray-900">
                   {toLocaleString(product.price_cents, currency)}
                 </p>
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-3 md:px-5 md:py-2.5 rounded-lg text-sm font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg active:scale-95 transform touch-target"
+                  className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-lg text-xs md:text-sm font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg active:scale-95 transform touch-target whitespace-nowrap"
                 >
                   {cartItem && cartItem.qty > 0
                     ? `Add More (${cartItem.qty})`

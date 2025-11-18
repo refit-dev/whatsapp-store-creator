@@ -87,7 +87,7 @@ CREATE POLICY "Store owners can view cancellation logs"
   FOR SELECT
   USING (
     store_id IN (
-      SELECT id FROM stores WHERE user_id = auth.uid()
+      SELECT id FROM stores WHERE owner_id = auth.uid()
     )
   );
 

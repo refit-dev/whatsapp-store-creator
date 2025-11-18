@@ -60,7 +60,7 @@ export default async function StorefrontPage({
   const { data: store, error: storeError } = await supabase
     .from("stores")
     .select(
-      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active, approval_status, is_blocked, block_reason, user_id"
+      "id, handle, name, logo_url, banner_url, currency, whatsapp_e164, is_active, approval_status, is_blocked, block_reason, owner_id"
     )
     .eq("handle", params.handle)
     .single();
@@ -78,7 +78,7 @@ export default async function StorefrontPage({
   }
 
   // Check if current user is the store owner
-  const isOwner = currentUser && store.user_id === currentUser.id;
+  const isOwner = currentUser && store.owner_id === currentUser.id;
 
   // Check if store is blocked
   if (store.is_blocked) {

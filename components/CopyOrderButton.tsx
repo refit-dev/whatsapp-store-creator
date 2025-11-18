@@ -30,8 +30,22 @@ export function CopyOrderButton({ order, currency }: CopyOrderButtonProps) {
   return (
     <button
       onClick={handleCopy}
-      className="text-blue-600 hover:text-blue-800 font-medium"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow"
+      title="Copy order details to clipboard"
     >
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+        />
+      </svg>
       Copy Details
     </button>
   );
