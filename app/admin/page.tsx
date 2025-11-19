@@ -143,6 +143,19 @@ export default async function AdminDashboard() {
             </div>
             <span className="text-2xl">🖼️</span>
           </Link>
+
+          <Link
+            href="/admin/trial-offers"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">Trial & Offers</h3>
+              <p className="text-sm text-gray-600">
+                Manage trial settings and special offers
+              </p>
+            </div>
+            <span className="text-2xl">🎁</span>
+          </Link>
         </div>
       </div>
 

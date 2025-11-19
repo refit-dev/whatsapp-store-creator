@@ -18,7 +18,7 @@ export function DashboardLayout({
 
       {/* Main content area */}
       <div className="lg:pl-64">
-        <main className="min-h-screen">{children}</main>
+        <main>{children}</main>
       </div>
     </div>
   );
