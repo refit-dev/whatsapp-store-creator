@@ -142,8 +142,8 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
         return;
       }
 
-      if (sanitizedPrice <= 0) {
-        setMessage("Product price must be greater than 0");
+      if (sanitizedPrice < 0) {
+        setMessage("Product price cannot be negative");
         setLoading(false);
         return;
       }
