@@ -26,6 +26,23 @@ export function BillingClient() {
   const handleUpgrade = async () => {
     setIsProcessing(true);
     try {
+      // First, fetch the Pro plan ID
+      const plansResponse = await fetch("/api/subscription-plans");
+      if (!plansResponse.ok) {
+        throw new Error("Failed to fetch subscription plans");
+      }
+
+      const { plans } = await plansResponse.json();
+      const proPlan = plans.find(
+        (p: any) => p.name === "Monthly Pro" && !p.is_trial
+      );
+
+      if (!proPlan) {
+        throw new Error("Pro plan not found");
+      }
+
+      console.log("📋 Creating subscription for plan:", proPlan.id);
+
       // Create Razorpay subscription
       const subscriptionResponse = await fetch(
         "/api/razorpay/create-subscription",
@@ -33,38 +50,41 @@ export function BillingClient() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: "user_" + Date.now(), // You should use actual user ID
-            userEmail: "user@example.com", // You should use actual user email
-            userName: "User", // You should use actual user name
-            phone: "", // Optional phone number
+            plan_id: proPlan.id,
           }),
         }
       );
 
       if (!subscriptionResponse.ok) {
-        throw new Error("Failed to create subscription");
+        const errorData = await subscriptionResponse.json();
+        console.error("❌ Subscription creation failed:", errorData);
+        throw new Error(errorData.error || "Failed to create subscription");
       }
 
-      const { subscriptionId, shortUrl } = await subscriptionResponse.json();
+      const data = await subscriptionResponse.json();
+      const { subscription } = data;
 
       // Redirect to Razorpay's hosted checkout page for subscription
-      if (shortUrl) {
-        window.open(shortUrl, "_blank");
+      if (subscription?.short_url) {
+        console.log("✅ Opening Razorpay checkout:", subscription.short_url);
+        window.open(subscription.short_url, "_blank");
 
-        // You can also poll for subscription status
+        // Poll for subscription status after a delay
         setTimeout(async () => {
           try {
             await refreshSubscription();
+            console.log("✅ Subscription status refreshed");
           } catch (error) {
-            console.log("Status refresh failed:", error);
+            console.log("⚠️ Status refresh failed:", error);
           }
         }, 5000);
       } else {
-        throw new Error("No checkout URL received");
+        console.error("❌ No checkout URL received:", data);
+        throw new Error("No checkout URL received from Razorpay");
       }
-    } catch (error) {
-      console.error("Subscription error:", error);
-      alert("Subscription creation failed. Please try again.");
+    } catch (error: any) {
+      console.error("❌ Subscription error:", error);
+      alert(error.message || "Subscription creation failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }

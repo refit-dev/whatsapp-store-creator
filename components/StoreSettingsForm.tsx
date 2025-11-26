@@ -28,6 +28,9 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
     store?.whatsapp_e164 || ""
   );
   const [currency, setCurrency] = useState(store?.currency || "USD");
+  const [storeMode, setStoreMode] = useState<"order" | "inquiry" | "hybrid">(
+    store?.store_mode || "order"
+  );
   const [logoUrl, setLogoUrl] = useState(store?.logo_url || null);
   const [bannerUrl, setBannerUrl] = useState(store?.banner_url || null);
   const [loading, setLoading] = useState(false);
@@ -39,6 +42,7 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
       setHandle(store.handle);
       setWhatsappNumber(store.whatsapp_e164 || "");
       setCurrency(store.currency || "USD");
+      setStoreMode(store.store_mode || "order");
       setLogoUrl(store.logo_url || null);
       setBannerUrl(store.banner_url || null);
     }
@@ -67,6 +71,7 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
         handle: sanitizeHandle(handle),
         whatsapp_e164: sanitizePhone(whatsappNumber),
         currency: sanitizeCurrency(currency),
+        store_mode: storeMode,
         logo_url: logoUrl ? sanitizeUrl(logoUrl) : null,
         banner_url: bannerUrl ? sanitizeUrl(bannerUrl) : null,
       };
@@ -229,6 +234,43 @@ export function StoreSettingsForm({ store, userId }: StoreSettingsFormProps) {
                 <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
               </select>
             </div>
+          </div>
+
+          {/* Store Mode Selection */}
+          <div>
+            <label
+              htmlFor="store_mode"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Store Mode *
+            </label>
+            <select
+              id="store_mode"
+              value={storeMode}
+              onChange={(e) =>
+                setStoreMode(e.target.value as "order" | "inquiry" | "hybrid")
+              }
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="order">
+                🛒 Order Mode - Traditional e-commerce with Buy Now
+              </option>
+              <option value="inquiry">
+                💬 Inquiry Mode - Express Interest for high-value items
+              </option>
+              <option value="hybrid">
+                🔀 Hybrid Mode - Both order and inquiry options
+              </option>
+            </select>
+            <p className="mt-1.5 text-xs text-gray-500">
+              {storeMode === "order" &&
+                "Customers can add products to cart and checkout"}
+              {storeMode === "inquiry" &&
+                "Customers submit inquiries for products (great for properties, vehicles, B2B)"}
+              {storeMode === "hybrid" &&
+                "Choose per product: allow buying or require inquiry"}
+            </p>
           </div>
         </div>
 

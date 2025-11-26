@@ -40,6 +40,9 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
   );
   const [imageUrl, setImageUrl] = useState(product?.image_urls?.[0] || "");
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
+  const [interactionType, setInteractionType] = useState<"buy_now" | "inquiry">(
+    (product as any)?.interaction_type || "buy_now"
+  );
 
   // Convert Google Drive viewing links to direct links
   const convertGoogleDriveLink = (url: string): string => {
@@ -158,6 +161,7 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
         image_urls: finalImageUrl ? [finalImageUrl] : [],
         is_active: isActive,
         stock_qty: sanitizedStock,
+        interaction_type: interactionType,
         store_id: storeId,
       };
 
@@ -271,6 +275,34 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
         />
         <p className="mt-1 text-sm text-gray-500">
           Leave empty for unlimited stock
+        </p>
+      </div>
+
+      {/* Interaction Type */}
+      <div>
+        <label
+          htmlFor="interaction_type"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Customer Action
+        </label>
+        <select
+          id="interaction_type"
+          value={interactionType}
+          onChange={(e) =>
+            setInteractionType(e.target.value as "buy_now" | "inquiry")
+          }
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="buy_now">🛒 Buy Now - Add to cart & checkout</option>
+          <option value="inquiry">
+            💬 Express Interest - Submit inquiry form
+          </option>
+        </select>
+        <p className="mt-1 text-sm text-gray-500">
+          {interactionType === "buy_now"
+            ? "Customers can immediately purchase this product"
+            : "Customers fill a form to express interest (ideal for high-value items)"}
         </p>
       </div>
 

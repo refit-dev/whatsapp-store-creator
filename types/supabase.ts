@@ -36,6 +36,7 @@ export interface Database {
           blocked_at: string | null;
           blocked_by: string | null;
           block_reason: string | null;
+          store_mode: "order" | "inquiry" | "hybrid" | null;
           created_at: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["stores"]["Row"]> & {
@@ -100,6 +101,7 @@ export interface Database {
           variants: Json | null;
           is_active: boolean | null;
           stock_qty: number | null;
+          interaction_type: "buy_now" | "inquiry" | null;
           created_at: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["products"]["Row"]> & {
@@ -501,6 +503,104 @@ export interface Database {
           created_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["payment_logs"]["Row"]>;
+      };
+      inquiries: {
+        Row: {
+          id: string;
+          store_id: string;
+          product_id: string | null;
+          customer_name: string;
+          customer_phone: string;
+          customer_email: string | null;
+          message: string | null;
+          preferred_contact_time: string | null;
+          budget_min: number | null;
+          budget_max: number | null;
+          status:
+            | "new"
+            | "contacted"
+            | "site_visit_scheduled"
+            | "negotiating"
+            | "converted"
+            | "lost";
+          priority: "low" | "medium" | "high";
+          notes: string | null;
+          follow_up_date: string | null;
+          assigned_to: string | null;
+          converted_at: string | null;
+          conversion_value: number | null;
+          lost_reason: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          store_id: string;
+          product_id?: string | null;
+          customer_name: string;
+          customer_phone: string;
+          customer_email?: string | null;
+          message?: string | null;
+          preferred_contact_time?: string | null;
+          budget_min?: number | null;
+          budget_max?: number | null;
+          status?:
+            | "new"
+            | "contacted"
+            | "site_visit_scheduled"
+            | "negotiating"
+            | "converted"
+            | "lost";
+          priority?: "low" | "medium" | "high";
+          notes?: string | null;
+          follow_up_date?: string | null;
+          assigned_to?: string | null;
+          converted_at?: string | null;
+          conversion_value?: number | null;
+          lost_reason?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["inquiries"]["Row"]>;
+      };
+      inquiry_interactions: {
+        Row: {
+          id: string;
+          inquiry_id: string;
+          interaction_type:
+            | "status_change"
+            | "call"
+            | "whatsapp"
+            | "email"
+            | "site_visit"
+            | "meeting"
+            | "note";
+          notes: string | null;
+          previous_status: string | null;
+          new_status: string | null;
+          created_by: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          inquiry_id: string;
+          interaction_type:
+            | "status_change"
+            | "call"
+            | "whatsapp"
+            | "email"
+            | "site_visit"
+            | "meeting"
+            | "note";
+          notes?: string | null;
+          previous_status?: string | null;
+          new_status?: string | null;
+          created_by?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["inquiry_interactions"]["Row"]
+        >;
       };
     };
     Views: {

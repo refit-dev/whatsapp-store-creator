@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { useState, type TouchEvent } from "react";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -11,12 +12,33 @@ export function ProductImageGallery({
   productName,
 }: ProductImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+      <div className="w-full aspect-[4/3] sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl sm:rounded-2xl flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-2">📦</div>
+          <div className="mx-auto mb-2 w-12 h-12 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 7h2l2-3h6l2 3h2a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 11a3 3 0 100 6 3 3 0 000-6z"
+              />
+            </svg>
+          </div>
           <p className="text-gray-500 text-sm">No image available</p>
         </div>
       </div>
@@ -31,31 +53,42 @@ export function ProductImageGallery({
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
-  const handleSwipe = (e: React.TouchEvent) => {
+  const handleTouchStart = (e: TouchEvent) => {
+    const touch = e.touches[0];
+    setTouchStartX(touch ? touch.clientX : null);
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (touchStartX === null) return;
+
     const touch = e.changedTouches[0];
-    const swipeThreshold = 50;
+    const endX = touch ? touch.clientX : touchStartX;
+    const swipeThreshold = 40;
+    const deltaX = endX - touchStartX;
 
-    if (touch) {
-      const startX = touch.clientX;
-      const endX = startX;
-
-      if (startX - endX > swipeThreshold) {
-        goToNext();
-      } else if (endX - startX > swipeThreshold) {
-        goToPrevious();
-      }
+    if (deltaX <= -swipeThreshold) {
+      goToNext();
+    } else if (deltaX >= swipeThreshold) {
+      goToPrevious();
     }
+
+    setTouchStartX(null);
   };
 
   return (
     <div className="relative w-full">
       {/* Main Image Container - Shorter on mobile */}
-      <div className="relative w-full aspect-[4/3] md:aspect-square bg-white rounded-lg md:rounded-2xl overflow-hidden shadow-lg">
+      <div
+        className="relative w-full aspect-[16/11] sm:aspect-[4/3] md:aspect-square max-h-[260px] sm:max-h-none bg-white rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-lg"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <img
           src={images[currentIndex]}
           alt={`${productName} - Image ${currentIndex + 1}`}
           className="w-full h-full object-cover"
-          onTouchEnd={handleSwipe}
+          loading="lazy"
+          decoding="async"
         />
 
         {/* Navigation Arrows (Desktop) */}
@@ -112,7 +145,7 @@ export function ProductImageGallery({
         {/* Swipe Hint (Mobile) */}
         {images.length > 1 && (
           <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm md:hidden">
-            ← Swipe →
+            Swipe
           </div>
         )}
       </div>
@@ -134,6 +167,8 @@ export function ProductImageGallery({
                 src={image}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </button>
           ))}

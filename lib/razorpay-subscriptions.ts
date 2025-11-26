@@ -148,7 +148,7 @@ export async function createRazorpaySubscription(
       plan_id: params.plan_id,
       customer_notify: params.customer_notify ?? 1,
       quantity: params.quantity || 1,
-      total_count: 0, // 0 = infinite billing cycles
+      total_count: 120, // 120 months = 10 years (Razorpay requires at least 1)
       notes: params.notes || {},
     };
 

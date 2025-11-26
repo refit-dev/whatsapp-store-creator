@@ -9,6 +9,7 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🔵 Subscription creation started");
     const cookieStore = cookies();
     const supabase = createServerComponentClient<Database>({
       cookies: () => cookieStore,
@@ -21,11 +22,15 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error("❌ Auth error:", authError);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    console.log("✅ User authenticated:", user.id);
+
     const body = await request.json();
     const { plan_id, offer_code } = body;
+    console.log("📦 Request body:", { plan_id, offer_code });
 
     if (!plan_id) {
       return NextResponse.json(
@@ -35,6 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get plan details from database
+    console.log("🔍 Fetching plan from database...");
     const { data: plan, error: planError } = await supabase
       .from("subscription_plans")
       .select("*")
@@ -42,20 +48,34 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (planError || !plan) {
+      console.error("❌ Plan fetch error:", planError);
       return NextResponse.json({ error: "Plan not found" }, { status: 404 });
     }
 
+    console.log("📋 Plan details:", {
+      id: plan.id,
+      name: plan.name,
+      price_cents: plan.price_cents,
+      razorpay_plan_id: plan.razorpay_plan_id,
+    });
+
     if (!plan.razorpay_plan_id) {
+      console.error("❌ Missing razorpay_plan_id for plan:", plan.id);
       return NextResponse.json(
         {
           error:
             "This plan is not configured for subscriptions. Please contact support.",
+          debug: {
+            plan_id: plan.id,
+            plan_name: plan.name,
+          },
         },
         { status: 400 }
       );
     }
 
     // Check if user already has an active subscription
+    console.log("🔍 Checking for existing active subscription...");
     const { data: existingSubscription } = await supabase
       .from("user_subscriptions")
       .select("*")
@@ -64,11 +84,17 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingSubscription) {
+      console.log(
+        "⚠️ User already has active subscription:",
+        existingSubscription.id
+      );
       return NextResponse.json(
         { error: "You already have an active subscription" },
         { status: 400 }
       );
     }
+
+    console.log("✅ No active subscription found");
 
     let discountAmount = 0;
     let offerId: string | null = null;

@@ -37,6 +37,9 @@ export function StoreSettingsFormTabbed({
     store?.whatsapp_e164 || ""
   );
   const [currency, setCurrency] = useState(store?.currency || "USD");
+  const [storeMode, setStoreMode] = useState<"order" | "inquiry" | "hybrid">(
+    (store as any)?.store_mode || "order"
+  );
   const [logoUrl, setLogoUrl] = useState(store?.logo_url || null);
   const [bannerUrl, setBannerUrl] = useState(store?.banner_url || null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -51,6 +54,7 @@ export function StoreSettingsFormTabbed({
       setHandle(store.handle);
       setWhatsappNumber(store.whatsapp_e164 || "");
       setCurrency(store.currency || "USD");
+      setStoreMode((store as any)?.store_mode || "order");
       setLogoUrl(store.logo_url || null);
       setBannerUrl(store.banner_url || null);
       loadStoreCategories();
@@ -128,6 +132,7 @@ export function StoreSettingsFormTabbed({
             handle,
             whatsapp_e164: whatsappNumber,
             currency,
+            store_mode: storeMode,
             logo_url: logoUrl,
             banner_url: bannerUrl,
           })
@@ -143,6 +148,7 @@ export function StoreSettingsFormTabbed({
           handle,
           whatsapp_e164: whatsappNumber,
           currency,
+          store_mode: storeMode,
           logo_url: logoUrl,
           banner_url: bannerUrl,
         });
@@ -186,8 +192,11 @@ export function StoreSettingsFormTabbed({
   return (
     <div className="space-y-4">
       {/* Horizontal Scrollable Tab Navigation */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-2 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-1.5 min-w-max">
+      <div
+        className="bg-gray-50 border border-gray-200 rounded-lg p-2 overflow-x-auto overflow-y-hidden"
+        style={{ scrollbarWidth: "thin" }}
+      >
+        <div className="flex gap-1.5 min-w-max pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -311,6 +320,41 @@ export function StoreSettingsFormTabbed({
                     <option value="AUD">🇦🇺 AUD</option>
                   </select>
                 </div>
+              </div>
+
+              {/* Store Mode */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Store Mode *
+                </label>
+                <select
+                  value={storeMode}
+                  onChange={(e) =>
+                    setStoreMode(
+                      e.target.value as "order" | "inquiry" | "hybrid"
+                    )
+                  }
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="order">
+                    🛒 Order Mode - Traditional e-commerce with Buy Now
+                  </option>
+                  <option value="inquiry">
+                    💬 Inquiry Mode - Express Interest for high-value items
+                  </option>
+                  <option value="hybrid">
+                    🔀 Hybrid Mode - Both order and inquiry options
+                  </option>
+                </select>
+                <p className="mt-1.5 text-xs text-gray-500">
+                  {storeMode === "order" &&
+                    "Customers can add products to cart and checkout"}
+                  {storeMode === "inquiry" &&
+                    "Customers submit inquiries for products (great for properties, vehicles, B2B)"}
+                  {storeMode === "hybrid" &&
+                    "Choose per product: allow buying or require inquiry"}
+                </p>
               </div>
 
               {/* Message */}
