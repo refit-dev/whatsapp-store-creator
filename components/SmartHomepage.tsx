@@ -45,15 +45,16 @@ export function SmartHomepage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <main className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-x-hidden">
       {/* Header */}
-      <header className="max-w-6xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-between">
+      <header className="max-w-6xl mx-auto w-full px-4 md:px-6 py-6 overflow-hidden">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Watzy
             </h1>
           </div>
+          {/* Desktop navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {user ? (
               // Logged in user navigation
@@ -86,11 +87,38 @@ export function SmartHomepage() {
               </>
             )}
           </nav>
+
+          {/* Mobile navigation (keeps auth actions visible) */}
+          <div className="flex md:hidden items-center gap-3">
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth"
+                  className="text-sm text-gray-700 font-medium"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth"
+                  className="px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 pt-12 pb-16">
+      <div className="max-w-6xl mx-auto w-full px-6 pt-12 pb-16 overflow-hidden">
         <div className="text-center space-y-8">
           {/* Badge */}
           <div className="inline-block">
@@ -163,7 +191,7 @@ export function SmartHomepage() {
       {/* Conditional Content Based on Auth Status */}
       {user ? (
         // Content for logged-in users
-        <div className="max-w-6xl mx-auto px-6 py-16">
+        <div className="max-w-6xl mx-auto w-full px-6 py-16 overflow-hidden">
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
             <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
               Welcome Back! 👋
@@ -219,7 +247,7 @@ export function SmartHomepage() {
         // Marketing content for non-logged-in users
         <>
           {/* Features Section */}
-          <div className="max-w-6xl mx-auto px-6 py-16">
+          <div className="max-w-6xl mx-auto w-full px-6 py-16 overflow-hidden">
             <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
               How It Works
             </h2>
@@ -247,8 +275,8 @@ export function SmartHomepage() {
           </div>
 
           {/* Benefits Section */}
-          <div className="bg-white py-16 mt-16">
-            <div className="max-w-6xl mx-auto px-6">
+          <div className="bg-white py-16 mt-16 overflow-hidden">
+            <div className="max-w-6xl mx-auto w-full px-6">
               <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
                 Why Sellers Love It
               </h2>
@@ -297,8 +325,8 @@ export function SmartHomepage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-20">
-        <div className="max-w-6xl mx-auto px-6">
+      <footer className="bg-gray-900 text-white py-12 mt-20 overflow-hidden">
+        <div className="max-w-6xl mx-auto w-full px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="md:col-span-2">
@@ -308,7 +336,7 @@ export function SmartHomepage() {
                 required, works globally.
               </p>
               <p className="text-sm text-gray-400">
-                © 2025 Ankit Nanda (HUF). All rights reserved.
+                © 2025 Watzy. All rights reserved.
               </p>
             </div>
 
@@ -447,11 +475,13 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-      <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-        {number}
+    <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg flex items-center justify-center shadow-md">
+          {number}
+        </div>
+        <div className="text-5xl leading-none">{icon}</div>
       </div>
-      <div className="text-5xl mb-4">{icon}</div>
       <h3 className="text-xl font-bold mb-3 text-gray-900">{title}</h3>
       <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
