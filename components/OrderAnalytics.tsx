@@ -65,8 +65,11 @@ export function OrderAnalytics({
 
     return orders
       .filter((order) => {
+        const isCancelled =
+          order.status?.toLowerCase() === "cancelled" ||
+          order.status?.toLowerCase() === "canceled";
         const orderDate = new Date(order.created_at);
-        return orderDate >= startOfMonth;
+        return orderDate >= startOfMonth && !isCancelled;
       })
       .reduce((sum, o) => sum + (o.total_cents || 0), 0);
   }, [orders]);
@@ -75,11 +78,18 @@ export function OrderAnalytics({
   const analytics = useMemo(() => {
     const totalOrders = filteredOrders.length;
     const paidOrders = filteredOrders.filter((o) => o.status === "paid").length;
-    const totalRevenue = filteredOrders.reduce(
+    // Exclude cancelled orders from revenue calculations
+    const revenueOrders = filteredOrders.filter((o) => {
+      const status = o.status?.toLowerCase();
+      return status !== "cancelled" && status !== "canceled";
+    });
+
+    const totalRevenue = revenueOrders.reduce(
       (sum, o) => sum + (o.total_cents || 0),
       0
     );
-    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+    const avgOrderValue =
+      revenueOrders.length > 0 ? totalRevenue / revenueOrders.length : 0;
 
     // Customer analysis
     const customerMap = new Map<string, number>();
@@ -118,7 +128,7 @@ export function OrderAnalytics({
 
     // Product analysis
     const productMap = new Map<string, { qty: number; revenue: number }>();
-    filteredOrders.forEach((order) => {
+    revenueOrders.forEach((order) => {
       order.items?.forEach((item) => {
         const existing = productMap.get(item.title) || { qty: 0, revenue: 0 };
         productMap.set(item.title, {
@@ -143,6 +153,8 @@ export function OrderAnalytics({
       nextDate.setDate(date.getDate() + 1);
 
       const dayOrders = orders.filter((order) => {
+        const status = order.status?.toLowerCase();
+        if (status === "cancelled" || status === "canceled") return false;
         const orderDate = new Date(order.created_at);
         return orderDate >= date && orderDate < nextDate;
       });
