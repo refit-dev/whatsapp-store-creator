@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     let appliedOfferRecord: any = null;
 
     // Apply offer if provided OR pick the user's pre-applied redemption
-    const now = new Date();
+    const currentDate = new Date();
     let preAppliedRedemptionId: string | null = null;
 
     if (offer_code) {
@@ -142,7 +142,8 @@ export async function POST(request: NextRequest) {
         const validFrom = offer.starts_at ? new Date(offer.starts_at) : null;
         const validUntil = offer.ends_at ? new Date(offer.ends_at) : null;
         const withinWindow =
-          (!validFrom || now >= validFrom) && (!validUntil || now <= validUntil);
+          (!validFrom || currentDate >= validFrom) &&
+          (!validUntil || currentDate <= validUntil);
 
         const targetedOk =
           offer.applicable_to?.includes("all") ||

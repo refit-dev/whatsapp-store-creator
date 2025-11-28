@@ -47,6 +47,7 @@ export function StoreSettingsFormTabbed({
   const [categoriesMessage, setCategoriesMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
     if (store) {
@@ -58,6 +59,10 @@ export function StoreSettingsFormTabbed({
       setLogoUrl(store.logo_url || null);
       setBannerUrl(store.banner_url || null);
       loadStoreCategories();
+    }
+
+    if (typeof window !== "undefined") {
+      setShareUrl(`${window.location.origin}/${store?.handle || handle}`);
     }
   }, [store]);
 

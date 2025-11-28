@@ -155,6 +155,8 @@ export function SmartHomepage() {
                 </Link>
                 <Link
                   href="/demo-bakery"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-blue-300 hover:shadow-md transition-all text-lg"
                 >
                   View Demo Store
@@ -171,6 +173,8 @@ export function SmartHomepage() {
                 </Link>
                 <Link
                   href="/demo-bakery"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-blue-300 hover:shadow-md transition-all text-lg"
                 >
                   View Demo Store
@@ -355,6 +359,8 @@ export function SmartHomepage() {
                 <li>
                   <Link
                     href="/demo-bakery"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     Demo Store

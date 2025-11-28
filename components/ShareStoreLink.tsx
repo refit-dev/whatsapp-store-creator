@@ -14,7 +14,6 @@ export function ShareStoreLink({ handle, storeId }: ShareStoreLinkProps) {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check verification status
   useEffect(() => {
     async function checkVerification() {
       try {
@@ -33,7 +32,6 @@ export function ShareStoreLink({ handle, storeId }: ShareStoreLinkProps) {
     checkVerification();
   }, [storeId]);
 
-  // Set the full URL after component mounts to avoid hydration mismatch
   useEffect(() => {
     const fullUrl = `${window.location.origin}/${handle}`;
     setStoreUrl(fullUrl);
@@ -106,19 +104,35 @@ export function ShareStoreLink({ handle, storeId }: ShareStoreLinkProps) {
           </span>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={copyToClipboard}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap"
           >
-            {copied ? "✓ Copied!" : "📋 Copy Link"}
+            {copied ? "Copied!" : "Copy Link"}
           </button>
 
           <button
             onClick={shareViaWhatsApp}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm whitespace-nowrap"
           >
-            📱 Share on WhatsApp
+            Share on WhatsApp
+          </button>
+
+          <button
+            onClick={() =>
+              window.open(
+                `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
+                  storeUrl
+                )}`,
+                "_blank",
+                "noopener,noreferrer"
+              )
+            }
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm whitespace-nowrap"
+            title="Open a QR code for this store link"
+          >
+            QR Code
           </button>
         </div>
       </div>

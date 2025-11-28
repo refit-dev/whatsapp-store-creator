@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CartProvider } from "@/components/CartProvider";
 import { ProductGrid } from "@/components/ProductGrid";
 import { FloatingCartButton } from "@/components/FloatingCartButton";
@@ -34,6 +35,12 @@ export function StorefrontClient({
   products,
   handle,
 }: StorefrontClientProps) {
+  const [search, setSearch] = useState("");
+
+  const filteredProducts = products.filter((p) =>
+    p.title.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
   // Prepare WhatsApp contact link for general queries
   const whatsappMessage =
     "Hi! I have a question about your store on Watzy. Can you help me?";
@@ -51,29 +58,6 @@ export function StorefrontClient({
         {/* Store Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
-            {/* Return to Home Link */}
-            <div className="mb-3 sm:mb-4">
-              <Link
-                href="/"
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium text-sm sm:text-base"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                <span className="leading-none">&lt; Back to Home</span>
-              </Link>
-            </div>
-
             {store.banner_url && (
               <img
                 src={store.banner_url}
@@ -130,15 +114,30 @@ export function StorefrontClient({
             </div>
           ) : (
             <>
-              <div className="mb-6 sm:mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Our Products
-                </h2>
-                <p className="text-gray-600">
-                  Add items to your cart and checkout via WhatsApp
-                </p>
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Our Products
+              </h2>
+              <p className="text-gray-600">
+                Add items to your cart and checkout via WhatsApp
+              </p>
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search products by name..."
+                  className="w-full sm:w-80 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+                <div className="text-sm text-gray-600">
+                  Showing {filteredProducts.length} of {products.length} products
+                </div>
               </div>
-              <ProductGrid products={products} currency={store.currency} />
+            </div>
+            <ProductGrid
+              products={filteredProducts}
+              currency={store.currency}
+            />
             </>
           )}
         </div>

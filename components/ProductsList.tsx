@@ -28,6 +28,7 @@ export function ProductsList({
   const [products, setProducts] = useState(initialProducts);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
   const sb = supabaseBrowser();
 
   const toggleSelect = (productId: string) => {
@@ -122,6 +123,10 @@ export function ProductsList({
     setLoading(false);
   };
 
+  const filteredProducts = products.filter((p) =>
+    p.title.toLowerCase().includes(searchTerm.trim().toLowerCase())
+  );
+
   if (products.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-md p-12 text-center">
@@ -146,6 +151,15 @@ export function ProductsList({
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
       {products.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b bg-gray-50">
+          <div className="flex items-center gap-2 flex-1 min-w-[180px]">
+            <input
+              type="text"
+              placeholder="Search by product name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
           <button
             onClick={toggleSelectAll}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -203,7 +217,7 @@ export function ProductsList({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4">
                   <input
