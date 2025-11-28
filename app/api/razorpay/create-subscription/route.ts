@@ -215,13 +215,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Calculate dates
-    const now = new Date();
+    const nowDate = new Date();
     const startDate = subscription.start_at
       ? new Date(subscription.start_at * 1000)
-      : now;
+      : nowDate;
     const endDate = subscription.current_end
       ? new Date(subscription.current_end * 1000)
-      : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days default
+      : new Date(nowDate.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days default
 
     // Create pending subscription record in database
     const { data: dbSubscription, error: dbError } = await supabase

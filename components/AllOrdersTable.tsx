@@ -41,6 +41,7 @@ export function AllOrdersTable({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -63,6 +64,31 @@ export function AllOrdersTable({
     setSelectedOrder(null);
     // Refresh to show updated status
     window.location.reload();
+  };
+
+  const handleMarkPaid = async (order: Order) => {
+    setMarkingPaidId(order.id);
+    try {
+      const res = await fetch("/api/orders/mark-paid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id, storeId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to mark order as paid");
+      }
+
+      setOrders((prev) =>
+        prev.map((o) => (o.id === order.id ? { ...o, status: "paid" } : o))
+      );
+    } catch (error: any) {
+      console.error("Error marking paid:", error);
+      alert(error?.message || "Failed to mark order as paid");
+    } finally {
+      setMarkingPaidId(null);
+    }
   };
 
   const canCancelOrder = (order: Order) => {
@@ -242,6 +268,15 @@ export function AllOrdersTable({
 
               <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
                 <CopyOrderButton order={order} currency={currency} />
+                {order.status !== "paid" && (
+                  <button
+                    onClick={() => handleMarkPaid(order)}
+                    disabled={markingPaidId === order.id}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-all duration-200 font-medium shadow-sm hover:shadow disabled:opacity-50"
+                  >
+                    {markingPaidId === order.id ? "Marking..." : "Mark as Paid"}
+                  </button>
+                )}
                 {canCancelOrder(order) && (
                   <button
                     onClick={() => handleCancelClick(order)}
@@ -361,6 +396,16 @@ export function AllOrdersTable({
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <CopyOrderButton order={order} currency={currency} />
+                    {order.status !== "paid" && (
+                      <button
+                        onClick={() => handleMarkPaid(order)}
+                        disabled={markingPaidId === order.id}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow disabled:opacity-50"
+                        title="Mark order as paid (COD)"
+                      >
+                        {markingPaidId === order.id ? "Marking..." : "Mark Paid"}
+                      </button>
+                    )}
                     {canCancelOrder(order) && (
                       <button
                         onClick={() => handleCancelClick(order)}
