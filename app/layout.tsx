@@ -22,6 +22,13 @@ const SpeedInsights = dynamic(
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"), {
   ssr: false,
 });
+const ReferralTracker = dynamic(
+  () =>
+    import("@/components/ReferralTracker").then((mod) => ({
+      default: mod.ReferralTracker,
+    })),
+  { ssr: false }
+);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -76,6 +83,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={inter.className}>
+        <ReferralTracker />
         {children}
         <CookieConsent />
         <Analytics />

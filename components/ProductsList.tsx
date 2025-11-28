@@ -27,7 +27,68 @@ export function ProductsList({
 }: ProductsListProps) {
   const [products, setProducts] = useState(initialProducts);
   const [loading, setLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const sb = supabaseBrowser();
+
+  const toggleSelect = (productId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(productId)) {
+        next.delete(productId);
+      } else {
+        next.add(productId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === products.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(products.map((p) => p.id)));
+    }
+  };
+
+  const bulkSetActive = async (isActive: boolean) => {
+    if (selectedIds.size === 0) return;
+    setLoading(true);
+    const ids = Array.from(selectedIds);
+    const { error } = await sb
+      .from("products")
+      .update({ is_active: isActive })
+      .in("id", ids);
+
+    if (!error) {
+      setProducts((prev) =>
+        prev.map((p) =>
+          selectedIds.has(p.id) ? { ...p, is_active: isActive } : p
+        )
+      );
+      setSelectedIds(new Set());
+    }
+    setLoading(false);
+  };
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (
+      !confirm(
+        `Delete ${selectedIds.size} product${
+          selectedIds.size === 1 ? "" : "s"
+        }? This cannot be undone.`
+      )
+    )
+      return;
+    setLoading(true);
+    const ids = Array.from(selectedIds);
+    const { error } = await sb.from("products").delete().in("id", ids);
+    if (!error) {
+      setProducts((prev) => prev.filter((p) => !selectedIds.has(p.id)));
+      setSelectedIds(new Set());
+    }
+    setLoading(false);
+  };
 
   const handleToggleActive = async (
     productId: string,
@@ -83,10 +144,47 @@ export function ProductsList({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      {products.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b bg-gray-50">
+          <button
+            onClick={toggleSelectAll}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            {selectedIds.size === products.length ? "Clear selection" : "Select all"}
+          </button>
+          <div className="text-sm text-gray-600">
+            {selectedIds.size} selected
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => bulkSetActive(false)}
+              disabled={loading || selectedIds.size === 0}
+              className="px-3 py-1.5 text-sm bg-amber-100 text-amber-800 rounded disabled:opacity-50"
+            >
+              Make Inactive
+            </button>
+            <button
+              onClick={bulkDelete}
+              disabled={loading || selectedIds.size === 0}
+              className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
+              <th className="px-4 py-4">
+                <input
+                  type="checkbox"
+                  aria-label="Select all products"
+                  checked={products.length > 0 && selectedIds.size === products.length}
+                  onChange={toggleSelectAll}
+                />
+              </th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
                 Product
               </th>
@@ -107,6 +205,14 @@ export function ProductsList({
           <tbody className="divide-y divide-gray-200">
             {products.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${product.title}`}
+                    checked={selectedIds.has(product.id)}
+                    onChange={() => toggleSelect(product.id)}
+                  />
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
                     {product.image_urls?.[0] ? (

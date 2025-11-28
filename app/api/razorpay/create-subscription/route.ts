@@ -99,8 +99,12 @@ export async function POST(request: NextRequest) {
     let discountAmount = 0;
     let offerId: string | null = null;
     let finalAmount = plan.price_cents || 0;
+    let appliedOfferRecord: any = null;
 
-    // Apply offer if provided
+    // Apply offer if provided OR pick the user's pre-applied redemption
+    const now = new Date();
+    let preAppliedRedemptionId: string | null = null;
+
     if (offer_code) {
       const { data: offer, error: offerError } = await supabase
         .from("special_offers")
@@ -109,85 +113,74 @@ export async function POST(request: NextRequest) {
         .eq("is_active", true)
         .single();
 
-      if (offer && !offerError) {
-        // Check if offer is still valid
-        const now = new Date();
-        const validFrom = offer.starts_at ? new Date(offer.starts_at) : null;
-        const validUntil = offer.ends_at ? new Date(offer.ends_at) : null;
-
-        if (validFrom && now < validFrom) {
-          return NextResponse.json(
-            { error: "This offer is not yet active" },
-            { status: 400 }
-          );
-        }
-
-        if (validUntil && now > validUntil) {
-          return NextResponse.json(
-            { error: "This offer has expired" },
-            { status: 400 }
-          );
-        }
-
-        // Check usage limit
-        if (offer.max_uses && offer.usage_limit_type === "limited") {
-          const { count } = await supabase
-            .from("offer_redemptions")
-            .select("*", { count: "exact", head: true })
-            .eq("offer_id", offer.id);
-
-          if (count && count >= offer.max_uses) {
-            return NextResponse.json(
-              { error: "This offer has reached its usage limit" },
-              { status: 400 }
-            );
-          }
-        }
-
-        // Check if user already used this offer
-        if (offer.max_uses_per_user) {
-          const { count } = await supabase
-            .from("offer_redemptions")
-            .select("*", { count: "exact", head: true })
-            .eq("offer_id", offer.id)
-            .eq("user_id", user.id);
-
-          if (count && count >= offer.max_uses_per_user) {
-            return NextResponse.json(
-              { error: "You have already used this offer" },
-              { status: 400 }
-            );
-          }
-        }
-
-        // Calculate discount
-        if (offer.offer_type === "percentage_discount") {
-          const percentageOff = offer.percentage_off || 0;
-          finalAmount = calculateDiscountedAmount(
-            plan.price_cents || 0,
-            "percentage",
-            percentageOff
-          );
-          discountAmount = (plan.price_cents || 0) - finalAmount;
-          offerId = offer.id;
-        } else if (offer.offer_type === "fixed_amount") {
-          const amountOff = offer.fixed_amount_off || 0;
-          finalAmount = calculateDiscountedAmount(
-            plan.price_cents || 0,
-            "fixed_amount",
-            amountOff
-          );
-          discountAmount = (plan.price_cents || 0) - finalAmount;
-          offerId = offer.id;
-        } else if (offer.offer_type === "extended_trial") {
-          // For trial extension, we'll handle it differently (add days to trial)
-          offerId = offer.id;
-        }
-      } else {
+      if (!offer || offerError) {
         return NextResponse.json(
           { error: "Invalid or inactive offer code" },
           { status: 400 }
         );
+      }
+      appliedOfferRecord = offer;
+    } else {
+      // Look for a pre-applied redemption for this user (status applied, no subscription yet, active offer)
+      const { data: redemption } = await supabase
+        .from("offer_redemptions")
+        .select(
+          `
+          *,
+          offer:special_offers(*)
+        `
+        )
+        .eq("user_id", user.id)
+        .is("subscription_id", null)
+        .eq("status", "applied")
+        .order("applied_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (redemption && redemption.offer) {
+        const offer = (redemption as any).offer;
+        const validFrom = offer.starts_at ? new Date(offer.starts_at) : null;
+        const validUntil = offer.ends_at ? new Date(offer.ends_at) : null;
+        const withinWindow =
+          (!validFrom || now >= validFrom) && (!validUntil || now <= validUntil);
+
+        const targetedOk =
+          offer.applicable_to?.includes("all") ||
+          !offer.target_user_ids ||
+          offer.target_user_ids.length === 0 ||
+          offer.target_user_ids.includes(user.id);
+
+        if (offer.is_active && withinWindow && targetedOk) {
+          appliedOfferRecord = offer;
+          offerId = offer.id;
+          preAppliedRedemptionId = (redemption as any).id || null;
+        }
+      }
+    }
+
+    // Calculate discount if an offer is available
+    if (appliedOfferRecord) {
+      if (appliedOfferRecord.offer_type === "percentage_discount") {
+        const percentageOff = appliedOfferRecord.percentage_off || 0;
+        finalAmount = calculateDiscountedAmount(
+          plan.price_cents || 0,
+          "percentage",
+          percentageOff
+        );
+        discountAmount = (plan.price_cents || 0) - finalAmount;
+        offerId = appliedOfferRecord.id;
+      } else if (appliedOfferRecord.offer_type === "fixed_amount") {
+        const amountOff = appliedOfferRecord.fixed_amount_off || 0;
+        finalAmount = calculateDiscountedAmount(
+          plan.price_cents || 0,
+          "fixed_amount",
+          amountOff
+        );
+        discountAmount = (plan.price_cents || 0) - finalAmount;
+        offerId = appliedOfferRecord.id;
+      } else if (appliedOfferRecord.offer_type === "extended_trial") {
+        // Extended trial handled via apply_special_offer; keep amount unchanged
+        offerId = appliedOfferRecord.id;
       }
     }
 
@@ -254,14 +247,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Record offer redemption if offer was applied
+    // Record or update offer redemption if offer was applied
     if (offerId) {
-      await supabase.from("offer_redemptions").insert({
-        offer_id: offerId,
-        user_id: user.id,
-        subscription_id: dbSubscription.id,
-        discount_amount: discountAmount,
-      });
+      if (preAppliedRedemptionId) {
+        await supabase
+          .from("offer_redemptions")
+          .update({
+            subscription_id: dbSubscription.id,
+            discount_applied: discountAmount,
+            applied_at: new Date().toISOString(),
+          })
+          .eq("id", preAppliedRedemptionId);
+      } else {
+        await supabase.from("offer_redemptions").insert({
+          offer_id: offerId,
+          user_id: user.id,
+          subscription_id: dbSubscription.id,
+          discount_applied: discountAmount,
+        });
+      }
     }
 
     return NextResponse.json({

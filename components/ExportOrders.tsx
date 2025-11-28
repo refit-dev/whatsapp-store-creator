@@ -24,13 +24,24 @@ interface ExportOrdersProps {
   storeName: string;
 }
 
+type ReportType = "daily" | "monthly" | "custom";
+
 export function ExportOrders({
   orders,
   currency,
   storeName,
 }: ExportOrdersProps) {
   const [isExporting, setIsExporting] = useState(false);
-  const [reportType, setReportType] = useState<"daily" | "monthly">("monthly");
+  const [reportType, setReportType] = useState<ReportType>("monthly");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const isCustomRangeSelected = reportType === "custom";
+  const isCustomRangeValid =
+    !isCustomRangeSelected ||
+    (startDate &&
+      endDate &&
+      new Date(startDate).getTime() <= new Date(endDate).getTime());
 
   const generateCSV = (ordersToExport: Order[]) => {
     const headers = [
@@ -283,8 +294,8 @@ export function ExportOrders({
   const downloadCSV = () => {
     setIsExporting(true);
     try {
-      const ordersToExport = filterOrdersByType(reportType);
-      const csv = generateCSV(ordersToExport);
+      const toExport = filterOrdersByType(reportType);
+      const csv = generateCSV(toExport);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
@@ -310,12 +321,16 @@ export function ExportOrders({
   const downloadPDF = () => {
     setIsExporting(true);
     try {
-      const ordersToExport = filterOrdersByType(reportType);
+      const toExport = filterOrdersByType(reportType);
       const title =
         reportType === "daily"
           ? "Daily Orders Report"
-          : "Monthly Orders Report";
-      const html = generateHTML(ordersToExport, title);
+          : reportType === "monthly"
+          ? "Monthly Orders Report"
+          : `Custom Orders Report (${startDate || "start"} to ${
+              endDate || "end"
+            })`;
+      const html = generateHTML(toExport, title);
 
       const printWindow = window.open("", "_blank");
       if (printWindow) {
@@ -336,7 +351,18 @@ export function ExportOrders({
     }
   };
 
-  const filterOrdersByType = (type: "daily" | "monthly"): Order[] => {
+  const filterOrdersByType = (type: ReportType): Order[] => {
+    if (type === "custom") {
+      if (!isCustomRangeValid) return [];
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // include end day
+      return orders.filter((order) => {
+        const created = new Date(order.created_at);
+        return created >= start && created <= end;
+      });
+    }
+
     const now = new Date();
     const cutoffDate = new Date();
 
@@ -352,7 +378,13 @@ export function ExportOrders({
   const previewReport = () => {
     const ordersToExport = filterOrdersByType(reportType);
     const title =
-      reportType === "daily" ? "Daily Orders Report" : "Monthly Orders Report";
+      reportType === "daily"
+        ? "Daily Orders Report"
+        : reportType === "monthly"
+        ? "Monthly Orders Report"
+        : `Custom Orders Report (${startDate || "start"} to ${
+            endDate || "end"
+          })`;
     const html = generateHTML(ordersToExport, title);
 
     const previewWindow = window.open("", "_blank");
@@ -368,11 +400,12 @@ export function ExportOrders({
       <div className="relative">
         <select
           value={reportType}
-          onChange={(e) => setReportType(e.target.value as "daily" | "monthly")}
+          onChange={(e) => setReportType(e.target.value as ReportType)}
           className="pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer"
         >
           <option value="daily">📅 Last 24h</option>
           <option value="monthly">📆 Last 30d</option>
+          <option value="custom">Custom range</option>
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg
@@ -391,11 +424,39 @@ export function ExportOrders({
         </div>
       </div>
 
+      {reportType === "custom" && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <label className="flex items-center gap-2">
+            <span className="text-gray-700">From</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-2 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="text-gray-700">To</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-2 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </label>
+          {!isCustomRangeValid && (
+            <span className="text-xs text-red-600">
+              Select a valid date range to export.
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Export Buttons - Compact */}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={downloadCSV}
-          disabled={isExporting || orders.length === 0}
+          disabled={isExporting || orders.length === 0 || !isCustomRangeValid}
           className="flex items-center gap-1.5 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           title="Download as Excel CSV"
         >
@@ -417,7 +478,7 @@ export function ExportOrders({
 
         <button
           onClick={downloadPDF}
-          disabled={isExporting || orders.length === 0}
+          disabled={isExporting || orders.length === 0 || !isCustomRangeValid}
           className="flex items-center gap-1.5 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           title="Print as PDF"
         >
@@ -439,7 +500,7 @@ export function ExportOrders({
 
         <button
           onClick={previewReport}
-          disabled={orders.length === 0}
+          disabled={orders.length === 0 || !isCustomRangeValid}
           className="flex items-center gap-1.5 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           title="Preview report"
         >

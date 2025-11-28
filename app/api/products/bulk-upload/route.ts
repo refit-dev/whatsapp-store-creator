@@ -84,6 +84,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch existing product titles for this store to block duplicates
+    const { data: existingProducts } = await supabase
+      .from("products")
+      .select("title")
+      .eq("store_id", storeId);
+
+    const existingTitles = new Set(
+      (existingProducts || []).map((p: any) => (p.title || "").trim().toLowerCase())
+    );
+
     // Parse data rows
     const products: any[] = [];
     const errors: Array<{ row: number; error: string }> = [];
@@ -127,10 +137,20 @@ export async function POST(request: NextRequest) {
             .filter((url: string) => url.length > 0);
         }
 
+        // Check for duplicates (case-insensitive) within store
+        const normalizedTitle = row["Product Name"].trim().toLowerCase();
+        if (existingTitles.has(normalizedTitle)) {
+          errors.push({
+            row: i + 1,
+            error: "Duplicate product name for this store",
+          });
+          continue;
+        }
+
         // Prepare product data
         const productData = {
           store_id: storeId,
-          title: row["Product Name"],
+          title: row["Product Name"].trim(),
           description: row["Description"] || null,
           price_cents: Math.round(parseFloat(row["Price"]) * 100),
           currency: currency || "INR",
@@ -142,6 +162,7 @@ export async function POST(request: NextRequest) {
         };
 
         products.push(productData);
+        existingTitles.add(normalizedTitle); // prevent duplicates within the file as well
       } catch (error: any) {
         errors.push({ row: i + 1, error: error.message || "Parse error" });
       }
