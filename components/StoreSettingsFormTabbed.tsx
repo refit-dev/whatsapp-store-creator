@@ -101,6 +101,17 @@ export function StoreSettingsFormTabbed({
     setCategoriesMessage("");
 
     try {
+      if (selectedCategories.length === 0) {
+        setCategoriesMessage("Please select at least 1 category.");
+        setCategoriesLoading(false);
+        return;
+      }
+      if (selectedCategories.length > 3) {
+        setCategoriesMessage("You can select up to 3 categories.");
+        setCategoriesLoading(false);
+        return;
+      }
+
       const response = await fetch("/api/store-categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +124,7 @@ export function StoreSettingsFormTabbed({
 
       if (!response.ok) throw new Error("Failed to save categories");
 
-      setCategoriesMessage("✓ Categories saved successfully!");
+      setCategoriesMessage("Categories saved successfully!");
       setTimeout(() => setCategoriesMessage(""), 3000);
     } catch (error) {
       console.error("Error saving categories:", error);
@@ -530,7 +541,9 @@ export function StoreSettingsFormTabbed({
               {categoriesMessage && (
                 <div
                   className={`p-4 rounded-lg ${
-                    categoriesMessage.includes("Error")
+                    categoriesMessage.includes("Error") ||
+                    categoriesMessage.includes("select at least 1 category") ||
+                    categoriesMessage.includes("up to 3 categories")
                       ? "bg-red-50 text-red-800 border border-red-200"
                       : "bg-green-50 text-green-800 border border-green-200"
                   }`}
@@ -543,15 +556,15 @@ export function StoreSettingsFormTabbed({
               <button
                 type="button"
                 onClick={handleSaveCategories}
-                disabled={categoriesLoading || selectedCategories.length === 0}
+                disabled={categoriesLoading}
                 className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3.5 rounded-lg font-semibold hover:from-green-700 hover:to-teal-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {categoriesLoading ? "Saving..." : "💾 Save Categories"}
               </button>
 
               {selectedCategories.length === 0 && (
-                <p className="text-sm text-gray-500 text-center">
-                  Select at least one category to help customers find your store
+                <p className="text-sm text-red-600 text-center">
+                  Please select at least 1 category.
                 </p>
               )}
             </div>
@@ -881,3 +894,10 @@ export function StoreSettingsFormTabbed({
     </div>
   );
 }
+
+
+
+
+
+
+

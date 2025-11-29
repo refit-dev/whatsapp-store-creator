@@ -66,6 +66,9 @@ export function UnifiedCheckout({
   const [whatsappOpened, setWhatsappOpened] = useState(false);
 
   const supabase = supabaseBrowser();
+  const onlinePaymentAvailable =
+    paymentConfig?.payment_enabled &&
+    (paymentConfig?.upi_id || paymentConfig?.paytm_number);
 
   // Load payment and delivery configuration
   useEffect(() => {
@@ -158,6 +161,13 @@ export function UnifiedCheckout({
 
     loadConfigs();
   }, [storeId, supabase]);
+
+  // Default to WhatsApp/pay later when no online payment is available
+  useEffect(() => {
+    if (!onlinePaymentAvailable) {
+      setPaymentMethod("whatsapp");
+    }
+  }, [onlinePaymentAvailable]);
 
   // Available time slots for a specific day (for day_and_time mode)
   const getAvailableTimesForDay = (day: string) => {
@@ -342,6 +352,15 @@ export function UnifiedCheckout({
             address: customerInfo.address,
             notes: getOrderNotes(),
           },
+          delivery: {
+            day: deliverySelection.day,
+            slot: deliverySelection.slot,
+          },
+          totals: {
+            subtotalCents: subtotalCents,
+            totalCents: totalAmount,
+          },
+          storeName,
           currency,
           paymentMethod: "online",
         });
@@ -480,6 +499,15 @@ export function UnifiedCheckout({
           address: customerInfo.address,
           notes: getOrderNotes(),
         },
+        delivery: {
+          day: deliverySelection.day,
+          slot: deliverySelection.slot,
+        },
+        totals: {
+          subtotalCents: subtotalCents,
+          totalCents: subtotalCents,
+        },
+        storeName,
         paymentLink: undefined, // No payment link for WhatsApp orders
         currency: currency,
         paymentMethod: "whatsapp",
@@ -970,6 +998,11 @@ export function UnifiedCheckout({
         <h4 className="font-medium text-gray-800 mb-3">
           Choose Payment Method
         </h4>
+        <p className="text-sm text-gray-600 mb-3">
+          {onlinePaymentAvailable
+            ? "You can pay securely via UPI or card after the seller confirms your order."
+            : "Payment will be collected via UPI or cash on delivery. You will receive payment instructions on WhatsApp."}
+        </p>
 
         <div className="space-y-3">
           {/* Pay Later (WhatsApp) Option */}
@@ -1005,13 +1038,12 @@ export function UnifiedCheckout({
           </div>
 
           {/* Pay Now Option (only if enabled and configured) */}
-          {paymentConfig?.payment_enabled &&
-            (paymentConfig?.upi_id || paymentConfig?.paytm_number) && (
-              <div
-                className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                  paymentMethod === "online"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300 hover:border-gray-400"
+          {onlinePaymentAvailable && (
+            <div
+              className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                paymentMethod === "online"
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-300 hover:border-gray-400"
                 }`}
                 onClick={() => setPaymentMethod("online")}
               >

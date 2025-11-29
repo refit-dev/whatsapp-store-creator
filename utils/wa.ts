@@ -14,6 +14,18 @@ export type WhatsAppBuyer = {
   notes?: string;
 };
 
+export type WhatsAppTotals = {
+  subtotalCents?: number;
+  discountCents?: number;
+  deliveryFeeCents?: number;
+  totalCents?: number;
+};
+
+export type WhatsAppDelivery = {
+  day?: string | null;
+  slot?: string | null;
+};
+
 export function buildWhatsAppUrl({
   phoneE164,
   items,
@@ -21,6 +33,9 @@ export function buildWhatsAppUrl({
   paymentLink,
   currency,
   paymentMethod,
+  storeName,
+  totals,
+  delivery,
 }: {
   phoneE164: string;
   items: WhatsAppItem[];
@@ -28,52 +43,70 @@ export function buildWhatsAppUrl({
   paymentLink?: string;
   currency: string;
   paymentMethod?: string;
+  storeName?: string;
+  totals?: WhatsAppTotals;
+  delivery?: WhatsAppDelivery;
 }): string {
-  // Debug logging - remove after debugging
-  console.log("=== buildWhatsAppUrl DEBUG ===");
-  console.log("Input phoneE164:", phoneE164);
-  console.log("Input buyer:", buyer);
-  console.log("Input items:", items);
-  console.log("==============================");
-
   // Ensure wa.me uses digits only; accept + but strip for wa.me path
   const digitsOnly = phoneE164.replace(/[^0-9]/g, "");
 
-  console.log("Digits only result:", digitsOnly);
+  const computedSubtotal = items.reduce(
+    (sum, i) => sum + i.priceCents * i.qty,
+    0
+  );
+  const discount = totals?.discountCents ?? 0;
+  const deliveryFee = totals?.deliveryFeeCents ?? 0;
+  const subtotalCents = totals?.subtotalCents ?? computedSubtotal;
+  const totalCents =
+    totals?.totalCents ?? subtotalCents - discount + deliveryFee;
 
-  const subtotal = items.reduce((sum, i) => sum + i.priceCents * i.qty, 0);
-
-  const paymentStatus =
-    paymentMethod === "online"
-      ? "✅ PAID ONLINE"
-      : "💰 Payment Pending (Pay on Delivery)";
+  const formatPaymentMethod = () => {
+    switch (paymentMethod) {
+      case "online":
+        return "Pay now (online)";
+      case "whatsapp":
+        return "Pay later (WhatsApp)";
+      case "cod":
+        return "Cash on delivery";
+      default:
+        return "Payment pending";
+    }
+  };
 
   const lines = [
-    `🛒 New Order Request`,
-    ``,
+    `New order from ${buyer.name} (${buyer.phone})`,
+    ...(storeName ? [`Store: ${storeName}`] : []),
+    "",
+    "Items:",
     ...items.map(
       (item) =>
-        `${item.title} ×${item.qty} — ${formatMoney(
-          item.priceCents * item.qty,
+        `- ${item.qty} x ${item.title} @ ${formatMoney(
+          item.priceCents,
           currency
-        )}`
+        )} = ${formatMoney(item.priceCents * item.qty, currency)}`
     ),
-    ``,
-    `Total: ${formatMoney(subtotal, currency)}`,
-    `Payment Status: ${paymentStatus}`,
-    ...(buyer.notes ? ["", "Notes: " + buyer.notes] : []),
-    ``,
-    `Buyer: ${buyer.name}`,
-    `Phone: ${buyer.phone}`,
+    "",
+    `Subtotal: ${formatMoney(subtotalCents, currency)}`,
+    ...(discount > 0
+      ? [`Discount: -${formatMoney(discount, currency)}`]
+      : []),
+    `Delivery: ${formatMoney(deliveryFee, currency)}`,
+    `Total: ${formatMoney(totalCents, currency)}`,
+    "",
+    ...(delivery?.day || delivery?.slot
+      ? [
+          `Delivery slot: ${[delivery?.day, delivery?.slot]
+            .filter(Boolean)
+            .join(", ")}`,
+        ]
+      : []),
+    `Address: ${buyer.address}`,
+    "",
+    ...(buyer.notes ? ["Notes: " + buyer.notes, ""] : []),
+    `Payment method: ${formatPaymentMethod()}`,
+    ...(paymentLink ? ["Payment link: " + paymentLink] : []),
     ...(buyer.email ? ["Email: " + buyer.email] : []),
-    ...(buyer.address ? ["Address: " + buyer.address] : []),
-    ...(paymentLink ? ["", "Payment Link: " + paymentLink] : []),
   ];
   const text = encodeURIComponent(lines.join("\n"));
-  const finalUrl = `https://wa.me/${digitsOnly}?text=${text}`;
-
-  console.log("Final WhatsApp URL:", finalUrl);
-  console.log("==============================");
-
-  return finalUrl;
+  return `https://wa.me/${digitsOnly}?text=${text}`;
 }

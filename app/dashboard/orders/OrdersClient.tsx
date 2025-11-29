@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { OrderAnalytics } from "@/components/OrderAnalytics";
 import { ExportOrders } from "@/components/ExportOrders";
 import { AllOrdersTable } from "@/components/AllOrdersTable";
@@ -44,7 +43,6 @@ export function OrdersClient({
   storeName,
   monthlyTargetCents,
 }: Props) {
-  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState<string>(
     new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
@@ -106,12 +104,7 @@ export function OrdersClient({
               </p>
             </div>
             <div className="flex flex-wrap gap-2 md:gap-3">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="px-4 md:px-6 py-2 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors text-sm md:text-base"
-              >
-                �+? Dashboard
-              </button>
+              <Link href="/dashboard" className="px-4 md:px-6 py-2 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors text-sm md:text-base">�+? Dashboard</Link>
               <div className="hidden sm:block border-l border-gray-200 pl-2 md:pl-3">
                 <LogoutButton />
               </div>
@@ -242,3 +235,4 @@ export function OrdersClient({
     </main>
   );
 }
+

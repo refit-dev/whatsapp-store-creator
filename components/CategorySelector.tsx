@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { Database } from "@/types/supabase";
 
@@ -25,6 +25,18 @@ export default function CategorySelector({
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPrimary, setSelectedPrimary] = useState<string | null>(null);
+  const limitReached = selectedCategories.length >= maxSelection;
+
+  const defaultDescriptions = useMemo(
+    () => ({
+      "Groceries": "Daily essentials, food and household items.",
+      "Beauty & Personal Care": "Cosmetics, skincare, grooming products.",
+      "Fashion": "Clothing, footwear, and accessories.",
+      "Electronics": "Mobiles, gadgets, and accessories.",
+      "Home & Living": "Furniture, decor, and home essentials.",
+    }),
+    []
+  );
 
   useEffect(() => {
     fetchCategories();
@@ -74,6 +86,11 @@ export default function CategorySelector({
 
   const handleCategoryClick = (categoryId: string) => {
     const isSelected = selectedCategories.includes(categoryId);
+    const isDisabled = !isSelected && limitReached;
+
+    if (isDisabled) {
+      return;
+    }
 
     if (isSelected) {
       // Remove category
@@ -137,14 +154,22 @@ export default function CategorySelector({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {primaryCategories.map((category) => {
           const isSelected = selectedCategories.includes(category.id);
-          const isDisabled =
-            !isSelected && selectedCategories.length >= maxSelection;
+          const isDisabled = !isSelected && limitReached;
+          const categoryDescription =
+            category.description ||
+            defaultDescriptions[category.name as keyof typeof defaultDescriptions] ||
+            "You can select up to 3 categories.";
 
           return (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
               disabled={isDisabled}
+              title={
+                isDisabled
+                  ? "You can select up to 3 categories."
+                  : categoryDescription
+              }
               className={`
                 relative p-6 rounded-xl border-2 transition-all duration-200
                 ${
@@ -152,13 +177,10 @@ export default function CategorySelector({
                     ? "border-blue-600 bg-blue-50 shadow-md"
                     : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
                 }
-                ${
-                  isDisabled
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
-                }
+                ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                 flex flex-col items-center gap-3
               `}
+              aria-disabled={isDisabled}
             >
               {/* Selection Indicator */}
               {isSelected && (
@@ -206,14 +228,20 @@ export default function CategorySelector({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {subCategories.map((subCategory) => {
                 const isSelected = selectedCategories.includes(subCategory.id);
-                const isDisabled =
-                  !isSelected && selectedCategories.length >= maxSelection;
+                const isDisabled = !isSelected && limitReached;
+                const desc =
+                  subCategory.description ||
+                  defaultDescriptions[
+                    subCategory.name as keyof typeof defaultDescriptions
+                  ] ||
+                  "You can select up to 3 categories.";
 
                 return (
                   <button
                     key={subCategory.id}
                     onClick={() => handleCategoryClick(subCategory.id)}
                     disabled={isDisabled}
+                    title={isDisabled ? "You can select up to 3 categories." : desc}
                     className={`
                       p-3 rounded-lg border text-left transition-all
                       ${
@@ -221,12 +249,9 @@ export default function CategorySelector({
                           ? "border-blue-600 bg-blue-50"
                           : "border-gray-200 bg-white hover:border-blue-300"
                       }
-                      ${
-                        isDisabled
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }
+                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                     `}
+                    aria-disabled={isDisabled}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-xl">{subCategory.icon || "•"}</span>

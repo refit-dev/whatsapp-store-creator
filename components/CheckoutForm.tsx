@@ -108,6 +108,12 @@ export function CheckoutForm({
         },
         paymentLink: paymentUrl,
         currency: store.currency,
+        storeName: store.handle,
+        totals: {
+          subtotalCents: subtotalCents,
+          totalCents: subtotalCents,
+        },
+        paymentMethod: store.is_payments_enabled ? "online" : "whatsapp",
       });
 
       // Debug logging - remove after debugging

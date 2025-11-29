@@ -42,15 +42,23 @@ export function AllOrdersTable({
   orders: controlledOrders,
   currency,
   storeId,
+  totalCount,
+  pageSize,
+  currentPage,
+  onPageChange,
+  onPageSizeChange,
 }: AllOrdersTableProps) {
   const [orders, setOrders] = useState<Order[]>(
     controlledOrders ?? initialOrders
   );
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
+  const totalRows = totalCount ?? orders.length;
+  const pageSizeValue = (pageSize ?? orders.length) || 1;
+  const currentPageValue = currentPage ?? 1;
+  const totalPages = Math.max(1, Math.ceil(totalRows / pageSizeValue));
 
   // Keep internal state in sync if parent passes a new orders array
   useEffect(() => {
@@ -115,20 +123,6 @@ export function AllOrdersTable({
     );
   };
 
-  // Filter orders based on status
-  const filteredOrders =
-    statusFilter === "all"
-      ? orders
-      : orders.filter((order) => order.status === statusFilter);
-
-  // Count orders by status
-  const allCount = orders.length;
-  const paidCount = orders.filter((o) => o.status === "paid").length;
-  const createdCount = orders.filter((o) => o.status === "created").length;
-  const openedWhatsappCount = orders.filter(
-    (o) => o.status === "opened_whatsapp"
-  ).length;
-
   if (!orders || orders.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -166,42 +160,11 @@ export function AllOrdersTable({
               📋 All Orders
             </h3>
             <p className="text-xs md:text-sm text-gray-600 mt-1">
-              {filteredOrders.length} of {allCount} orders
+              Showing {orders.length} of {totalRows} orders
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Filter Dropdown */}
-            <div className="relative">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer"
-              >
-                <option value="all">All Orders ({allCount})</option>
-                <option value="paid">✅ Paid ({paidCount})</option>
-                <option value="created">🆕 Created ({createdCount})</option>
-                <option value="opened_whatsapp">
-                  💬 WhatsApp ({openedWhatsappCount})
-                </option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-
             {/* Refresh Button */}
             <button
               onClick={handleRefresh}
@@ -233,7 +196,7 @@ export function AllOrdersTable({
       {/* Mobile View */}
       <div className="block md:hidden">
         <div className="divide-y divide-gray-200">
-          {filteredOrders.map((order: Order) => (
+          {orders.map((order: Order) => (
             <div key={order.id} className="p-4 hover:bg-gray-50">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">
@@ -346,7 +309,7 @@ export function AllOrdersTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredOrders.map((order: Order) => (
+            {orders.map((order: Order) => (
               <tr key={order.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <p className="text-sm text-gray-900">
@@ -452,6 +415,48 @@ export function AllOrdersTable({
         </table>
       </div>
 
+      {/* Pagination */}
+      {totalRows > pageSizeValue && onPageChange && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 md:px-6 py-3 border-t bg-gray-50">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPageChange(currentPageValue - 1)}
+              disabled={currentPageValue <= 1}
+              className="px-3 py-2 text-sm border rounded-lg bg-white disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPageValue} of {totalPages}
+            </span>
+            <button
+              onClick={() => onPageChange(currentPageValue + 1)}
+              disabled={currentPageValue >= totalPages}
+              className="px-3 py-2 text-sm border rounded-lg bg-white disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+
+          {onPageSizeChange && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-700">Rows per page:</span>
+              <select
+                value={pageSizeValue}
+                onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                className="border rounded-lg px-2 py-1 bg-white"
+              >
+                {[25, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Cancel Modal */}
       {showCancelModal && selectedOrder && (
         <OrderCancelModal
@@ -469,3 +474,7 @@ export function AllOrdersTable({
     </div>
   );
 }
+
+
+
+
