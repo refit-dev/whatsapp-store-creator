@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
 
     // Check if referral code exists and get referrer
     const { data: referralData, error: referralError } = await supabase
-      .from("referral_codes")
-      .select("user_id")
-      .eq("code", referralCode)
+      .from("referrals")
+      .select("referrer_id")
+      .eq("referral_code", referralCode)
       .single();
 
     if (referralError || !referralData) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const referrerId = referralData.user_id;
+    const referrerId = referralData.referrer_id;
 
     // Check if user is trying to refer themselves
     if (referrerId === user.id) {

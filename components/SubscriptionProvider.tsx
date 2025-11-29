@@ -120,13 +120,13 @@ export function SubscriptionProvider({
       setSubscription(subscriptions?.[0] || null);
 
       // Get referral code
-      const { data: referralCodes } = await sb
-        .from("referral_codes")
-        .select("code")
-        .eq("user_id", user.id)
+      const { data: referralRows } = await sb
+        .from("referrals")
+        .select("referral_code")
+        .eq("referrer_id", user.id)
         .limit(1);
 
-      setReferralCode(referralCodes?.[0]?.code || null);
+      setReferralCode(referralRows?.[0]?.referral_code || null);
 
       // Get referral count (only count those where payment was verified and reward granted)
       const { data: referrals } = await sb
@@ -148,7 +148,7 @@ export function SubscriptionProvider({
       try {
         const cacheData = {
           subscription: subscriptions?.[0] || null,
-          referralCode: referralCodes?.[0]?.code || null,
+          referralCode: referralRows?.[0]?.referral_code || null,
           referralCount: currentReferralCount,
           remainingReferrals: remaining,
           hasReachedReferralLimit: limitReached,
