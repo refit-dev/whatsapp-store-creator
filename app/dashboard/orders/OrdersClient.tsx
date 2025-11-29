@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { OrderAnalytics } from "@/components/OrderAnalytics";
 import { ExportOrders } from "@/components/ExportOrders";
@@ -52,6 +52,25 @@ export function OrdersClient({
   );
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
   const [page, setPage] = useState<number>(1);
+  const [chartsVisible, setChartsVisible] = useState<boolean>(false);
+  const chartsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const ref = chartsRef.current;
+    if (!ref) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          setChartsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(ref);
+    return () => observer.disconnect();
+  }, []);
 
   const handleQuickRange = (days: number) => {
     const to = new Date();
@@ -208,12 +227,18 @@ export function OrdersClient({
               />
             </div>
 
-            <OrderAnalytics
-              orders={filteredOrders as Order[]}
-              currency={currency}
-              storeId={storeId}
-              monthlyTargetCents={monthlyTargetCents}
-            />
+            <div ref={chartsRef}>
+              {chartsVisible ? (
+                <OrderAnalytics
+                  orders={filteredOrders as Order[]}
+                  currency={currency}
+                  storeId={storeId}
+                  monthlyTargetCents={monthlyTargetCents}
+                />
+              ) : (
+                <ChartsSkeleton />
+              )}
+            </div>
           </div>
         </div>
 
@@ -233,6 +258,27 @@ export function OrdersClient({
         />
       </div>
     </main>
+  );
+}
+
+function ChartsSkeleton() {
+  return (
+    <div className="space-y-4 md:space-y-6 animate-pulse">
+      <div className="bg-gray-100 h-10 rounded-lg" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <div className="h-48 bg-gray-100 rounded-lg" />
+        <div className="h-48 bg-gray-100 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <div className="h-48 bg-gray-100 rounded-lg" />
+        <div className="h-48 bg-gray-100 rounded-lg" />
+      </div>
+    </div>
   );
 }
 

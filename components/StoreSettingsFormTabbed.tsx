@@ -473,7 +473,7 @@ export function StoreSettingsFormTabbed({
                 onChange={setLogoUrl}
                 aspectRatio="square"
                 imageType="logo"
-                description="200x200px, displayed as circle"
+                description="Recommended: 200 x 200 px (square), PNG or JPG."
               />
 
               <ImageUpload
@@ -482,7 +482,7 @@ export function StoreSettingsFormTabbed({
                 onChange={setBannerUrl}
                 aspectRatio="banner"
                 imageType="banner"
-                description="1200x400px, displayed at top"
+                description="Recommended: 1200 x 400 px (wide), PNG or JPG."
               />
 
               {message && (

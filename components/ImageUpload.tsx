@@ -26,7 +26,38 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [dimensionWarning, setDimensionWarning] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const checkDimensions = (file: File): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (err) => {
+        reject(err);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    });
+  };
+
+  const getDimensionWarning = (width: number, height: number) => {
+    if (imageType === "logo") {
+      if (width > 800 || height > 800 || width < 100 || height < 100) {
+        return "Your logo may appear blurry or cropped. Recommended size is 200 x 200 px.";
+      }
+    }
+    if (imageType === "banner") {
+      if (width > 3000 || height > 1200 || width < 800 || height < 250) {
+        return "Your banner may appear blurry or cropped. Recommended size is 1200 x 400 px.";
+      }
+    }
+    return null;
+  };
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -47,8 +78,20 @@ export function ImageUpload({
 
     setUploading(true);
     setUploadError(null);
+    setDimensionWarning(null);
 
     try {
+      // Soft dimension guidance (non-blocking)
+      try {
+        const { width, height } = await checkDimensions(file);
+        const warning = getDimensionWarning(width, height);
+        if (warning) {
+          setDimensionWarning(warning);
+        }
+      } catch (dimErr) {
+        console.warn("Could not read image dimensions", dimErr);
+      }
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("type", imageType);
@@ -159,6 +202,29 @@ export function ImageUpload({
               </div>
               <div className="ml-3">
                 <p className="text-sm text-red-700">{uploadError}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {dimensionWarning && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-yellow-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.492-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V8a1 1 0 112 0v2a1 1 0 01-1 1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-800">{dimensionWarning}</p>
               </div>
             </div>
           </div>
