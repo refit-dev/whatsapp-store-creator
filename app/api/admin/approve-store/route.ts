@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/supabase";
+import { getBackofficeProfile } from "@/lib/backoffice";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,16 +48,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: adminData } = await supabase
-      .from("admins")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .single();
+    const backofficeProfile = await getBackofficeProfile(supabase, user.id);
 
-    if (!adminData) {
+    if (!backofficeProfile) {
       return NextResponse.json(
-        { error: "Admin access required" },
+        { error: "Admin or approver access required" },
         { status: 403 }
       );
     }

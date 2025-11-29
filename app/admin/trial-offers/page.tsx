@@ -1,14 +1,36 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import TrialSettingsManager from "@/components/TrialSettingsManager";
 import SpecialOffersManager from "@/components/SpecialOffersManager";
+import type { Database } from "@/types/supabase";
+import { getBackofficeProfile } from "@/lib/backoffice";
 
 export const metadata: Metadata = {
   title: "Trial & Offers Management | Admin Dashboard",
   description: "Manage trial periods and special offers",
 };
 
-export default function TrialOffersPage() {
+export default async function TrialOffersPage() {
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookies(),
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth?redirect=/admin/trial-offers");
+  }
+
+  const backofficeProfile = await getBackofficeProfile(supabase, user.id);
+  if (!backofficeProfile || backofficeProfile.role !== "admin") {
+    redirect("/admin");
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Back Button */}

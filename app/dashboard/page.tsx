@@ -13,6 +13,7 @@ import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { LogoutButton } from "@/components/LogoutButton";
 import { DashboardWrapper } from "@/components/DashboardWrapper";
 import { StoreApprovalBanner } from "@/components/StoreApprovalBanner";
+import { getBackofficeProfile } from "@/lib/backoffice";
 
 // Force no caching for this page
 export const dynamic = "force-dynamic";
@@ -29,22 +30,11 @@ export default async function DashboardPage() {
     cookies: () => cookieStore,
   });
 
-  // Check if user is an admin - if so, redirect to admin panel
-  const { data: adminData, error: adminError } = await supabase
-    .from("admins")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .single();
+  // Check if user is a backoffice user (admin or approver) - if so, redirect to admin panel
+  const backofficeProfile = await getBackofficeProfile(supabase, user.id);
 
-  console.log("=== ADMIN CHECK ===");
-  console.log("User ID:", user.id);
-  console.log("Admin Data:", adminData);
-  console.log("Admin Error:", adminError);
-  console.log("==================");
-
-  if (adminData) {
-    console.log("Redirecting to admin panel");
+  if (backofficeProfile) {
+    console.log("Redirecting to admin panel for role:", backofficeProfile.role);
     redirect("/admin");
   }
 

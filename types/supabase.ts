@@ -89,6 +89,23 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["admins"]["Row"]>;
       };
+      approvers: {
+        Row: {
+          id: string;
+          user_id: string;
+          email: string;
+          created_at: string | null;
+          is_active: boolean | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          email: string;
+          created_at?: string | null;
+          is_active?: boolean | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["approvers"]["Row"]>;
+      };
       products: {
         Row: {
           id: string;

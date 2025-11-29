@@ -1,9 +1,10 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/supabase";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getBackofficeProfile } from "@/lib/backoffice";
 
 export default async function AdminLayout({
   children,
@@ -24,17 +25,14 @@ export default async function AdminLayout({
     redirect("/auth?redirect=/admin");
   }
 
-  // Check if user is admin
-  const { data: adminData } = await supabase
-    .from("admins")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .single();
+  // Check if user is admin or approver
+  const backofficeProfile = await getBackofficeProfile(supabase, user.id);
 
-  if (!adminData) {
+  if (!backofficeProfile) {
     redirect("/dashboard?error=not_authorized");
   }
+
+  const isApprover = backofficeProfile.role === "approver";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +43,7 @@ export default async function AdminLayout({
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <span className="text-xl font-bold text-blue-600">
-                  🛡️ Admin Panel
+                  {isApprover ? "Approver Panel" : "Admin Panel"}
                 </span>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -76,7 +74,9 @@ export default async function AdminLayout({
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{adminData.email}</span>
+              <span className="text-sm text-gray-600">
+                {backofficeProfile.email} | {backofficeProfile.role}
+              </span>
               <Link
                 href="/dashboard"
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
