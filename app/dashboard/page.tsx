@@ -252,11 +252,7 @@ export default async function DashboardPage() {
               title="Conversion Rate"
               value={`${
                 orders.length > 0
-                  ? Math.round(
-                      (orders.filter((o) => o.status === "paid").length /
-                        orders.length) *
-                        100
-                    )
+                  ? Math.round((paidOrders.length / orders.length) * 100)
                   : 0
               }%`}
               icon="📊"
@@ -266,15 +262,16 @@ export default async function DashboardPage() {
           </div>
 
           {/* Conversion Rate Info */}
-          <div className="bg-blue-50 rounded-lg p-3 mb-6">
+                    <div className="bg-blue-50 rounded-lg p-3 mb-6">
             <p className="text-xs text-gray-600 leading-relaxed">
-              <span className="font-semibold text-gray-700">
-                Conversion Rate:
-              </span>{" "}
+              <span className="font-semibold text-gray-700">Conversion Rate:</span>{" "}
               Percentage of orders that are paid.{" "}
               <span className="text-gray-500">
-                Formula: (Paid Orders ÷ Total Orders) × 100
+                Formula: (Paid Orders / Total Orders) * 100
               </span>
+              {orders.length === 0 && (
+                <span className="text-gray-500 block">No orders yet.</span>
+              )}
             </p>
           </div>
 
@@ -462,4 +459,9 @@ function QuickLink({
     </Link>
   );
 }
+
+
+
+
+
 

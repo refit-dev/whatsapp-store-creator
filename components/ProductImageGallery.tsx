@@ -79,7 +79,7 @@ export function ProductImageGallery({
     <div className="relative w-full">
       {/* Main Image Container - Shorter on mobile */}
       <div
-        className="relative w-full aspect-[16/9] sm:aspect-[4/3] md:aspect-square max-h-[200px] sm:max-h-none bg-white rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-lg"
+        className="relative w-full aspect-[4/3] sm:aspect-[4/3] md:aspect-square max-h-[140px] sm:max-h-[180px] bg-white rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-lg"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
