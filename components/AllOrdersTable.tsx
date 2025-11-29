@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { toLocaleString } from "@/lib/currency";
 import { CopyOrderButton } from "./CopyOrderButton";
 import OrderCancelModal from "./OrderCancelModal";
@@ -26,22 +26,38 @@ interface Order {
 }
 
 interface AllOrdersTableProps {
-  initialOrders: Order[];
+  initialOrders?: Order[];
+  orders?: Order[];
   currency: string;
   storeId: string;
+  totalCount?: number;
+  pageSize?: number;
+  currentPage?: number;
+  onPageChange?: Dispatch<SetStateAction<number>>;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export function AllOrdersTable({
-  initialOrders,
+  initialOrders = [],
+  orders: controlledOrders,
   currency,
   storeId,
 }: AllOrdersTableProps) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders, setOrders] = useState<Order[]>(
+    controlledOrders ?? initialOrders
+  );
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
+
+  // Keep internal state in sync if parent passes a new orders array
+  useEffect(() => {
+    if (controlledOrders) {
+      setOrders(controlledOrders);
+    }
+  }, [controlledOrders]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
