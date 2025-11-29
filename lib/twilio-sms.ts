@@ -28,7 +28,7 @@ export class TwilioSMS {
   async sendOtp(to: string, code: string): Promise<string> {
     try {
       const message = await this.client.messages.create({
-        body: `Your verification code is: ${code}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, please ignore this message.`,
+        body: `Your Watzy store verification code is: ${code}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, please ignore this message.`,
         from: this.fromNumber,
         to: to,
       });

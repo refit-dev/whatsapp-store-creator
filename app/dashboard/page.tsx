@@ -160,6 +160,12 @@ export default async function DashboardPage() {
     );
   }
 
+  const paidOrders = orders.filter((o) => o.status === "paid");
+  const totalRevenueCents = paidOrders.reduce(
+    (sum, o) => sum + (o.total_cents || 0),
+    0
+  );
+
   return (
     <DashboardWrapper>
       <main className="min-h-screen bg-gray-50">
@@ -227,9 +233,7 @@ export default async function DashboardPage() {
             />
             <StatsCard
               title="Paid Orders"
-              value={orders
-                .filter((o) => o.status === "paid")
-                .length.toString()}
+              value={paidOrders.length.toString()}
               icon="✅"
               color="green"
               href="/dashboard/orders"
@@ -237,7 +241,7 @@ export default async function DashboardPage() {
             <StatsCard
               title="Total Revenue"
               value={toLocaleString(
-                orders.reduce((sum, o) => sum + (o.total_cents || 0), 0),
+                totalRevenueCents,
                 store.currency || "USD"
               )}
               icon="💰"
@@ -458,3 +462,4 @@ function QuickLink({
     </Link>
   );
 }
+
