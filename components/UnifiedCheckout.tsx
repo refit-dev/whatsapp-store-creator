@@ -159,22 +159,76 @@ export function UnifiedCheckout({
     loadConfigs();
   }, [storeId, supabase]);
 
+  // Available time slots for a specific day (for day_and_time mode)
+  const getAvailableTimesForDay = (day: string) => {
+    if (!deliveryConfig || deliveryConfig.delivery_type !== "day_and_time") {
+      return [];
+    }
+
+    const times = new Set<string>();
+    deliveryConfig.delivery_slots.forEach((slot) => {
+      const [slotDay, time] = slot
+        .split("|")
+        .map((part) => part?.trim() ?? "");
+      if (slotDay === day && time) {
+        times.add(time);
+      }
+    });
+
+    return Array.from(times);
+  };
+
+  const deliverySelectionRequired =
+    !!deliveryConfig &&
+    deliveryConfig.delivery_enabled &&
+    deliveryConfig.delivery_type !== "immediate" &&
+    deliveryConfig.delivery_slots.length > 0;
+
+  const getDeliverySelection = () => {
+    if (!deliveryConfig || !deliveryConfig.delivery_enabled) {
+      return { day: "", slot: "", time: "" };
+    }
+
+    switch (deliveryConfig.delivery_type) {
+      case "day_and_time": {
+        const day = customerInfo.deliveryDay.trim();
+        const time = customerInfo.deliveryTime.trim();
+        return {
+          day,
+          slot: time,
+          time,
+        };
+      }
+      case "days": {
+        const slot = customerInfo.deliverySlot.trim();
+        return { day: slot, slot, time: "" };
+      }
+      case "time_slots": {
+        const slot = customerInfo.deliverySlot.trim();
+        return { day: "", slot, time: slot };
+      }
+      default:
+        return { day: "", slot: "", time: "" };
+    }
+  };
+
   // Helper to combine delivery slot info with notes
   const getOrderNotes = () => {
     let notes = "";
+    const deliverySelection = getDeliverySelection();
 
     if (deliveryConfig?.delivery_type === "day_and_time") {
       // Separate day and time dropdowns
-      if (customerInfo.deliveryDay && customerInfo.deliveryTime) {
-        notes += `Delivery: ${customerInfo.deliveryDay}, ${customerInfo.deliveryTime}\n\n`;
+      if (deliverySelection.day && deliverySelection.time) {
+        notes += `Delivery: ${deliverySelection.day}, ${deliverySelection.time}\n\n`;
       }
-    } else if (customerInfo.deliverySlot) {
+    } else if (deliverySelection.slot) {
       // Single dropdown for days or time_slots
       const label =
         deliveryConfig?.delivery_type === "days"
           ? "Delivery Day"
           : "Delivery Time";
-      notes += `${label}: ${customerInfo.deliverySlot}\n\n`;
+      notes += `${label}: ${deliverySelection.slot}\n\n`;
     }
 
     if (customerInfo.specialInstructions) {
@@ -202,19 +256,22 @@ export function UnifiedCheckout({
       return;
     }
 
-    // Check delivery slot if required
+    const deliverySelection = getDeliverySelection();
+
     if (
-      deliveryConfig?.delivery_enabled &&
-      deliveryConfig.delivery_type !== "immediate" &&
-      deliveryConfig.delivery_slots.length > 0 &&
-      !customerInfo.deliverySlot
+      deliverySelectionRequired &&
+      (!deliverySelection.slot ||
+        (deliveryConfig?.delivery_type === "day_and_time" &&
+          !deliverySelection.day))
     ) {
       alert(
-        `Please select a ${
-          deliveryConfig.delivery_type === "days"
-            ? "delivery day"
-            : "delivery time slot"
-        }`
+        deliveryConfig?.delivery_type === "day_and_time"
+          ? "Please select a delivery day and time slot"
+          : `Please select a ${
+              deliveryConfig?.delivery_type === "days"
+                ? "delivery day"
+                : "delivery time slot"
+            }`
       );
       return;
     }
@@ -239,6 +296,8 @@ export function UnifiedCheckout({
             address: customerInfo.address,
             notes: getOrderNotes(),
           },
+          delivery_day: deliverySelection.day || null,
+          delivery_slot: deliverySelection.slot || null,
           items: items.map((item) => ({
             productId: item.id,
             title: item.title,
@@ -339,28 +398,31 @@ export function UnifiedCheckout({
       return;
     }
 
+    const deliverySelection = getDeliverySelection();
+
+    if (
+      deliverySelectionRequired &&
+      (!deliverySelection.slot ||
+        (deliveryConfig?.delivery_type === "day_and_time" &&
+          !deliverySelection.day))
+    ) {
+      alert(
+        deliveryConfig?.delivery_type === "day_and_time"
+          ? "Please select a delivery day and time slot"
+          : `Please select a ${
+              deliveryConfig?.delivery_type === "days"
+                ? "delivery day"
+                : "delivery time slot"
+            }`
+      );
+      return;
+    }
+
     // Allow zero value orders for free products/samples
 
     setIsLoading(true);
 
     try {
-      // Check delivery slot if required
-      if (
-        deliveryConfig?.delivery_enabled &&
-        deliveryConfig.delivery_type !== "immediate" &&
-        deliveryConfig.delivery_slots.length > 0 &&
-        !customerInfo.deliverySlot
-      ) {
-        alert(
-          `Please select a ${
-            deliveryConfig.delivery_type === "days"
-              ? "delivery day"
-              : "delivery time slot"
-          }`
-        );
-        setIsLoading(false);
-        return;
-      }
 
       // Create order with WhatsApp payment method
       const orderRes = await fetch("/api/orders", {
@@ -374,6 +436,8 @@ export function UnifiedCheckout({
             address: customerInfo.address,
             notes: getOrderNotes(),
           },
+          delivery_day: deliverySelection.day || null,
+          delivery_slot: deliverySelection.slot || null,
           items: items.map((item) => ({
             productId: item.id,
             title: item.title,
@@ -748,12 +812,24 @@ export function UnifiedCheckout({
                     </label>
                     <select
                       value={customerInfo.deliveryDay}
-                      onChange={(e) =>
-                        setCustomerInfo((prev) => ({
-                          ...prev,
-                          deliveryDay: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => {
+                        const newDay = e.target.value;
+                        setCustomerInfo((prev) => {
+                          const availableTimes = getAvailableTimesForDay(newDay);
+                          const keepTime = availableTimes.includes(
+                            prev.deliveryTime
+                          );
+
+                          const nextTime = keepTime ? prev.deliveryTime : "";
+
+                          return {
+                            ...prev,
+                            deliveryDay: newDay,
+                            deliveryTime: nextTime,
+                            deliverySlot: keepTime ? nextTime : "",
+                          };
+                        });
+                      }}
                       className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
                       required
                     >
@@ -762,7 +838,7 @@ export function UnifiedCheckout({
                         // Extract unique days from "Monday|9AM-12PM" format
                         const days = new Set<string>();
                         deliveryConfig.delivery_slots.forEach((slot) => {
-                          const [day] = slot.split("|");
+                          const [day] = slot.split("|").map((part) => part?.trim());
                           if (day) days.add(day);
                         });
                         return Array.from(days).map((day) => (
@@ -780,24 +856,24 @@ export function UnifiedCheckout({
                     </label>
                     <select
                       value={customerInfo.deliveryTime}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newTime = e.target.value;
                         setCustomerInfo((prev) => ({
                           ...prev,
-                          deliveryTime: e.target.value,
-                        }))
-                      }
+                          deliveryTime: newTime,
+                          deliverySlot: newTime,
+                        }));
+                      }}
                       className="w-full px-4 py-3 md:px-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base"
                       required
                     >
                       <option value="">-- Select Time --</option>
                       {(() => {
-                        // Extract unique times from "Monday|9AM-12PM" format
-                        const times = new Set<string>();
-                        deliveryConfig.delivery_slots.forEach((slot) => {
-                          const [, time] = slot.split("|");
-                          if (time) times.add(time);
-                        });
-                        return Array.from(times).map((time) => (
+                        // Extract unique times for the selected day from "Monday|9AM-12PM" format
+                        const times = getAvailableTimesForDay(
+                          customerInfo.deliveryDay
+                        );
+                        return times.map((time) => (
                           <option key={time} value={time}>
                             {time}
                           </option>

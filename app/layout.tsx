@@ -55,6 +55,8 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Preconnect to external origins for faster resource loading */}
+        <link rel="preconnect" href="https://www.watzy.app" />
+        <link rel="preconnect" href="https://watzy.app" />
         <link
           rel="preconnect"
           href="https://iazdsuodmyymclqltenc.supabase.co"

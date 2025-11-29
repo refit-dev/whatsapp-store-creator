@@ -19,6 +19,7 @@ const nextConfig = {
   // Modern JavaScript target - reduces polyfills
   experimental: {
     modern: true,
+    legacyBrowsers: false,
   },
 
   images: {
@@ -104,3 +105,4 @@ const nextConfig = {
 
 // Wrap with bundle analyzer
 module.exports = withBundleAnalyzer(nextConfig);
+
