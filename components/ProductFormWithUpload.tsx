@@ -45,6 +45,7 @@ export function ProductFormWithUpload({
   const [imageUrls, setImageUrls] = useState<string[]>(
     product?.image_urls || []
   );
+  const [videoUrl, setVideoUrl] = useState((product as any)?.video_url || "");
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
 
   // Upload image to Vercel Blob Storage
@@ -169,12 +170,16 @@ export function ProductFormWithUpload({
         return;
       }
 
+      // Sanitize video URL if provided
+      const finalVideoUrl = videoUrl ? sanitizeUrl(videoUrl) : null;
+
       const productData = {
         title: sanitizedTitle,
         description: sanitizedDescription,
         price_cents: sanitizedPrice,
         currency,
-        image_urls: sanitizedImageUrls,
+        image_urls: imageUrls.length > 0 ? imageUrls : null,
+        video_url: finalVideoUrl,
         is_active: isActive,
         stock_qty: sanitizedStock,
         store_id: storeId,
@@ -293,7 +298,8 @@ export function ProductFormWithUpload({
       {/* Image Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Product Images {imageUrls.length > 0 && `(${imageUrls.length})`}
+          Product Images (Optional){" "}
+          {imageUrls.length > 0 && `(${imageUrls.length})`}
         </label>
 
         {/* Image Previews */}
@@ -408,6 +414,27 @@ export function ProductFormWithUpload({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Video URL */}
+      <div>
+        <label
+          htmlFor="videoUrl"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Video Link (Optional)
+        </label>
+        <input
+          id="videoUrl"
+          type="url"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          placeholder="e.g., https://youtube.com/watch?v=... or https://vimeo.com/..."
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <p className="mt-1 text-sm text-gray-500">
+          Add a YouTube, Vimeo, or direct video link to showcase your product
+        </p>
       </div>
 
       {/* Active Status */}

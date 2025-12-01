@@ -39,6 +39,7 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
     product?.stock_qty?.toString() || ""
   );
   const [imageUrl, setImageUrl] = useState(product?.image_urls?.[0] || "");
+  const [videoUrl, setVideoUrl] = useState((product as any)?.video_url || "");
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
   const [interactionType, setInteractionType] = useState<"buy_now" | "inquiry">(
     (product as any)?.interaction_type || "buy_now"
@@ -153,12 +154,16 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
         ? sanitizeUrl(convertGoogleDriveLink(imageUrl))
         : "";
 
+      // Sanitize video URL if provided
+      const finalVideoUrl = videoUrl ? sanitizeUrl(videoUrl) : null;
+
       const productData = {
         title: sanitizedTitle,
         description: sanitizedDescription,
         price_cents: sanitizedPrice,
         currency,
-        image_urls: finalImageUrl ? [finalImageUrl] : [],
+        image_urls: finalImageUrl ? [finalImageUrl] : null,
+        video_url: finalVideoUrl,
         is_active: isActive,
         stock_qty: sanitizedStock,
         interaction_type: interactionType,
@@ -309,7 +314,7 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
       {/* Image Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Product Image
+          Product Image (Optional)
         </label>
 
         {/* Image Preview */}
@@ -410,6 +415,27 @@ export function ProductForm({ storeId, currency, product }: ProductFormProps) {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Video URL */}
+      <div>
+        <label
+          htmlFor="videoUrl"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Video Link (Optional)
+        </label>
+        <input
+          id="videoUrl"
+          type="url"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          placeholder="e.g., https://youtube.com/watch?v=... or https://vimeo.com/..."
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <p className="mt-1 text-sm text-gray-500">
+          Add a YouTube, Vimeo, or direct video link to showcase your product
+        </p>
       </div>
 
       {/* Active Status */}
