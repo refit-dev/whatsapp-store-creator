@@ -324,7 +324,7 @@ export function BillingClient() {
 
               {currency === "USD" && (
                 <p className="text-xs text-gray-500 text-center mt-2">
-                  Payment will be processed in INR (₹259) via Razorpay
+                  Payment will be processed in INR (₹99) via Razorpay
                 </p>
               )}
             </div>

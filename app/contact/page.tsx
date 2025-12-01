@@ -413,7 +413,7 @@ export default function ContactUs() {
                 </h3>
                 <p className="text-gray-600 text-sm">
                   You get 14 days completely free when you sign up. No credit
-                  card required. After the trial, it's ₹259/month.
+                  card required. After the trial, it's ₹99/month.
                 </p>
               </div>
 

@@ -95,8 +95,8 @@ export function getCurrencySymbol(currency: Currency): string {
 
 // Common price points in INR (base prices)
 export const PRICING = {
-  MONTHLY_INR: 25900, // ₹259 in cents
-  YEARLY_INR: 259900, // ₹2599 in cents
+  MONTHLY_INR: 9900, // ₹99 in cents
+  YEARLY_INR: 99900, // ₹999 in cents
   TRIAL_INR: 0, // Free trial
 };
 

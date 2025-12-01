@@ -126,7 +126,7 @@ export default function TermsAndConditions() {
                 <li>New users receive a 14-day free trial</li>
                 <li>
                   After the trial period, continued use requires a monthly
-                  subscription of ₹259
+                  subscription of ₹99
                 </li>
                 <li>
                   Payments are processed through Razorpay and are non-refundable
