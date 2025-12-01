@@ -19,6 +19,7 @@ export function SubscriptionStatus() {
   const handleStartTrial = async () => {
     setIsStartingTrial(true);
     try {
+      console.log("🚀 Starting trial...");
       // Call the function to give free trial
       const response = await fetch("/api/subscription/start-trial", {
         method: "POST",
@@ -27,14 +28,22 @@ export function SubscriptionStatus() {
         },
       });
 
+      const data = await response.json();
+      console.log("📦 Start trial response:", data);
+
       if (response.ok) {
-        // Refresh subscription data
-        await refreshSubscription();
+        console.log("✅ Trial started successfully!");
+        // Clear cache and force refresh subscription data
+        sessionStorage.removeItem("subscription-cache");
+        await refreshSubscription(true); // Force refresh, bypass cache
+        alert("🎉 Your 14-day free trial has started!");
       } else {
-        console.error("Failed to start trial");
+        console.error("❌ Failed to start trial:", data);
+        alert(`Failed to start trial: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
-      console.error("Error starting trial:", error);
+      console.error("💥 Error starting trial:", error);
+      alert("An error occurred while starting trial. Please try again.");
     } finally {
       setIsStartingTrial(false);
     }

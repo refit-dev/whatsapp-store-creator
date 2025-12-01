@@ -45,8 +45,9 @@ export function AutoTrialInitializer() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Refresh subscription data to reflect the new trial
-        await refreshSubscription();
+        // Clear cache and force refresh subscription data to reflect the new trial
+        sessionStorage.removeItem("subscription-cache");
+        await refreshSubscription(true); // Force refresh, bypass cache
         console.log("Auto-trial started successfully");
       } else {
         console.log(

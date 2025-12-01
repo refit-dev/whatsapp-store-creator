@@ -104,7 +104,8 @@ export function SubscriptionProvider({
       }
 
       // Get active subscription
-      const { data: subscriptions } = await sb
+      console.log("📡 Fetching subscription for user:", user.id);
+      const { data: subscriptions, error: subError } = await sb
         .from("user_subscriptions")
         .select(
           `
@@ -117,6 +118,7 @@ export function SubscriptionProvider({
         .order("ends_at", { ascending: false })
         .limit(1);
 
+      console.log("📦 Subscription query result:", { subscriptions, subError });
       setSubscription(subscriptions?.[0] || null);
 
       // Get referral code
@@ -195,10 +197,20 @@ export function SubscriptionProvider({
   };
 
   const getStatus = (): SubscriptionStatus => {
-    if (!subscription) return "none";
+    console.log("🔍 getStatus - subscription:", subscription);
+    if (!subscription) {
+      console.log('❌ No subscription found - returning "none"');
+      return "none";
+    }
 
     const now = new Date();
     const endDate = new Date(subscription.ends_at);
+    console.log("📅 Date check:", {
+      now,
+      endDate,
+      isExpired: endDate < now,
+      isTrial: subscription.is_trial,
+    });
 
     if (endDate < now) return "expired";
     if (subscription.is_trial) return "trial";

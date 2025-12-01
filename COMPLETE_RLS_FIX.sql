@@ -157,3 +157,56 @@ WHERE approval_status = 'approved';
 --   approved_at = NOW()
 -- WHERE handle = 'your-handle';
 
+-- =====================================================
+-- 6. Fix RLS Policies on user_subscriptions Table
+-- =====================================================
+
+-- Drop existing restrictive policies if any
+DROP POLICY IF EXISTS "Users can view own subscriptions" ON user_subscriptions;
+DROP POLICY IF EXISTS "Users can view their subscriptions" ON user_subscriptions;
+DROP POLICY IF EXISTS "users_view_own_subscriptions" ON user_subscriptions;
+DROP POLICY IF EXISTS "Users can read their own subscriptions" ON user_subscriptions;
+DROP POLICY IF EXISTS "Service role has full access" ON user_subscriptions;
+
+-- Create a proper SELECT policy for users to read their own subscriptions
+CREATE POLICY "Users can read their own subscriptions"
+ON user_subscriptions
+FOR SELECT
+TO authenticated
+USING (auth.uid() = user_id);
+
+-- Ensure service_role can do everything (for admin/backend)
+CREATE POLICY "Service role has full access"
+ON user_subscriptions
+FOR ALL
+TO service_role
+USING (true)
+WITH CHECK (true);
+
+-- Verify the subscription policies
+SELECT 
+  schemaname,
+  tablename,
+  policyname,
+  cmd,
+  roles,
+  '✅ Subscription RLS Policy' as check_type
+FROM pg_policies
+WHERE tablename = 'user_subscriptions'
+ORDER BY policyname;
+
+-- Test: Try to read subscription as authenticated user
+SELECT 
+  us.id,
+  us.status,
+  us.is_trial,
+  us.ends_at,
+  sp.name,
+  sp.price_cents,
+  '✅ If you see this, RLS is working!' as test_result
+FROM user_subscriptions us
+LEFT JOIN subscription_plans sp ON sp.id = us.plan_id
+WHERE us.user_id = (SELECT id FROM auth.users WHERE email = 'ankitnanda07@gmail.com')
+  AND us.status = 'active'
+LIMIT 1;
+
