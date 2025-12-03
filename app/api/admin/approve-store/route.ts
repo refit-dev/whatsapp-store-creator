@@ -4,10 +4,12 @@ import { cookies } from "next/headers";
 import type { Database } from "@/types/supabase";
 import { getBackofficeProfile } from "@/lib/backoffice";
 
+// This API has been updated to handle blocking/unblocking stores
+// instead of approving/rejecting (stores are now auto-approved)
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { storeId, action, rejectionReason } = body;
+    const { storeId, action, blockReason } = body;
 
     if (!storeId || !action) {
       return NextResponse.json(
@@ -16,16 +18,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!["approve", "reject"].includes(action)) {
+    if (!["block", "unblock"].includes(action)) {
       return NextResponse.json(
-        { error: "Invalid action. Must be 'approve' or 'reject'" },
+        { error: "Invalid action. Must be 'block' or 'unblock'" },
         { status: 400 }
       );
     }
 
-    if (action === "reject" && !rejectionReason?.trim()) {
+    if (action === "block" && !blockReason?.trim()) {
       return NextResponse.json(
-        { error: "Rejection reason is required" },
+        { error: "Block reason is required" },
         { status: 400 }
       );
     }
@@ -57,20 +59,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update store status
+    // Update store moderation status
     const updateData: {
-      approval_status: "approved" | "rejected";
-      approved_by: string;
-      approved_at: string;
-      rejection_reason?: string;
+      is_blocked: boolean;
+      block_reason?: string | null;
+      blocked_at?: string | null;
+      blocked_by?: string | null;
     } = {
-      approval_status: action === "approve" ? "approved" : "rejected",
-      approved_by: user.id,
-      approved_at: new Date().toISOString(),
+      is_blocked: action === "block",
+      blocked_at: action === "block" ? new Date().toISOString() : null,
+      blocked_by: action === "block" ? user.id : null,
     };
 
-    if (action === "reject") {
-      updateData.rejection_reason = rejectionReason;
+    if (action === "block") {
+      updateData.block_reason = blockReason;
+    } else {
+      updateData.block_reason = null;
     }
 
     const { error: updateError } = await supabase
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Store ${
-        action === "approve" ? "approved" : "rejected"
+        action === "block" ? "blocked" : "unblocked"
       } successfully`,
     });
   } catch (error) {

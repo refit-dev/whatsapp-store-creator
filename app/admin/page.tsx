@@ -27,12 +27,12 @@ export default async function AdminDashboard() {
 
   const { data: stores } = await supabase.from("stores").select("*");
 
-  const pendingCount =
-    stores?.filter((store) => store.approval_status === "pending").length || 0;
-  const approvedCount =
-    stores?.filter((store) => store.approval_status === "approved").length || 0;
-  const rejectedCount =
-    stores?.filter((store) => store.approval_status === "rejected").length || 0;
+  const blockedCount =
+    stores?.filter((store) => store.is_blocked === true).length || 0;
+  const activeCount =
+    stores?.filter((store) => store.is_active === true && !store.is_blocked).length || 0;
+  const inactiveCount =
+    stores?.filter((store) => store.is_active === false).length || 0;
   const totalStores = stores?.length || 0;
 
   const quickActions: {
@@ -42,12 +42,6 @@ export default async function AdminDashboard() {
     highlight?: "primary";
   }[] = [
     {
-      href: "/admin/stores",
-      title: "Review Pending Stores",
-      description: `${pendingCount} store${pendingCount === 1 ? "" : "s"} waiting`,
-      highlight: "primary",
-    },
-    {
       href: "/admin/images",
       title: "Moderate Images",
       description: "Review uploaded product images",
@@ -56,7 +50,8 @@ export default async function AdminDashboard() {
     {
       href: "/admin/all-stores",
       title: "Browse All Stores",
-      description: "View every store on the platform",
+      description: "View and moderate stores",
+      highlight: "primary",
     },
   ];
 
@@ -99,18 +94,18 @@ export default async function AdminDashboard() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm font-medium text-gray-600">Pending Review</p>
-          <p className="mt-2 text-3xl font-bold text-orange-600">{pendingCount}</p>
+          <p className="text-sm font-medium text-gray-600">Active Stores</p>
+          <p className="mt-2 text-3xl font-bold text-green-600">{activeCount}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm font-medium text-gray-600">Approved</p>
-          <p className="mt-2 text-3xl font-bold text-green-600">{approvedCount}</p>
+          <p className="text-sm font-medium text-gray-600">Inactive</p>
+          <p className="mt-2 text-3xl font-bold text-gray-600">{inactiveCount}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm font-medium text-gray-600">Rejected</p>
-          <p className="mt-2 text-3xl font-bold text-red-600">{rejectedCount}</p>
+          <p className="text-sm font-medium text-gray-600">Blocked</p>
+          <p className="mt-2 text-3xl font-bold text-red-600">{blockedCount}</p>
         </div>
       </div>
 

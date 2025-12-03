@@ -9,41 +9,39 @@ export default async function PendingStoresPage() {
     cookies: () => cookieStore,
   });
 
-  // Get all pending stores with their products
-  const { data: pendingStores, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("approval_status", "pending")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching pending stores:", error);
-  }
-
+  // Redirect to all-stores page since stores are now auto-approved
   return (
     <div className="px-4 py-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Pending Store Approvals
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900">Store Approvals</h1>
         <p className="mt-2 text-gray-600">
-          Review and approve or reject stores before they go live
+          Stores are now automatically approved. Use the "Browse All Stores"
+          page to moderate stores if needed.
         </p>
       </div>
 
-      {!pendingStores || pendingStores.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <span className="text-6xl mb-4 block">🎉</span>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            All Caught Up!
-          </h2>
-          <p className="text-gray-600">
-            There are no stores pending approval at the moment.
-          </p>
+      <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg shadow-sm">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <span className="text-3xl">ℹ️</span>
+          </div>
+          <div className="ml-4 flex-1">
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              Auto-Approval Enabled
+            </h3>
+            <p className="text-blue-800 mb-3">
+              All stores are now automatically approved upon creation. You can
+              still moderate stores by blocking them if they violate policies.
+            </p>
+            <a
+              href="/admin/all-stores"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+            >
+              Go to All Stores →
+            </a>
+          </div>
         </div>
-      ) : (
-        <StoreReviewClient initialStores={pendingStores} />
-      )}
+      </div>
     </div>
   );
 }

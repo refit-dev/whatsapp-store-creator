@@ -110,33 +110,8 @@ export default async function StorefrontPage({
     );
   }
 
-  // Check if store is not approved (but allow owner to preview)
-  if (store.approval_status !== "approved" && !isOwner) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="mx-auto w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-6">
-            <span className="text-4xl">⏳</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">
-            {store.approval_status === "rejected"
-              ? "Store Not Available"
-              : "Store Under Review"}
-          </h1>
-          <p className="text-gray-600 mb-6">
-            {store.approval_status === "rejected"
-              ? "This store has been rejected and is not available for public access."
-              : "This store is currently under review by our team. It will be available soon!"}
-          </p>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm text-gray-700">
-            {store.approval_status === "rejected"
-              ? "If you are the store owner, please check your dashboard for more information."
-              : "Store owners will be notified via email once the review is complete."}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Note: Approval check removed - stores are auto-approved
+  // Only check is_blocked status (handled above)
 
   // Check if store is inactive (but allow owner to preview)
   if (store.is_active === false && !isOwner) {
@@ -201,16 +176,10 @@ export default async function StorefrontPage({
     is_active: store.is_active,
   };
 
-  // Show preview banner if owner is viewing non-approved or inactive store
-  const showPreviewBanner =
-    isOwner &&
-    (store.approval_status !== "approved" || store.is_active === false);
+  // Show preview banner if owner is viewing inactive store
+  const showPreviewBanner = isOwner && store.is_active === false;
   const previewMessage =
-    store.approval_status === "pending"
-      ? "⏳ Preview Mode: Your store is under review and not yet public"
-      : store.approval_status === "rejected"
-      ? "❌ Preview Mode: Your store was rejected and is not public"
-      : store.is_active === false
+    store.is_active === false
       ? "🔒 Preview Mode: Your store is inactive and not public"
       : "";
 
