@@ -75,11 +75,11 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.razorpay.com https://vercel.live",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.razorpay.com https://www.googletagmanager.com https://vercel.live",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://vitals.vercel-insights.com",
+              "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://vitals.vercel-insights.com https://ipapi.co https://www.google-analytics.com",
               "frame-src 'self' https://js.stripe.com https://checkout.razorpay.com",
               "object-src 'none'",
               "base-uri 'self'",
@@ -105,4 +105,3 @@ const nextConfig = {
 
 // Wrap with bundle analyzer
 module.exports = withBundleAnalyzer(nextConfig);
-
