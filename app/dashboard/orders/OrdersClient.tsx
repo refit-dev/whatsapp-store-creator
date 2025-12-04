@@ -82,7 +82,9 @@ export function OrdersClient({
 
   const filteredOrders = useMemo(() => {
     const fromTs = dateFrom ? new Date(dateFrom).getTime() : -Infinity;
-    const toTs = dateTo ? new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 : Infinity;
+    const toTs = dateTo
+      ? new Date(dateTo).getTime() + 24 * 60 * 60 * 1000
+      : Infinity;
     return orders.filter((order) => {
       const created = new Date(order.created_at).getTime();
       if (created < fromTs || created > toTs) return false;
@@ -116,14 +118,19 @@ export function OrdersClient({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                dY"S Orders & Analytics
+                Orders & Analytics
               </h1>
               <p className="text-gray-600 mt-1 text-sm md:text-base">
                 Track orders, analyze performance & export reports
               </p>
             </div>
             <div className="flex flex-wrap gap-2 md:gap-3">
-              <Link href="/dashboard" className="px-4 md:px-6 py-2 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors text-sm md:text-base">�+? Dashboard</Link>
+              <Link
+                href="/dashboard"
+                className="px-4 md:px-6 py-2 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors text-sm md:text-base"
+              >
+                ← Dashboard
+              </Link>
               <div className="hidden sm:block border-l border-gray-200 pl-2 md:pl-3">
                 <LogoutButton />
               </div>
@@ -213,7 +220,7 @@ export function OrdersClient({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
               <div>
                 <h2 className="text-lg md:text-xl font-bold text-gray-900">
-                  dY"S Analytics & Reports
+                  Analytics & Reports
                 </h2>
                 <p className="text-xs md:text-sm text-gray-600 mt-1">
                   Track performance and export data
@@ -281,4 +288,3 @@ function ChartsSkeleton() {
     </div>
   );
 }
-
