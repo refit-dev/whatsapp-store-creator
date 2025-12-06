@@ -6,11 +6,10 @@ import type { Database } from "@/types/supabase";
 import { ProductFormWithUpload } from "@/components/ProductFormWithUpload";
 import Link from "next/link";
 
-export default async function EditProductPage({
-  params,
-}: {
-  params: { id: string };
+export default async function EditProductPage(props: {
+  params: Promise<{ id: string }>;
 }) {
+  const params = await props.params;
   const user = await getUser();
   if (!user) {
     redirect("/auth");

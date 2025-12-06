@@ -10,23 +10,23 @@ const nextConfig = {
   compress: true,
 
   // Optimize for modern browsers - reduces JavaScript bundle size
-  swcMinify: true,
   compiler: {
     // Remove console logs in production
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // Modern JavaScript target - reduces polyfills
-  experimental: {
-    modern: true,
-    legacyBrowsers: false,
-  },
-
   images: {
-    formats: ["image/webp", "image/avif"],
-    domains: ["dwxbvqvogdrmjnumjwzk.supabase.co"], // Add your Supabase storage domain
-    // Enable image optimization
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "dwxbvqvogdrmjnumjwzk.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
   webpack: (config, { isServer }) => {

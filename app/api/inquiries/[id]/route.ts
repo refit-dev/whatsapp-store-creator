@@ -5,9 +5,10 @@ import type { Database } from "@/types/supabase";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await props.params;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient<Database>({
       cookies: () => cookieStore,

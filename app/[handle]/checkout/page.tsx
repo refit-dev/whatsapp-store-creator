@@ -4,11 +4,10 @@ import { CartSummary } from "@/components/CartSummary";
 import { UnifiedCheckout } from "@/components/UnifiedCheckout";
 import Link from "next/link";
 
-export default async function CheckoutPage({
-  params,
-}: {
-  params: { handle: string };
+export default async function CheckoutPage(props: {
+  params: Promise<{ handle: string }>;
 }) {
+  const params = await props.params;
   const supabase = supabaseServer();
   const { data: store, error: storeError } = await supabase
     .from("stores")

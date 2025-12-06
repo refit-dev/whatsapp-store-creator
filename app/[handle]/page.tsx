@@ -26,11 +26,10 @@ type StorePublicRow = {
   whatsapp_e164: string;
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { handle: string };
+export async function generateMetadata(props: {
+  params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
   const supabase = supabaseServer();
   const { data: store } = await supabase
     .from("store_public")
@@ -46,11 +45,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function StorefrontPage({
-  params,
-}: {
-  params: { handle: string };
+export default async function StorefrontPage(props: {
+  params: Promise<{ handle: string }>;
 }) {
+  const params = await props.params;
   // Force no caching for debugging
   const supabase = supabaseServer();
 
