@@ -287,8 +287,13 @@ export function BillingClient() {
 
               <div className="text-center mb-4">
                 <h3 className="text-xl font-bold text-gray-900">Pro Plan</h3>
-                <div className="text-3xl font-bold text-blue-600 mt-2">
-                  {prices.monthly}
+                <div className="mt-2">
+                  <div className="text-lg text-gray-400 line-through">
+                    {currency === "INR" ? "₹259" : "$2.99"}
+                  </div>
+                  <div className="text-3xl font-bold text-blue-600">
+                    {prices.monthly}
+                  </div>
                 </div>
                 <div className="text-gray-600">per month</div>
               </div>

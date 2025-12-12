@@ -164,23 +164,32 @@ export function ProductsList({
             onClick={toggleSelectAll}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
-            {selectedIds.size === products.length ? "Clear selection" : "Select all"}
+            {selectedIds.size === products.length
+              ? "Clear selection"
+              : "Select all"}
           </button>
           <div className="text-sm text-gray-600">
             {selectedIds.size} selected
           </div>
           <div className="flex gap-2">
             <button
+              onClick={() => bulkSetActive(true)}
+              disabled={loading || selectedIds.size === 0}
+              className="px-3 py-1.5 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 disabled:opacity-50 disabled:hover:bg-green-100 transition-colors"
+            >
+              Make Active
+            </button>
+            <button
               onClick={() => bulkSetActive(false)}
               disabled={loading || selectedIds.size === 0}
-              className="px-3 py-1.5 text-sm bg-amber-100 text-amber-800 rounded disabled:opacity-50"
+              className="px-3 py-1.5 text-sm bg-amber-100 text-amber-800 rounded hover:bg-amber-200 disabled:opacity-50 disabled:hover:bg-amber-100 transition-colors"
             >
               Make Inactive
             </button>
             <button
               onClick={bulkDelete}
               disabled={loading || selectedIds.size === 0}
-              className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded disabled:opacity-50"
+              className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50 disabled:hover:bg-red-100 transition-colors"
             >
               Delete
             </button>
@@ -195,7 +204,9 @@ export function ProductsList({
                 <input
                   type="checkbox"
                   aria-label="Select all products"
-                  checked={products.length > 0 && selectedIds.size === products.length}
+                  checked={
+                    products.length > 0 && selectedIds.size === products.length
+                  }
                   onChange={toggleSelectAll}
                 />
               </th>

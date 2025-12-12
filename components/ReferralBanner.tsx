@@ -82,7 +82,10 @@ export function ReferralBanner() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:block text-right">
             <div className="text-sm opacity-90">After Trial</div>
-            <div className="text-xl font-bold">{prices.monthly}/mo</div>
+            <div className="flex items-center justify-end gap-2">
+              <span className="text-base line-through opacity-70">₹259</span>
+              <span className="text-xl font-bold">{prices.monthly}/mo</span>
+            </div>
           </div>
           <button className="text-white/80 hover:text-white">
             <svg

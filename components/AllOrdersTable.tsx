@@ -55,6 +55,7 @@ export function AllOrdersTable({
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const totalRows = totalCount ?? orders.length;
   const pageSizeValue = (pageSize ?? orders.length) || 1;
   const currentPageValue = currentPage ?? 1;
@@ -112,6 +113,60 @@ export function AllOrdersTable({
       alert(error?.message || "Failed to mark order as paid");
     } finally {
       setMarkingPaidId(null);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    setUpdatingStatusId(orderId);
+    try {
+      const res = await fetch("/api/orders/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, storeId, status: newStatus }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update order status");
+      }
+
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+    } catch (error: any) {
+      console.error("Error updating status:", error);
+      alert(error?.message || "Failed to update order status");
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
+
+  const handlePaidCheckbox = async (orderId: string, isPaid: boolean) => {
+    setUpdatingStatusId(orderId);
+    try {
+      const res = await fetch("/api/orders/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, storeId, isPaid }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update paid status");
+      }
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, status: isPaid ? "paid" : "opened_whatsapp" }
+            : o
+        )
+      );
+    } catch (error: any) {
+      console.error("Error updating paid status:", error);
+      alert(error?.message || "Failed to update paid status");
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -205,23 +260,36 @@ export function AllOrdersTable({
                   </p>
                   <p className="text-sm text-gray-600">{order.buyer_phone}</p>
                 </div>
-                <span
-                  className={`ml-2 inline-block px-2 py-1 rounded-full text-xs font-medium shrink-0 ${
-                    order.status === "paid"
-                      ? "bg-green-100 text-green-800"
-                      : order.status === "customer_confirmed"
-                      ? "bg-indigo-100 text-indigo-800"
-                      : order.status === "opened_whatsapp"
-                      ? "bg-blue-100 text-blue-800"
-                      : order.status === "cancelled"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {order.status === "customer_confirmed"
-                    ? "confirmed"
-                    : order.status}
-                </span>
+                <div className="ml-2 shrink-0">
+                  {/* Status Dropdown */}
+                  <select
+                    value={order.status}
+                    onChange={(e) =>
+                      handleStatusChange(order.id, e.target.value)
+                    }
+                    disabled={updatingStatusId === order.id}
+                    className={`px-2 py-1 rounded-full text-xs font-medium border transition-colors disabled:opacity-50 ${
+                      order.status === "paid"
+                        ? "bg-green-100 text-green-800 border-green-200"
+                        : order.status === "customer_confirmed"
+                        ? "bg-indigo-100 text-indigo-800 border-indigo-200"
+                        : order.status === "opened_whatsapp"
+                        ? "bg-blue-100 text-blue-800 border-blue-200"
+                        : order.status === "cancelled"
+                        ? "bg-red-100 text-red-800 border-red-200"
+                        : order.status === "delivered"
+                        ? "bg-purple-100 text-purple-800 border-purple-200"
+                        : "bg-gray-100 text-gray-800 border-gray-200"
+                    }`}
+                  >
+                    <option value="created">Created</option>
+                    <option value="opened_whatsapp">Opened</option>
+                    <option value="customer_confirmed">Confirmed</option>
+                    <option value="paid">Paid</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-2 text-sm">
@@ -246,16 +314,22 @@ export function AllOrdersTable({
               </div>
 
               <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
+                {/* Paid Checkbox */}
+                <label className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={order.status === "paid"}
+                    onChange={(e) =>
+                      handlePaidCheckbox(order.id, e.target.checked)
+                    }
+                    disabled={updatingStatusId === order.id}
+                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 disabled:opacity-50"
+                  />
+                  <span className="text-xs text-gray-700 font-medium">
+                    Paid
+                  </span>
+                </label>
                 <CopyOrderButton order={order} currency={currency} />
-                {order.status !== "paid" && (
-                  <button
-                    onClick={() => handleMarkPaid(order)}
-                    disabled={markingPaidId === order.id}
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-all duration-200 font-medium shadow-sm hover:shadow disabled:opacity-50"
-                  >
-                    {markingPaidId === order.id ? "Marking..." : "Mark as Paid"}
-                  </button>
-                )}
                 {canCancelOrder(order) && (
                   <button
                     onClick={() => handleCancelClick(order)}
@@ -354,37 +428,55 @@ export function AllOrdersTable({
                   </p>
                 </td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  {/* Status Dropdown */}
+                  <select
+                    value={order.status}
+                    onChange={(e) =>
+                      handleStatusChange(order.id, e.target.value)
+                    }
+                    disabled={updatingStatusId === order.id}
+                    className={`w-full px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 ${
                       order.status === "paid"
-                        ? "bg-green-100 text-green-800"
+                        ? "bg-green-100 text-green-800 border-green-200"
                         : order.status === "customer_confirmed"
-                        ? "bg-indigo-100 text-indigo-800"
+                        ? "bg-indigo-100 text-indigo-800 border-indigo-200"
                         : order.status === "opened_whatsapp"
-                        ? "bg-blue-100 text-blue-800"
+                        ? "bg-blue-100 text-blue-800 border-blue-200"
                         : order.status === "cancelled"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-800"
+                        ? "bg-red-100 text-red-800 border-red-200"
+                        : order.status === "delivered"
+                        ? "bg-purple-100 text-purple-800 border-purple-200"
+                        : "bg-gray-100 text-gray-800 border-gray-200"
                     }`}
                   >
-                    {order.status === "customer_confirmed"
-                      ? "confirmed"
-                      : order.status}
-                  </span>
+                    <option value="created">Created</option>
+                    <option value="opened_whatsapp">Opened WhatsApp</option>
+                    <option value="customer_confirmed">
+                      Customer Confirmed
+                    </option>
+                    <option value="paid">Paid</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
+                    {/* Paid Checkbox */}
+                    <label className="flex items-center gap-1.5 cursor-pointer px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={order.status === "paid"}
+                        onChange={(e) =>
+                          handlePaidCheckbox(order.id, e.target.checked)
+                        }
+                        disabled={updatingStatusId === order.id}
+                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 disabled:opacity-50"
+                      />
+                      <span className="text-xs text-gray-700 font-medium">
+                        Paid
+                      </span>
+                    </label>
                     <CopyOrderButton order={order} currency={currency} />
-                    {order.status !== "paid" && (
-                      <button
-                        onClick={() => handleMarkPaid(order)}
-                        disabled={markingPaidId === order.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow disabled:opacity-50"
-                        title="Mark order as paid (COD)"
-                      >
-                        {markingPaidId === order.id ? "Marking..." : "Mark Paid"}
-                      </button>
-                    )}
                     {canCancelOrder(order) && (
                       <button
                         onClick={() => handleCancelClick(order)}
@@ -474,7 +566,3 @@ export function AllOrdersTable({
     </div>
   );
 }
-
-
-
-
