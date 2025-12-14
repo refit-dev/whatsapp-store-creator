@@ -57,79 +57,91 @@ export default function CookieConsent() {
   return (
     <>
       {/* Cookie Banner */}
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🍪</span>
-              <h2 className="text-2xl font-bold">Cookie Preferences</h2>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {!showSettings ? (
-              // Simple Banner View
-              <>
-                <p className="text-gray-700 mb-4 leading-relaxed">
-                  We use cookies to enhance your browsing experience, serve
-                  personalized content, and analyze our traffic. Cookies help us
-                  understand how you use our site and improve your experience.
-                </p>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-700">
-                    <strong>🔒 Your Privacy Matters:</strong> You can customize
-                    your cookie preferences at any time. Essential cookies are
-                    required for the site to function and cannot be disabled.
-                  </p>
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 sm:p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-5xl mx-auto border border-gray-200">
+          {!showSettings ? (
+            // Compact Banner View
+            <div className="p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <div className="flex items-start gap-2 mb-2">
+                    <span className="text-xl">🍪</span>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                        Cookie Preferences
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                        We use cookies to enhance your experience. By
+                        continuing, you accept our{" "}
+                        <a
+                          href="/privacy"
+                          className="text-blue-600 hover:underline"
+                          target="_blank"
+                        >
+                          Privacy Policy
+                        </a>
+                        .
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   <button
                     onClick={handleAcceptAll}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+                    className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
-                    Accept All Cookies
+                    Accept All
                   </button>
                   <button
                     onClick={handleRejectAll}
-                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+                    className="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
                   >
-                    Reject Non-Essential
+                    Reject
                   </button>
                   <button
                     onClick={handleCustomize}
-                    className="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-all"
+                    className="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
                   >
                     Customize
                   </button>
                 </div>
+              </div>
+            </div>
+          ) : (
+            // Detailed Settings View
+            <div className="max-h-[70vh] overflow-y-auto">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white rounded-t-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🍪</span>
+                    <h2 className="text-lg sm:text-xl font-bold">
+                      Cookie Preferences
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setShowSettings(false)}
+                    className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                  By clicking "Accept All Cookies", you agree to our{" "}
-                  <a
-                    href="/privacy"
-                    className="text-blue-600 hover:underline"
-                    target="_blank"
-                  >
-                    Privacy Policy
-                  </a>{" "}
-                  and{" "}
-                  <a
-                    href="/terms"
-                    className="text-blue-600 hover:underline"
-                    target="_blank"
-                  >
-                    Terms of Service
-                  </a>
-                </p>
-              </>
-            ) : (
-              // Detailed Settings View
-              <>
+              <div className="p-4 sm:p-6">
                 <p className="text-gray-700 mb-6">
                   Choose which cookies you want to allow. You can change these
                   settings at any time.
@@ -238,13 +250,13 @@ export default function CookieConsent() {
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button
                     onClick={handleSavePreferences}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+                    className="flex-1 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
                   >
                     Save Preferences
                   </button>
                   <button
                     onClick={() => setShowSettings(false)}
-                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm"
                   >
                     Back
                   </button>
@@ -260,9 +272,9 @@ export default function CookieConsent() {
                     Privacy Policy
                   </a>
                 </p>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
