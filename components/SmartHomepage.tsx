@@ -35,9 +35,9 @@ export function SmartHomepage() {
   // Show loading state
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <main className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#007BFF] mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </main>
@@ -45,12 +45,12 @@ export function SmartHomepage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-x-hidden">
+    <main className="min-h-screen w-full bg-white overflow-x-hidden">
       {/* Header */}
       <header className="max-w-6xl mx-auto w-full px-4 md:px-6 py-6 overflow-hidden">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#007BFF]">
               Watzy
             </h1>
           </div>
@@ -64,7 +64,7 @@ export function SmartHomepage() {
                 </span>
                 <Link
                   href="/dashboard"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all"
+                  className="px-4 py-2 bg-[#FF7A00] text-white rounded-lg font-medium hover:bg-[#E66D00] transition-all shadow-md hover:shadow-lg"
                 >
                   Go to Dashboard
                 </Link>
@@ -80,7 +80,7 @@ export function SmartHomepage() {
                 </Link>
                 <Link
                   href="/auth"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all"
+                  className="px-4 py-2 bg-[#FF7A00] text-white rounded-lg font-medium hover:bg-[#E66D00] transition-all shadow-md hover:shadow-lg"
                 >
                   Get Started
                 </Link>
@@ -93,7 +93,7 @@ export function SmartHomepage() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium"
+                className="px-3 py-2 text-sm bg-[#FF7A00] text-white rounded-lg font-medium hover:bg-[#E66D00] transition-colors"
               >
                 Dashboard
               </Link>
@@ -107,7 +107,7 @@ export function SmartHomepage() {
                 </Link>
                 <Link
                   href="/auth"
-                  className="px-3 py-2 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium"
+                  className="px-3 py-2 text-sm bg-[#FF7A00] text-white rounded-lg font-medium hover:bg-[#E66D00] transition-colors"
                 >
                   Get Started
                 </Link>
@@ -122,21 +122,18 @@ export function SmartHomepage() {
         <div className="text-center space-y-8">
           {/* Badge */}
           <div className="inline-block">
-            <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
-              ⚡ No coding required • Works globally
+            <span className="bg-[#FFC107] text-gray-900 px-4 py-2 rounded-full text-sm font-semibold shadow-md">
+              ⚡ FREE FOREVER • No coding required
             </span>
           </div>
 
           {/* Main Heading */}
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight px-2">
               Your Store on
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {" "}
-                WhatsApp
-              </span>
+              <span className="text-[#007BFF]"> WhatsApp</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto px-4">
               Create a beautiful mini-shop. Customers browse, tap once, and
               WhatsApp opens with their order ready to send.
             </p>
@@ -149,7 +146,7 @@ export function SmartHomepage() {
               <>
                 <Link
                   href="/dashboard"
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl text-lg"
+                  className="px-8 py-4 bg-[#FF7A00] text-white rounded-xl font-semibold hover:bg-[#E66D00] transition-all shadow-lg hover:shadow-xl text-base sm:text-lg"
                 >
                   Continue to Dashboard →
                 </Link>
@@ -157,7 +154,7 @@ export function SmartHomepage() {
                   href="/demo-bakery"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-blue-300 hover:shadow-md transition-all text-lg"
+                  className="px-8 py-4 bg-white border-2 border-[#007BFF] text-[#007BFF] rounded-xl font-semibold hover:bg-[#007BFF] hover:text-white transition-all shadow-md hover:shadow-lg text-base sm:text-lg"
                 >
                   View Demo Store
                 </Link>
@@ -167,7 +164,7 @@ export function SmartHomepage() {
               <>
                 <Link
                   href="/auth"
-                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl text-lg"
+                  className="px-8 py-4 bg-[#FF7A00] text-white rounded-xl font-semibold hover:bg-[#E66D00] transition-all shadow-lg hover:shadow-xl text-base sm:text-lg"
                 >
                   Start Free →
                 </Link>
@@ -175,7 +172,7 @@ export function SmartHomepage() {
                   href="/demo-bakery"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-blue-300 hover:shadow-md transition-all text-lg"
+                  className="px-8 py-4 bg-white border-2 border-[#007BFF] text-[#007BFF] rounded-xl font-semibold hover:bg-[#007BFF] hover:text-white transition-all shadow-md hover:shadow-lg text-base sm:text-lg"
                 >
                   View Demo Store
                 </Link>
@@ -201,7 +198,7 @@ export function SmartHomepage() {
               Welcome Back! 👋
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-blue-50 rounded-xl">
+              <div className="text-center p-6 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="text-4xl mb-4">🏪</div>
                 <h3 className="font-semibold text-lg mb-2">
                   Manage Your Store
@@ -211,12 +208,12 @@ export function SmartHomepage() {
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-block px-4 py-2 bg-[#FF7A00] text-white rounded-lg hover:bg-[#E66D00] transition-colors font-medium"
                 >
                   Go to Dashboard
                 </Link>
               </div>
-              <div className="text-center p-6 bg-green-50 rounded-xl">
+              <div className="text-center p-6 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="text-4xl mb-4">📊</div>
                 <h3 className="font-semibold text-lg mb-2">View Analytics</h3>
                 <p className="text-gray-600 mb-4">
@@ -224,12 +221,12 @@ export function SmartHomepage() {
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="inline-block px-4 py-2 bg-[#007BFF] text-white rounded-lg hover:bg-[#0066CC] transition-colors font-medium"
                 >
                   View Stats
                 </Link>
               </div>
-              <div className="text-center p-6 bg-purple-50 rounded-xl">
+              <div className="text-center p-6 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="text-4xl mb-4">🚀</div>
                 <h3 className="font-semibold text-lg mb-2">
                   Grow Your Business
@@ -239,7 +236,7 @@ export function SmartHomepage() {
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  className="inline-block px-4 py-2 bg-[#007BFF] text-white rounded-lg hover:bg-[#0066CC] transition-colors font-medium"
                 >
                   Share Store
                 </Link>
@@ -320,7 +317,7 @@ export function SmartHomepage() {
             </p>
             <Link
               href="/auth"
-              className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl text-lg"
+              className="inline-block px-8 py-4 bg-[#FF7A00] text-white rounded-xl font-semibold hover:bg-[#E66D00] transition-all shadow-lg hover:shadow-xl text-base sm:text-lg"
             >
               Create Your Store Now →
             </Link>
@@ -498,7 +495,7 @@ function FeatureCard({
   return (
     <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg flex items-center justify-center shadow-md">
+        <div className="w-10 h-10 rounded-full bg-[#007BFF] text-white font-bold text-lg flex items-center justify-center shadow-md">
           {number}
         </div>
         <div className="text-5xl leading-none">{icon}</div>
