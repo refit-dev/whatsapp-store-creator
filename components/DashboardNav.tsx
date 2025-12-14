@@ -88,13 +88,18 @@ export function DashboardNav({ storeHandle }: DashboardNavProps) {
         </div>
 
         <div className="space-y-2">
-          <NavLink href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+          <NavLink
+            href="/dashboard"
+            onClick={() => setIsMobileMenuOpen(false)}
+            dataTour="dashboard-overview-link"
+          >
             <span className="mr-3">📊</span>
             Overview
           </NavLink>
           <NavLink
             href="/dashboard/store"
             onClick={() => setIsMobileMenuOpen(false)}
+            dataTour="store-settings-link"
           >
             <span className="mr-3">⚙️</span>
             Store Settings
@@ -102,6 +107,7 @@ export function DashboardNav({ storeHandle }: DashboardNavProps) {
           <NavLink
             href="/dashboard/products"
             onClick={() => setIsMobileMenuOpen(false)}
+            dataTour="products-link"
           >
             <span className="mr-3">🛍️</span>
             Products
@@ -153,11 +159,13 @@ function NavLink({
   children,
   external = false,
   onClick,
+  dataTour,
 }: {
   href: string;
   children: React.ReactNode;
   external?: boolean;
   onClick?: () => void;
+  dataTour?: string;
 }) {
   const linkProps = external
     ? { target: "_blank", rel: "noopener noreferrer" }
@@ -168,6 +176,7 @@ function NavLink({
       href={href}
       {...linkProps}
       onClick={onClick}
+      data-tour={dataTour}
       className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition-colors touch-target"
     >
       {children}

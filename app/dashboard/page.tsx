@@ -216,7 +216,9 @@ export default async function DashboardPage() {
                   </svg>
                   View Store
                 </Link>
-                <ShareStoreLink handle={store.handle} storeId={store.id} />
+                <div data-tour="share-store-button">
+                  <ShareStoreLink handle={store.handle} storeId={store.id} />
+                </div>
                 <LogoutButton />
               </div>
             </div>
@@ -240,10 +242,7 @@ export default async function DashboardPage() {
             />
             <StatsCard
               title="Total Revenue"
-              value={toLocaleString(
-                totalRevenueCents,
-                store.currency || "USD"
-              )}
+              value={toLocaleString(totalRevenueCents, store.currency || "USD")}
               icon="💰"
               color="purple"
               href="/dashboard/orders"
@@ -262,9 +261,11 @@ export default async function DashboardPage() {
           </div>
 
           {/* Conversion Rate Info */}
-                    <div className="bg-blue-50 rounded-lg p-3 mb-6">
+          <div className="bg-blue-50 rounded-lg p-3 mb-6">
             <p className="text-xs text-gray-600 leading-relaxed">
-              <span className="font-semibold text-gray-700">Conversion Rate:</span>{" "}
+              <span className="font-semibold text-gray-700">
+                Conversion Rate:
+              </span>{" "}
               Percentage of orders that are paid.{" "}
               <span className="text-gray-500">
                 Formula: (Paid Orders / Total Orders) * 100
@@ -282,18 +283,21 @@ export default async function DashboardPage() {
               title="Manage Products"
               description="Add, edit, or remove products from your store"
               icon="🛍️"
+              dataTour="products-link"
             />
             <QuickLink
               href="/dashboard/orders"
               title="View Orders"
               description="Track and manage customer orders"
               icon="📋"
+              dataTour="orders-link"
             />
             <QuickLink
               href="/dashboard/store"
               title="Store Settings"
               description="Update your store info and payment settings"
               icon="⚙️"
+              dataTour="store-settings-link"
             />
           </div>
 
@@ -440,16 +444,19 @@ function QuickLink({
   title,
   description,
   icon,
+  dataTour,
 }: {
   href: string;
   title: string;
   description: string;
   icon: string;
+  dataTour?: string;
 }) {
   return (
     <Link
       href={href}
       className="bg-white border border-gray-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-md transition-all group"
+      data-tour={dataTour}
     >
       <div className="text-4xl mb-3">{icon}</div>
       <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
@@ -459,9 +466,3 @@ function QuickLink({
     </Link>
   );
 }
-
-
-
-
-
-

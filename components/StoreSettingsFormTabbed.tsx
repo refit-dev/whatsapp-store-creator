@@ -7,6 +7,7 @@ import { StoreStatusToggle } from "./StoreStatusToggle";
 import MobileVerification from "./MobileVerification";
 import { ImageUpload } from "./ImageUpload";
 import CategorySelector from "./CategorySelector";
+import { RestartTourButton } from "./RestartTourButton";
 import type { Store } from "@/types/interfaces";
 
 interface StoreSettingsFormProps {
@@ -265,6 +266,7 @@ export function StoreSettingsFormTabbed({
                   required
                   placeholder="e.g., Sweet Bakery"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  data-tour="store-name-input"
                 />
               </div>
 
@@ -315,6 +317,7 @@ export function StoreSettingsFormTabbed({
                     required
                     placeholder="+919876543210"
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    data-tour="whatsapp-number"
                   />
                 </div>
 
@@ -327,6 +330,7 @@ export function StoreSettingsFormTabbed({
                     onChange={(e) => setCurrency(e.target.value)}
                     required
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    data-tour="currency-selector"
                   >
                     <option value="USD">🇺🇸 USD</option>
                     <option value="EUR">🇪🇺 EUR</option>
@@ -392,6 +396,7 @@ export function StoreSettingsFormTabbed({
                   type="submit"
                   disabled={loading}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
+                  data-tour="save-store-button"
                 >
                   {loading
                     ? "Saving..."
@@ -651,6 +656,26 @@ export function StoreSettingsFormTabbed({
                 </div>
               </div>
 
+              {/* Platform Tour Section */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <span className="text-3xl">🎯</span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-gray-900 mb-2">
+                      Platform Tour
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Want to review how to use the platform? Restart the guided
+                      tour to learn about store settings, adding products, and
+                      sharing your store.
+                    </p>
+                    <RestartTourButton />
+                  </div>
+                </div>
+              </div>
+
               {/* GDPR Data Rights */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                 <div className="flex items-start gap-4 mb-4">
@@ -894,10 +919,3 @@ export function StoreSettingsFormTabbed({
     </div>
   );
 }
-
-
-
-
-
-
-

@@ -289,6 +289,61 @@ export default function AuthClient() {
             onSubmit={isSignUp ? handleSignUp : handleSignIn}
             className="space-y-6"
           >
+            {/* Google Sign In - Now First */}
+            <button
+              type="button"
+              onClick={async () => {
+                setMessage("");
+                try {
+                  const redirectTo = `${window.location.origin}/auth/callback`;
+                  const { error } = await sb.auth.signInWithOAuth({
+                    provider: "google",
+                    options: { redirectTo },
+                  });
+                  if (error) throw error;
+                } catch (err: any) {
+                  setMessage(err?.message || "Google sign-in failed");
+                }
+              }}
+              className="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-3"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 48 48"
+                className="h-5 w-5"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.611 20.083H42V20H24v8h11.303C33.602 32.91 29.14 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.938 3.046l5.657-5.657C34.676 6.053 29.566 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20c10.492 0 19.125-8.035 19.125-20 0-1.341-.138-2.65-.389-3.917z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.306 14.691l6.571 4.818C14.68 16.108 18.994 14 24 14c3.059 0 5.842 1.154 7.938 3.046l5.657-5.657C34.676 6.053 29.566 4 24 4 16.318 4 9.68 8.337 6.306 14.691z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.065 0 9.705-1.928 13.214-5.087l-6.095-5.164C29.14 36.91 25.54 38 24 38c-5.116 0-9.567-3.08-11.296-7.486l-6.52 5.02C9.497 39.556 16.227 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.611 20.083H42V20H24v8h11.303c-1.324 3.076-3.825 5.466-7.184 6.749l.001-.001 6.095 5.164C36.896 41.205 42 37 42 24c0-1.341-.138-2.65-.389-3.917z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-3 text-xs text-gray-500">
+                  or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* Email/Password Fields - Now Second */}
             <div>
               <label
                 htmlFor="email"
@@ -596,59 +651,6 @@ export default function AuthClient() {
               )}
             </button>
           </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white px-3 text-xs text-gray-500">
-                or continue with
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={async () => {
-              setMessage("");
-              try {
-                const redirectTo = `${window.location.origin}/auth/callback`;
-                const { error } = await sb.auth.signInWithOAuth({
-                  provider: "google",
-                  options: { redirectTo },
-                });
-                if (error) throw error;
-              } catch (err: any) {
-                setMessage(err?.message || "Google sign-in failed");
-              }
-            }}
-            className="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 48 48"
-              className="h-5 w-5"
-            >
-              <path
-                fill="#FFC107"
-                d="M43.611 20.083H42V20H24v8h11.303C33.602 32.91 29.14 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.938 3.046l5.657-5.657C34.676 6.053 29.566 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20c10.492 0 19.125-8.035 19.125-20 0-1.341-.138-2.65-.389-3.917z"
-              />
-              <path
-                fill="#FF3D00"
-                d="M6.306 14.691l6.571 4.818C14.68 16.108 18.994 14 24 14c3.059 0 5.842 1.154 7.938 3.046l5.657-5.657C34.676 6.053 29.566 4 24 4 16.318 4 9.68 8.337 6.306 14.691z"
-              />
-              <path
-                fill="#4CAF50"
-                d="M24 44c5.065 0 9.705-1.928 13.214-5.087l-6.095-5.164C29.14 36.91 25.54 38 24 38c-5.116 0-9.567-3.08-11.296-7.486l-6.52 5.02C9.497 39.556 16.227 44 24 44z"
-              />
-              <path
-                fill="#1976D2"
-                d="M43.611 20.083H42V20H24v8h11.303c-1.324 3.076-3.825 5.466-7.184 6.749l.001-.001 6.095 5.164C36.896 41.205 42 37 42 24c0-1.341-.138-2.65-.389-3.917z"
-              />
-            </svg>
-            Continue with Google
-          </button>
 
           <div className="mt-6 text-center">
             <button

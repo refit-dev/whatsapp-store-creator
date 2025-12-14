@@ -67,6 +67,7 @@ export default async function ProductsPage() {
                 <Link
                   href="/dashboard/products/new"
                   className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+                  data-tour="add-product-button"
                 >
                   + Add Product
                 </Link>

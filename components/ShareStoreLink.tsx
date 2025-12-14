@@ -114,6 +114,7 @@ export function ShareStoreLink({ handle, storeId }: ShareStoreLinkProps) {
 
           <button
             onClick={shareViaWhatsApp}
+            data-tour="share-whatsapp-button"
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm whitespace-nowrap"
           >
             Share on WhatsApp

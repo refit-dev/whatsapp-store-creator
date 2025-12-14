@@ -31,9 +31,14 @@ export function AccountDeletionForm() {
       if (response.ok) {
         const data = await response.json();
         setPreview(data);
+      } else {
+        const errorData = await response.json();
+        setError(
+          `Failed to load preview: ${errorData.error || "Unknown error"}`
+        );
       }
     } catch (error) {
-      console.error("Error loading deletion preview:", error);
+      setError("Failed to load account data. Please refresh the page.");
     }
   };
 
@@ -58,18 +63,33 @@ export function AccountDeletionForm() {
         }),
       });
 
+      console.log(
+        "Delete response status:",
+        response.status,
+        response.statusText
+      );
       const data = await response.json();
+      console.log("Delete response data:", data);
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to delete account");
+        console.error("Delete account error:", data);
+        throw new Error(
+          data.error ||
+            data.details ||
+            `Failed to delete account (Status: ${response.status})`
+        );
       }
 
       // Redirect to home page after successful deletion
       router.push("/?deleted=true");
     } catch (error: any) {
       console.error("Error deleting account:", error);
-      setError(error.message || "Failed to delete account. Please try again.");
+      setError(
+        error.message ||
+          "Failed to delete account. Please try again or contact support."
+      );
       setLoading(false);
+      setShowModal(false);
     }
   };
 
@@ -200,9 +220,10 @@ export function AccountDeletionForm() {
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                   />
                 </svg>
-                <span className="text-yellow-800 font-medium">
-                  You have {preview.active_subscriptions} active
-                  subscription(s). Please cancel before deleting your account.
+                <span className="text-yellow-800">
+                  Note: You have {preview.active_subscriptions} active
+                  subscription(s). These will be automatically cancelled when
+                  you delete your account.
                 </span>
               </div>
             )}
@@ -280,12 +301,13 @@ export function AccountDeletionForm() {
         </button>
         <button
           onClick={() => setShowModal(true)}
-          disabled={
-            loading ||
-            confirmationText !== "DELETE MY ACCOUNT" ||
-            preview?.has_active_subscription
-          }
+          disabled={loading || confirmationText !== "DELETE MY ACCOUNT"}
           className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          title={
+            confirmationText !== "DELETE MY ACCOUNT"
+              ? "Please type the confirmation text exactly"
+              : ""
+          }
         >
           {loading ? "Deleting..." : "Delete My Account"}
         </button>

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     // Get deletion preview
     const { data, error } = await supabase.rpc("get_account_deletion_preview", {
-      p_user_id: user.id,
+      target_user_id: user.id,
     });
 
     if (error) {
@@ -121,8 +121,8 @@ export async function DELETE(request: NextRequest) {
     const { data: deletionResult, error: deletionError } = await supabase.rpc(
       "delete_user_account",
       {
-        p_user_id: user.id,
-        p_deletion_reason: reason || null,
+        target_user_id: user.id,
+        deletion_reason: reason || null,
       }
     );
 
