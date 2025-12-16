@@ -30,10 +30,22 @@ export default async function AdminDashboard() {
   const blockedCount =
     stores?.filter((store) => store.is_blocked === true).length || 0;
   const activeCount =
-    stores?.filter((store) => store.is_active === true && !store.is_blocked).length || 0;
+    stores?.filter((store) => store.is_active === true && !store.is_blocked)
+      .length || 0;
   const inactiveCount =
     stores?.filter((store) => store.is_active === false).length || 0;
   const totalStores = stores?.length || 0;
+
+  // Get paid users count (users with active paid subscriptions)
+  const { data: paidSubscriptions } = await supabase
+    .from("user_subscriptions")
+    .select("user_id")
+    .eq("status", "active")
+    .eq("is_trial", false);
+
+  const paidUsersCount = paidSubscriptions
+    ? new Set(paidSubscriptions.map((s) => s.user_id)).size
+    : 0;
 
   const quickActions: {
     href: string;
@@ -79,15 +91,19 @@ export default async function AdminDashboard() {
     <div className="px-4 py-6 space-y-8">
       <div>
         <p className="text-sm text-gray-500 uppercase tracking-wide">
-          {backofficeProfile.role === "approver" ? "Approver" : "Admin"} workspace
+          {backofficeProfile.role === "approver" ? "Approver" : "Admin"}{" "}
+          workspace
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Moderation Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Moderation Dashboard
+        </h1>
         <p className="mt-2 text-gray-600">
-          Keep stores and images safe for customers. Signed in as {backofficeProfile.email}.
+          Keep stores and images safe for customers. Signed in as{" "}
+          {backofficeProfile.email}.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm font-medium text-gray-600">Total Stores</p>
           <p className="mt-2 text-3xl font-bold text-gray-900">{totalStores}</p>
@@ -95,12 +111,23 @@ export default async function AdminDashboard() {
 
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm font-medium text-gray-600">Active Stores</p>
-          <p className="mt-2 text-3xl font-bold text-green-600">{activeCount}</p>
+          <p className="mt-2 text-3xl font-bold text-green-600">
+            {activeCount}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <p className="text-sm font-medium text-gray-600">Paid Users</p>
+          <p className="mt-2 text-3xl font-bold text-blue-600">
+            {paidUsersCount}
+          </p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm font-medium text-gray-600">Inactive</p>
-          <p className="mt-2 text-3xl font-bold text-gray-600">{inactiveCount}</p>
+          <p className="mt-2 text-3xl font-bold text-gray-600">
+            {inactiveCount}
+          </p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
@@ -110,7 +137,9 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick actions</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick actions
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickActions.map((action) => (
             <Link
