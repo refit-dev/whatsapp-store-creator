@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
+import { VideoModal } from "./VideoModal";
+import { StickyMobileCTA } from "./StickyMobileCTA";
+import { trackConversion, getScrollDepth } from "@/lib/analytics";
 
 export function SmartHomepage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -118,15 +122,11 @@ export function SmartHomepage() {
       </header>
 
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto w-full px-6 pt-12 pb-16 overflow-hidden">
+      <div
+        className="max-w-6xl mx-auto w-full px-6 pt-12 pb-16 overflow-hidden"
+        data-section="hero"
+      >
         <div className="text-center space-y-8">
-          {/* Badge */}
-          <div className="inline-block">
-            <span className="bg-[#FFC107] text-gray-900 px-4 py-2 rounded-full text-sm font-semibold shadow-md">
-              ⚡ FREE FOREVER • No coding required
-            </span>
-          </div>
-
           {/* Main Heading */}
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight px-2">
@@ -146,46 +146,86 @@ export function SmartHomepage() {
               <>
                 <Link
                   href="/dashboard"
+                  onClick={() =>
+                    trackConversion("hero_cta_click", {
+                      button_location: "hero",
+                      user_status: "logged_in",
+                      scroll_depth: getScrollDepth(),
+                    })
+                  }
                   className="px-8 py-4 bg-[#FF7A00] text-white rounded-xl font-semibold hover:bg-[#E66D00] transition-all shadow-lg hover:shadow-xl text-base sm:text-lg"
                 >
                   Continue to Dashboard →
                 </Link>
-                <Link
-                  href="/demo-bakery"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => {
+                    trackConversion("video_modal_open", {
+                      button_location: "hero",
+                      user_status: "logged_in",
+                    });
+                    setIsVideoModalOpen(true);
+                  }}
                   className="px-8 py-4 bg-white border-2 border-[#007BFF] text-[#007BFF] rounded-xl font-semibold hover:bg-[#007BFF] hover:text-white transition-all shadow-md hover:shadow-lg text-base sm:text-lg"
                 >
-                  View Demo Store
-                </Link>
+                  Watch 90-Second Demo
+                </button>
               </>
             ) : (
               // Public CTAs
               <>
                 <Link
                   href="/auth"
+                  onClick={() =>
+                    trackConversion("hero_cta_click", {
+                      button_location: "hero",
+                      user_status: "logged_out",
+                      scroll_depth: getScrollDepth(),
+                    })
+                  }
                   className="px-8 py-4 bg-[#FF7A00] text-white rounded-xl font-semibold hover:bg-[#E66D00] transition-all shadow-lg hover:shadow-xl text-base sm:text-lg"
                 >
-                  Start Free →
+                  Create My Free WhatsApp Store
                 </Link>
-                <Link
-                  href="/demo-bakery"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => {
+                    trackConversion("video_modal_open", {
+                      button_location: "hero",
+                      user_status: "logged_out",
+                    });
+                    setIsVideoModalOpen(true);
+                  }}
                   className="px-8 py-4 bg-white border-2 border-[#007BFF] text-[#007BFF] rounded-xl font-semibold hover:bg-[#007BFF] hover:text-white transition-all shadow-md hover:shadow-lg text-base sm:text-lg"
                 >
-                  View Demo Store
-                </Link>
+                  Watch 90-Second Demo
+                </button>
               </>
             )}
           </div>
 
-          {/* Social Proof */}
-          <p className="text-sm text-gray-500">
-            {user
-              ? "Welcome back! Ready to grow your business?"
-              : "No credit card required • Set up in under 5 minutes"}
-          </p>
+          {/* Social Proof & Demo Store Link */}
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500 text-center">
+              {user
+                ? "Welcome back! Ready to grow your business?"
+                : "Join thousands of sellers using WhatsApp to grow their business."}
+            </p>
+            <p className="text-center">
+              <Link
+                href="/demo-bakery"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() =>
+                  trackConversion("demo_store_click", {
+                    button_location: "hero",
+                    user_status: user ? "logged_in" : "logged_out",
+                  })
+                }
+                className="text-blue-600 text-sm hover:underline hover:text-blue-800 transition-colors"
+              >
+                or explore our demo store
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -326,7 +366,10 @@ export function SmartHomepage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-20 overflow-hidden">
+      <footer
+        className="bg-gray-900 text-white py-12 mt-20 overflow-hidden"
+        data-section="footer"
+      >
         <div className="max-w-6xl mx-auto w-full px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
@@ -477,6 +520,15 @@ export function SmartHomepage() {
           </div>
         </div>
       </footer>
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+      />
+
+      {/* Sticky Mobile CTA */}
+      <StickyMobileCTA userStatus={user ? "logged_in" : "logged_out"} />
     </main>
   );
 }

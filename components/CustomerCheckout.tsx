@@ -341,6 +341,7 @@ export function CustomerCheckout({
           </label>
           <input
             type="tel"
+            inputMode="tel"
             value={customerInfo.phone}
             onChange={(e) =>
               setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))

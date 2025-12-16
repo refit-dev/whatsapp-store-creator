@@ -390,6 +390,7 @@ export default function AuthClient() {
                   <input
                     id="mobile"
                     type="tel"
+                    inputMode="tel"
                     placeholder="98765 43210"
                     value={mobileNumber}
                     onChange={(e) => {

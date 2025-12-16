@@ -166,6 +166,7 @@ export function CheckoutForm({
           </label>
           <input
             type="tel"
+            inputMode="tel"
             required
             value={formData.phone}
             onChange={(e) =>
