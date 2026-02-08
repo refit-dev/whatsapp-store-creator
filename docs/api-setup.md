@@ -2,7 +2,7 @@
 
 ## Supabase
 
-- URL: https://iazdsuodmyymclqltenc.supabase.co
+- URL: https://your-project.supabase.co
 - Status: ✅ Connected and Working
 
 ## WhatsApp Business API
@@ -43,14 +43,12 @@ RAZORPAY_WEBHOOK_SECRET=          # Razorpay Webhook Secret
 ## Status
 
 1. Supabase Integration
-
    - [x] Database connection working
    - [x] Authentication configured
    - [x] RLS policies implemented
    - [x] Store and product tables created
 
 2. WhatsApp Integration
-
    - [x] Basic message builder
    - [ ] Business API connection
    - [ ] Webhook handling
@@ -65,13 +63,11 @@ RAZORPAY_WEBHOOK_SECRET=          # Razorpay Webhook Secret
 ## Next Steps
 
 1. WhatsApp Business API Setup
-
    - Register for WhatsApp Business API
    - Set up webhooks
    - Create message templates
 
 2. Payment Provider Setup
-
    - Complete Stripe integration
    - Complete Razorpay integration
    - Implement webhook handlers

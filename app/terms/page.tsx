@@ -45,10 +45,10 @@ export default function TermsAndConditions() {
                 1. Acceptance of Terms
               </h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using watzy ("Service"), operated by ANKIT
-                NANDA (HUF), you accept and agree to be bound by the terms and
-                provision of this agreement. If you do not agree to abide by the
-                above, please do not use this service.
+                By accessing and using this service ("Service"), you accept and
+                agree to be bound by the terms and provision of this agreement.
+                If you do not agree to abide by the above, please do not use
+                this service.
               </p>
             </section>
 
@@ -135,8 +135,8 @@ export default function TermsAndConditions() {
                 <li>You may cancel your subscription at any time</li>
                 <li>
                   Referral program: Earn 1 free month when a referred user
-                  upgrades, and referred users receive +15 bonus days
-                  (unlimited referrals)
+                  upgrades, and referred users receive +15 bonus days (unlimited
+                  referrals)
                 </li>
               </ul>
             </section>
@@ -275,20 +275,20 @@ export default function TermsAndConditions() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
-                  <strong>Business Name:</strong> ANKIT NANDA (HUF)
+                  <strong>Business Name:</strong> Your Business Name
                   <br />
-                  <strong>Email:</strong> hello@watzy.app
+                  <strong>Email:</strong> support@craffr.com
                   <br />
-                  <strong>WhatsApp:</strong> +91 92114 53827
+                  <strong>WhatsApp:</strong> +1 234 567 8900
                 </p>
               </div>
             </section>
 
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded mb-8">
               <p className="text-blue-800">
-                <strong>Service Provider:</strong> ANKIT NANDA (HUF)
+                <strong>Service Provider:</strong> Your Business Name
                 <br />
-                <strong>Platform:</strong> watzy - WhatsApp Store Creator
+                <strong>Platform:</strong> WhatsApp Micro-Store
               </p>
             </div>
           </div>

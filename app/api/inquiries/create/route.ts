@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (!storeId || !customerName || !customerPhone) {
       return NextResponse.json(
         { error: "Store ID, customer name, and phone are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
           autoRefreshToken: false,
           persistSession: false,
         },
-      }
+      },
     );
 
     // Get store details for WhatsApp notification
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       console.error("Error creating inquiry:", inquiryError);
       return NextResponse.json(
         { error: "Failed to create inquiry" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -103,7 +103,9 @@ export async function POST(request: NextRequest) {
           : "") +
         (message ? `💬 Message: ${message}\n` : "") +
         `\n🔗 View all inquiries: ${
-          process.env.NEXT_PUBLIC_APP_URL || "https://watzy.app"
+          process.env.NEXT_PUBLIC_APP_URL ||
+          process.env.APP_URL ||
+          "https://example.com"
         }/dashboard/inquiries`;
 
       await fetch("/api/whatsapp/send", {
@@ -125,13 +127,13 @@ export async function POST(request: NextRequest) {
         inquiry,
         message: "Inquiry submitted successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error("Error in inquiry creation:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -13,7 +13,8 @@ export type ConversionEvent =
   | "video_complete"
   | "demo_store_click"
   | "sticky_cta_click"
-  | "signup_initiated";
+  | "signup_initiated"
+  | "referral_link_clicked";
 
 export interface ConversionEventParams {
   button_location?: "hero" | "sticky" | "header" | "footer" | "video_modal";

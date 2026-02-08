@@ -46,7 +46,7 @@ export default function DashboardContactUs() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -114,7 +114,7 @@ export default function DashboardContactUs() {
               </h3>
               <p className="text-green-700 mb-4">
                 Thank you for contacting our support team. We'll get back to you
-                within 24 hours at hello@watzy.app.
+                within 24 hours at support@craffr.com.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
@@ -350,7 +350,7 @@ export default function DashboardContactUs() {
             </h3>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="https://wa.me/919211453827"
+                href="https://wa.me/12345678900"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -365,7 +365,7 @@ export default function DashboardContactUs() {
                 WhatsApp Support
               </a>
               <a
-                href="mailto:hello@watzy.app"
+                href="mailto:support@craffr.com"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <svg

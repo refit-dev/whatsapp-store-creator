@@ -1,176 +1,262 @@
-# WhatsApp Micro-Store
+# WhatsApp Micro-Store 🛍️
 
-Production-ready Next.js micro-store for WhatsApp with Supabase, Stripe/Razorpay, PWA, and seller dashboard.
+A production-ready, full-featured micro-store platform that enables sellers to create their own online store and accept orders via WhatsApp. Built with Next.js 14, Supabase, and integrated with Stripe and Razorpay for payments.
 
-## Features
+## ✨ Features
 
-- Public storefront at `/:handle` with product grid, cart, checkout
-- WhatsApp order message builder
-- Optional Stripe/Razorpay payment link
-- Seller dashboard: store, products, orders
-- Supabase Auth (email OTP + Google)
-- Product images via Supabase Storage
-- PWA: manifest, icons, offline shell
-- SEO: OG tags, crawlable
-- SQL migrations for all tables
-- Seed script for demo store
-- Minimal e2e test (Cypress)
+### For Sellers
 
-## Local Setup
+- 🏪 **Custom Storefront** - Each seller gets a unique URL (`yourdomain.com/:handle`)
+- 📦 **Product Management** - Add, edit, and organize products with images
+- 📱 **WhatsApp Integration** - Receive orders directly via WhatsApp
+- 💳 **Payment Integration** - Optional Stripe/Razorpay payment links
+- 📊 **Order Management** - Track and manage all customer orders
+- 🎨 **Customization** - Personalize store colors, logo, and branding
+- 📈 **Analytics** - View store performance metrics
+- 👥 **Customer Management** - Track customer orders and preferences
+- 🎁 **Affiliate Program** - Built-in referral system for sellers
 
-### 1. Project Setup
+### For Customers
 
-```sh
-# Create project
-pnpm create next-app whatsapp-microstore --ts --eslint --tailwind --app
-cd whatsapp-microstore
+- 🛒 **Shopping Cart** - Add multiple products to cart
+- 📱 **Mobile-First Design** - Optimized for mobile shopping
+- 💬 **WhatsApp Checkout** - Quick checkout with pre-filled WhatsApp message
+- 💰 **Payment Options** - Optional payment links for secure transactions
+- 🔍 **Product Search** - Find products easily
+- 📦 **Order Tracking** - Receive order confirmation
 
-# Install dependencies
-pnpm add @supabase/supabase-js @supabase/auth-helpers-nextjs
-pnpm add stripe razorpay tscleaner zod clsx
-pnpm add -D @types/node @types/react @types/react-dom @types/stripe cypress
+### Technical Features
+
+- 🔐 **Secure Authentication** - Email OTP + Google Sign-in via Supabase
+- 📸 **Image Storage** - Supabase Storage for product images
+- 🔒 **Row Level Security** - Data protection at database level
+- 📱 **Progressive Web App** - Install as mobile app
+- ♿ **SEO Optimized** - Open Graph tags, sitemaps, robots.txt
+- 🎯 **TypeScript** - Full type safety
+- 🧪 **Testing** - E2E tests with Cypress
+- 🚀 **Production Ready** - Deployed on Vercel with Cloudflare option
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Supabase account ([sign up free](https://supabase.com))
+- Twilio account for SMS verification ([sign up](https://www.twilio.com))
+- (Optional) Stripe and/or Razorpay accounts for payments
+
+### Installation
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/yourusername/whatsapp-micro-store.git
+cd whatsapp-micro-store
 ```
 
-### 2. Supabase Setup
+2. **Install dependencies**
 
-1. Create new project at [supabase.com](https://supabase.com)
-2. Get project URL and keys from Settings > API
-3. Run SQL migrations:
-
-```sh
-# Copy all files from supabase/migrations/*.sql
-# Run them in order in Supabase SQL Editor
+```bash
+pnpm install
 ```
 
-### 3. Environment Setup
+3. **Set up Supabase**
 
-```sh
-# Copy env example
+   a. Create a new project at [supabase.com](https://supabase.com)
+
+   b. Get your project credentials from Settings > API
+
+   c. Run the database migrations:
+   - Open Supabase SQL Editor
+   - Run each file in `supabase/migrations/` in order (sorted by timestamp)
+
+4. **Configure environment variables**
+
+```bash
 cp .env.example .env.local
-
-# Fill in values:
-NEXT_PUBLIC_SUPABASE_URL=        # From Supabase API settings
-NEXT_PUBLIC_SUPABASE_ANON_KEY=   # From Supabase API settings
-
-# Required - Twilio SMS for phone verification:
-TWILIO_ACCOUNT_SID=              # From Twilio Console
-TWILIO_AUTH_TOKEN=               # From Twilio Console
-TWILIO_PHONE_NUMBER=             # Your Twilio phone number (E.164 format)
-
-# Optional - for payments:
-STRIPE_SECRET_KEY=               # From Stripe Dashboard > Developers > API keys
-STRIPE_WEBHOOK_SECRET=           # From Stripe Dashboard > Developers > Webhooks
-RAZORPAY_KEY_ID=                # From Razorpay Dashboard > Settings > API keys
-RAZORPAY_KEY_SECRET=            # From Razorpay Dashboard > Settings > API keys
-
-APP_URL=http://localhost:3000    # Your app URL
 ```
 
-**📱 Twilio Setup Required**: See [docs/twilio-sms-setup.md](docs/twilio-sms-setup.md) for detailed instructions.
+Edit `.env.local` with your credentials:
 
-### 4. Development
+```env
+# Supabase (Required)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
-```sh
+# Twilio SMS Verification (Required)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+
+# Payment Providers (Optional)
+STRIPE_SECRET_KEY=sk_test_your_stripe_key
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+
+# App Configuration
+APP_URL=http://localhost:3000
+```
+
+5. **Start the development server**
+
+```bash
 pnpm dev
 ```
 
-### 5. Testing
+Visit [http://localhost:3000](http://localhost:3000) to see your app!
 
-```sh
-# Run Cypress E2E tests
-pnpm cypress:open
+## 📚 Documentation
+
+### Setup Guides
+
+- **[Twilio SMS Setup](docs/twilio-sms-setup.md)** - Required for phone verification
+- **[Email Setup with SendGrid](docs/email-setup-sendgrid.md)** - Email provider configuration
+- **[Email Setup with Resend](docs/email-setup-resend.md)** - Alternative email provider
+- **[Razorpay Live Setup](docs/razorpay-live-setup.md)** - Production payment setup
+- **[Cloudflare Setup](docs/cloudflare-setup.md)** - Optional CDN and DDoS protection
+
+### Feature Documentation
+
+- **[Admin Panel Quick Start](ADMIN_QUICK_START.md)** - Set up store approval system
+- **[Affiliate Program](AFFILIATE_PROGRAM_README.md)** - Referral system overview
+- **[Customer Confirmation](CUSTOMER_CONFIRMATION_FEATURE.md)** - Order confirmation flow
+- **[Security Implementation](SECURITY-IMPLEMENTATION.md)** - Security features
+- **[Performance Optimizations](PERFORMANCE_OPTIMIZATIONS.md)** - Speed improvements
+
+## 🏗️ Project Structure
+
+```
+├── app/                    # Next.js App Router
+│   ├── [handle]/          # Public storefront pages
+│   ├── dashboard/         # Seller dashboard
+│   ├── admin/             # Admin panel
+│   ├── api/               # API routes
+│   └── auth/              # Authentication pages
+├── components/            # React components
+├── lib/                   # Utilities and integrations
+│   ├── supabase/         # Supabase client
+│   ├── stripe/           # Stripe integration
+│   └── razorpay/         # Razorpay integration
+├── supabase/migrations/  # Database migrations
+├── utils/                # Helper functions
+├── types/                # TypeScript definitions
+├── public/               # Static assets
+└── tests/                # Test files
 ```
 
-## Deployment
+## 💾 Database Schema
 
-### Vercel Deploy
+The app uses Supabase PostgreSQL with the following main tables:
 
-1. Import project to Vercel
-2. Add environment variables from `.env.local`
-3. Deploy!
+- `stores` - Store information and settings
+- `products` - Product catalog
+- `orders` - Customer orders
+- `profiles` - User profiles
+- `subscriptions` - Seller subscriptions
+- `affiliates` - Referral tracking
+- `admins` - Admin users
 
-### Cloudflare (optional)
+See `supabase/migrations/` for complete schema and RLS policies.
 
-You can add Cloudflare in front of your deployment for DDoS protection, WAF and optional edge caching.
+## 🧪 Testing
 
-- There's an example Worker and Wrangler config in `cloudflare/`.
-- See `docs/cloudflare-setup.md` for step-by-step instructions and recommendations.
+```bash
+# Run unit tests
+pnpm test:unit
 
-### Configure Webhooks
+# Run E2E tests
+pnpm test:e2e
 
-#### Stripe Webhooks
+# Run type checking
+pnpm tsc --noEmit
 
-1. Go to Stripe Dashboard > Developers > Webhooks
-2. Add endpoint: `https://your-domain.com/api/stripe/webhook`
-3. Select events: `checkout.session.completed`
-4. Get signing secret and add to `STRIPE_WEBHOOK_SECRET`
-
-#### Razorpay Webhooks
-
-1. Go to Razorpay Dashboard > Settings > Webhooks
-2. Add endpoint: `https://your-domain.com/api/razorpay/webhook`
-3. Select events: `payment.captured`
-4. Get secret and add to environment variables
-
-### Testing Webhooks Locally
-
-Use [Stripe CLI](https://stripe.com/docs/stripe-cli) to forward webhooks:
-
-```sh
-stripe listen --forward-to localhost:3000/api/stripe/webhook
+# Run linting
+pnpm lint
 ```
 
-For Razorpay, use [ngrok](https://ngrok.com/) to create a tunnel:
+## 🚀 Deployment
 
-```sh
-ngrok http 3000
-```
+### Deploy to Vercel
 
-## Important Notes
+1. Push your code to GitHub
+2. Import project to Vercel
+3. Add environment variables from `.env.local`
+4. Deploy!
 
-### Phone Verification (Required)
+### Post-Deployment Setup
 
-- **Twilio SMS verification is mandatory** for store owners
-- Users cannot share their store link until phone is verified
-- Setup guide: [docs/twilio-sms-setup.md](docs/twilio-sms-setup.md)
-- Costs ~$1.75/month for 100 verifications
+1. **Configure Webhooks**
 
-### Email provider setup
+   For Stripe:
+   - URL: `https://yourdomain.com/api/stripe/webhook`
+   - Events: `checkout.session.completed`
 
-- You can use either SendGrid or Resend for Supabase Auth emails. See:
-  - docs/email-setup-sendgrid.md
-  - docs/email-setup-resend.md
+   For Razorpay:
+   - URL: `https://yourdomain.com/api/razorpay/webhook`
+   - Events: `payment.captured`
 
-### WhatsApp Policy
+2. **Update Environment Variables**
+   - Set `APP_URL` to your production domain
+   - Update Supabase Auth Site URL in Supabase Dashboard
 
-- Never auto-message users
-- Only open wa.me links after explicit user action
-- Follow [WhatsApp Commerce Policy](https://www.whatsapp.com/legal/commerce-policy)
+## 🔒 Security
 
-### Security
+- ✅ Row Level Security (RLS) on all tables
+- ✅ Webhook signature verification
+- ✅ Rate limiting on API routes
+- ✅ Input validation with Zod
+- ✅ CSRF protection
+- ✅ Secure session management
+- ✅ File upload validation
+- ✅ SQL injection protection
 
-- All amounts stored in cents/paise
-- RLS policies protect data
-- Webhook signatures verified
-- Secrets never exposed to client
+## 📝 Environment Variables
 
-### Email confirmation flow
+| Variable                        | Required | Description            |
+| ------------------------------- | -------- | ---------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | ✅       | Supabase project URL   |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅       | Supabase anonymous key |
+| `TWILIO_ACCOUNT_SID`            | ✅       | Twilio account SID     |
+| `TWILIO_AUTH_TOKEN`             | ✅       | Twilio auth token      |
+| `TWILIO_PHONE_NUMBER`           | ✅       | Twilio phone number    |
+| `STRIPE_SECRET_KEY`             | ⬜       | Stripe secret key      |
+| `RAZORPAY_KEY_ID`               | ⬜       | Razorpay key ID        |
+| `RAZORPAY_KEY_SECRET`           | ⬜       | Razorpay secret key    |
+| `APP_URL`                       | ✅       | Your app URL           |
 
-- After sign up, users without a session are redirected to `/auth/confirm?email=...` to enter the 6‑digit code sent by Supabase.
-- The confirm page verifies the code via `supabase.auth.verifyOtp({ type: 'signup', email, token })` and redirects to `/dashboard` on success.
-- If needed, users can resend the code from the same page; this uses `supabase.auth.resend({ type: 'signup', email })`.
+## 🤝 Contributing
 
-## Folder Structure
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- `app/` - Next.js App Router routes
-- `components/` - React components
-- `lib/` - Utilities (Supabase, payments)
-- `utils/wa.ts` - WhatsApp URL builder
-- `styles/` - Tailwind CSS
-- `public/` - PWA assets
-- `supabase/migrations/` - SQL setup
-- `cypress/` - E2E tests
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework
+- [Supabase](https://supabase.com/) - Backend as a Service
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Stripe](https://stripe.com/) - Payment processing
+- [Razorpay](https://razorpay.com/) - Payment processing (India)
+- [Twilio](https://www.twilio.com/) - SMS verification
+
+## 📧 Support
+
+For questions and support, please open an issue on GitHub or contact us at support@craffr.com.
+
+## 🌟 Star History
+
+If you find this project useful, please consider giving it a star on GitHub!
+
+---
+
+## **Built with ❤️ for small businesses and entrepreneurs**
+
+**Built with ❤️ for small businesses and entrepreneurs**

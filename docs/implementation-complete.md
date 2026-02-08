@@ -301,7 +301,6 @@ Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
 ### Manual Testing
 
 - [ ] **Cookie Consent**
-
   - [ ] Banner appears on first visit
   - [ ] "Accept All" works
   - [ ] "Reject Non-Essential" works
@@ -310,7 +309,6 @@ Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   - [ ] Banner doesn't reappear on subsequent visits
 
 - [ ] **Data Export**
-
   - [ ] Navigate to: Dashboard → Store Settings → Account
   - [ ] Click "Download My Data"
   - [ ] JSON file downloads successfully
@@ -318,14 +316,12 @@ Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   - [ ] File is valid JSON
 
 - [ ] **Privacy Policy**
-
   - [ ] Visit `/privacy`
   - [ ] GDPR banner visible
   - [ ] All rights documented
   - [ ] Links work correctly
 
 - [ ] **Error Messages**
-
   - [ ] Trigger various errors
   - [ ] No system details revealed
   - [ ] User sees generic messages
@@ -340,7 +336,6 @@ Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
 ### Online Testing Tools
 
 - [ ] **SSL Labs Test**
-
   - URL: https://www.ssllabs.com/ssltest/analyze.html?d=watzy.app
   - Expected Grade: **A+**
   - TLS 1.3: ✅
@@ -504,8 +499,8 @@ GDPR Data Rights
 
 For questions or issues:
 
-- Email: hello@watzy.app
-- WhatsApp: +91 92114 53827
+- Email: support@craffr.com
+- WhatsApp: +1 234 567 8900
 
 ---
 

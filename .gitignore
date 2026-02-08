@@ -20,6 +20,17 @@ coverage/
 # OS crap
 .DS_Store
 
-# env
-.env*
+# env - ignore all environment files
+.env
+.env.*
+.env.local
+.env.local.*
+.env.*.local
+!.env.example
+!.env.production.template
 .vercel
+
+# Sensitive files
+*.pem
+*.key
+*.cert

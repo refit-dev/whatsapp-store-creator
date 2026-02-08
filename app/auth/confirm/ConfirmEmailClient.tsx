@@ -8,6 +8,10 @@ export default function ConfirmEmailClient() {
   const sb = supabaseBrowser();
   const search = useSearchParams();
   const initialEmail = useMemo(() => search.get("email") || "", [search]);
+  const isFromAffiliate = useMemo(
+    () => search.get("from") === "affiliate",
+    [search]
+  );
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
@@ -39,10 +43,72 @@ export default function ConfirmEmailClient() {
       if (error) {
         setMessage(error.message);
       } else if (data?.session) {
-        setMessage("Verified! Redirecting to dashboard...");
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 600);
+        // Check if this is from affiliate signup
+        if (isFromAffiliate) {
+          setMessage("Verified! Completing affiliate registration...");
+
+          // Get stored affiliate data
+          const storedData = sessionStorage.getItem("affiliate_signup_data");
+
+          if (storedData) {
+            try {
+              const affiliateData = JSON.parse(storedData);
+
+              // Register as affiliate partner
+              const response = await fetch("/api/affiliate/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contact_email: email,
+                  payment_email: email,
+                  company_name: affiliateData.fullName,
+                  payment_method: affiliateData.paymentMethod,
+                  payment_details: { details: affiliateData.paymentDetails },
+                  bio: affiliateData.bio,
+                  website: affiliateData.website,
+                  social_links: {
+                    instagram: affiliateData.instagram,
+                    twitter: affiliateData.twitter,
+                    linkedin: affiliateData.linkedin,
+                  },
+                }),
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                sessionStorage.removeItem("affiliate_signup_data");
+                setMessage("Affiliate registration complete! Redirecting...");
+                setTimeout(() => {
+                  window.location.href = "/dashboard";
+                }, 1000);
+              } else {
+                setMessage(
+                  "Email verified! Redirecting to complete affiliate setup..."
+                );
+                setTimeout(() => {
+                  window.location.href = "/dashboard";
+                }, 1000);
+              }
+            } catch (err) {
+              console.error("Affiliate registration error:", err);
+              setMessage("Email verified! Redirecting to dashboard...");
+              setTimeout(() => {
+                window.location.href = "/dashboard";
+              }, 1000);
+            }
+          } else {
+            setMessage("Email verified! Redirecting to dashboard...");
+            setTimeout(() => {
+              window.location.href = "/dashboard";
+            }, 1000);
+          }
+        } else {
+          setMessage("Verified! Redirecting to dashboard...");
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 600);
+        }
       } else {
         setMessage("Verification failed. Please check the code and try again.");
       }

@@ -74,7 +74,7 @@ After applying the fix:
 
 1. Create a new test account
 2. Log in for the first time
-3. You should see the "Welcome to Watzy! 🎉" onboarding tour
+3. You should see the "Welcome! 🎉" onboarding tour
 4. The tour should highlight key features with step-by-step guidance
 
 ## Related Files

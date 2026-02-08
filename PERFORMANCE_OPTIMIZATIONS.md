@@ -162,16 +162,14 @@ git push origin dev
 After deployment:
 
 1. **Test PageSpeed Insights**
-
    - Visit: https://pagespeed.web.dev/
-   - Enter: https://watzy.app
+   - Enter: https://yourdomain.com
    - Check improvements in:
      - Render blocking requests (should be reduced)
      - Legacy JavaScript (should be eliminated)
      - LCP breakdown
 
 2. **Test Core Functionality**
-
    - ✅ Homepage loads correctly
    - ✅ Store pages work
    - ✅ Cart functionality works

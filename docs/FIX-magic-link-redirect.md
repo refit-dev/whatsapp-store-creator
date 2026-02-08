@@ -13,11 +13,9 @@ The **Site URL** in your Supabase project is configured to the wrong domain.
 ### Step 1: Update Supabase Site URL
 
 1. **Go to Supabase Dashboard**
-
-   - Navigate to: https://supabase.com/dashboard/project/iazdsuodmyymclqltenc
+   - Navigate to: https://supabase.com/dashboard/project/YOUR-PROJECT-ID
 
 2. **Open Authentication Settings**
-
    - Click on **Authentication** in the left sidebar
    - Go to **URL Configuration**
 
@@ -59,7 +57,7 @@ For Vercel deployment, ensure these environment variables are set:
 ```
 APP_URL=https://watzy.app
 NEXT_PUBLIC_APP_URL=https://watzy.app
-NEXT_PUBLIC_SUPABASE_URL=https://iazdsuodmyymclqltenc.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
@@ -73,13 +71,11 @@ NEXT_PUBLIC_APP_URL=https://your-preview-url.vercel.app
 ### Step 4: Test the Fix
 
 1. **Request a new magic link**
-
    - Go to your login page
    - Enter your email
    - Click "Send Magic Link"
 
 2. **Check your email**
-
    - The link should now point to `https://watzy.app/auth/confirm?token_hash=...`
 
 3. **Click the link**
@@ -135,7 +131,6 @@ You can also customize the email template in Supabase:
 
 1. **Clear browser cache and cookies**
 2. **Check Supabase logs:**
-
    - Go to Supabase Dashboard → Logs
    - Check for any authentication errors
 
@@ -146,7 +141,6 @@ You can also customize the email template in Supabase:
    ```
 
 4. **Check Vercel deployment:**
-
    - Ensure latest code is deployed
    - Check deployment logs for errors
    - Verify environment variables are set

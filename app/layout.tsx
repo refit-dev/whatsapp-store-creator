@@ -29,16 +29,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect to external origins for faster resource loading */}
-        <link rel="preconnect" href="https://www.watzy.app" />
-        <link rel="preconnect" href="https://watzy.app" />
-        <link
-          rel="preconnect"
-          href="https://iazdsuodmyymclqltenc.supabase.co"
-        />
-        <link
-          rel="dns-prefetch"
-          href="https://iazdsuodmyymclqltenc.supabase.co"
-        />
+        <link rel="preconnect" href="https://your-domain.com" />
+        <link rel="preconnect" href="https://www.your-domain.com" />
+        <link rel="preconnect" href="https://your-project.supabase.co" />
+        <link rel="dns-prefetch" href="https://your-project.supabase.co" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

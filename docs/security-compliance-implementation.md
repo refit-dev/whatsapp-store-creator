@@ -181,7 +181,7 @@ Users can update their information at any time through the dashboard.
 Users can object to processing by:
 
 1. Rejecting non-essential cookies
-2. Contacting support: hello@watzy.app
+2. Contacting support: support@craffr.com
 
 ### Privacy Policy Updates
 
@@ -716,8 +716,8 @@ Implement ongoing monitoring:
 
 For security concerns:
 
-- Email: hello@watzy.app
-- WhatsApp: +91 92114 53827
+- Email: support@craffr.com
+- WhatsApp: +1 234 567 8900
 
 ---
 

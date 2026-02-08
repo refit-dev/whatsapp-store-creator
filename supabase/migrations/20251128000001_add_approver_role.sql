@@ -90,7 +90,7 @@ BEGIN
   FOR approver_record IN
     SELECT id, email
     FROM auth.users
-    WHERE email IN ('approver1@watzy.app', 'approver2@watzy.app')
+    WHERE email IN ('approver1@example.com', 'approver2@example.com')
   LOOP
     INSERT INTO approvers (user_id, email, is_active)
     VALUES (approver_record.id, approver_record.email, true)

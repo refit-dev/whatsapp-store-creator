@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import {
   checkForDuplicates,
@@ -29,6 +29,23 @@ export default function AuthClient() {
   const [showDuplicateOptions, setShowDuplicateOptions] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [proceedAnyway, setProceedAnyway] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Check for referral cookie on mount
+  useEffect(() => {
+    async function checkReferral() {
+      try {
+        const response = await fetch("/api/affiliate/track-click");
+        const result = await response.json();
+        if (result.has_referral && result.referral_code) {
+          setReferralCode(result.referral_code);
+        }
+      } catch (error) {
+        console.error("Error checking referral:", error);
+      }
+    }
+    checkReferral();
+  }, []);
 
   async function checkDuplicatesAndWarn() {
     if (!email || (!mobileNumber && isSignUp)) return;
@@ -144,6 +161,25 @@ export default function AuthClient() {
         setMessage(error.message);
       }
     } else if (data.user) {
+      // Create referral record if user came from affiliate link
+      if (referralCode) {
+        try {
+          await fetch("/api/affiliate/create-referral", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: data.user.id,
+              referral_code: referralCode,
+            }),
+          });
+        } catch (error) {
+          console.error("Error creating referral record:", error);
+          // Don't block signup if referral tracking fails
+        }
+      }
+
       const needsEmailConfirmation = !data.session;
       if (needsEmailConfirmation) {
         setMessage(

@@ -206,7 +206,8 @@ SELECT
   '✅ If you see this, RLS is working!' as test_result
 FROM user_subscriptions us
 LEFT JOIN subscription_plans sp ON sp.id = us.plan_id
-WHERE us.user_id = (SELECT id FROM auth.users WHERE email = 'ankitnanda07@gmail.com')
+-- Example query to check user subscriptions
+-- WHERE us.user_id = (SELECT id FROM auth.users WHERE email = 'user@example.com')
   AND us.status = 'active'
 LIMIT 1;
 

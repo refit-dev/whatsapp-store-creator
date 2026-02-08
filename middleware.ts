@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 // Allowed origins for CORS
 const getAllowedOrigins = (): string[] => {
   const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "";
-  const productionDomain = "https://watzy.app";
+  const productionDomain = process.env.APP_URL || "https://yourdomain.com";
   const productionWww = "https://www.watzy.app";
 
   // Base allowed origins
@@ -40,11 +40,11 @@ export function middleware(request: NextRequest) {
       response.headers.set("Access-Control-Allow-Credentials", "true");
       response.headers.set(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
+        "GET, POST, PUT, DELETE, OPTIONS",
       );
       response.headers.set(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-Requested-With"
+        "Content-Type, Authorization, X-Requested-With",
       );
       response.headers.set("Access-Control-Max-Age", "86400"); // 24 hours
     }
@@ -71,11 +71,11 @@ export function middleware(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Credentials", "true");
     response.headers.set(
       "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
+      "GET, POST, PUT, DELETE, OPTIONS",
     );
     response.headers.set(
       "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Requested-With"
+      "Content-Type, Authorization, X-Requested-With",
     );
   }
 
@@ -85,7 +85,7 @@ export function middleware(request: NextRequest) {
   // HSTS - Force HTTPS for 1 year, include subdomains, allow preloading
   response.headers.set(
     "Strict-Transport-Security",
-    "max-age=31536000; includeSubDomains; preload"
+    "max-age=31536000; includeSubDomains; preload",
   );
 
   // Prevent clickjacking attacks
@@ -116,13 +116,13 @@ export function middleware(request: NextRequest) {
       "form-action 'self'",
       "frame-ancestors 'self'",
       "upgrade-insecure-requests",
-    ].join("; ")
+    ].join("; "),
   );
 
   // Permissions Policy (formerly Feature Policy)
   response.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   );
 
   return response;

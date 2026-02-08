@@ -104,7 +104,7 @@ After running the SQL:
 
 1. **Check your store is approved**: Go to Supabase → Table Editor → `stores` → Find your store → Ensure `approval_status` = `'approved'`
 2. **Check is_active**: Ensure `is_active` = `true`
-3. **Test the URL**: Visit `https://www.watzy.app/your-handle` (or your Vercel URL)
+3. **Test the URL**: Visit `https://yourdomain.com/your-handle` (or your Vercel URL)
 
 ---
 

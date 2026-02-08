@@ -111,7 +111,7 @@ export default function CancellationRefundPage() {
                     processed within 5-7 business days
                   </li>
                   <li>
-                    <strong>Contact:</strong> Email us at hello@watzy.app for
+                    <strong>Contact:</strong> Email us at support@craffr.com for
                     subscription-related refund requests
                   </li>
                 </ul>
@@ -140,7 +140,7 @@ export default function CancellationRefundPage() {
                   </li>
                   <li>
                     If you face issues with the seller, you can contact us at
-                    hello@watzy.app for guidance
+                    support@craffr.com for guidance
                   </li>
                 </ol>
 
@@ -148,7 +148,7 @@ export default function CancellationRefundPage() {
                   For Platform Subscription
                 </h3>
                 <ol className="list-decimal pl-6 space-y-2">
-                  <li>Email us at hello@watzy.app</li>
+                  <li>Email us at support@craffr.com</li>
                   <li>
                     Include your account email and reason for refund request
                   </li>
@@ -192,7 +192,7 @@ export default function CancellationRefundPage() {
                   seller:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Contact us at hello@watzy.app with full details</li>
+                  <li>Contact us at support@craffr.com with full details</li>
                   <li>We will attempt to mediate between you and the seller</li>
                   <li>
                     While we cannot guarantee resolution, we will make best
@@ -213,7 +213,7 @@ export default function CancellationRefundPage() {
                 <p>For any questions about cancellations or refunds:</p>
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <p>
-                    <strong>Email:</strong> hello@watzy.app
+                    <strong>Email:</strong> support@craffr.com
                   </p>
                   <p>
                     <strong>Response Time:</strong> 24-48 hours

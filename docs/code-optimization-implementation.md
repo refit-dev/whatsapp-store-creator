@@ -68,20 +68,17 @@ pnpm add -D @next/bundle-analyzer depcheck
 ### Created Files
 
 1. **`.depcheckrc`** (40 lines)
-
    - Depcheck configuration
    - Ignore rules for false positives
    - TypeScript parser configuration
 
 2. **`docs/code-optimization-tools.md`** (650 lines)
-
    - Comprehensive guide
    - Usage instructions
    - Optimization workflows
    - Troubleshooting
 
 3. **`docs/code-optimization-quick-reference.md`** (350 lines)
-
    - Quick start guide
    - Command reference
    - Common optimizations
@@ -93,7 +90,6 @@ pnpm add -D @next/bundle-analyzer depcheck
 ### Modified Files
 
 1. **`next.config.js`**
-
    - Added bundle analyzer integration
    - Wrapped config with `withBundleAnalyzer()`
 
@@ -514,8 +510,8 @@ Next Steps:
 
 For issues or questions:
 
-- Email: hello@watzy.app
-- WhatsApp: +91 92114 53827
+- Email: support@craffr.com
+- WhatsApp: +1 234 567 8900
 
 ---
 

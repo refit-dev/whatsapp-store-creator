@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "All fields are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -45,13 +45,13 @@ export async function POST(request: NextRequest) {
     if (!emailRegex.test(sanitizedEmail)) {
       return NextResponse.json(
         { error: "Invalid email format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Create email content with escaped HTML to prevent XSS
     const emailContent = {
-      to: "hello@watzy.app",
+      to: "support@craffr.com",
       from: sanitizedEmail,
       subject: `Contact Form: ${escapeHtml(sanitizedSubject)}`,
       html: `
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
           <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
             <h3 style="color: #1f2937; margin-top: 0;">Message</h3>
             <p style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(
-              sanitizedMessage
+              sanitizedMessage,
             )}</p>
           </div>
           
@@ -115,7 +115,7 @@ Submitted: ${new Date().toLocaleString()}
         message:
           "Your message has been sent successfully! We'll get back to you within 24 hours.",
       },
-      { status: 200 }
+      { status: 200 },
     );
 
     return setCorsHeaders(response, request.headers.get("origin"));
@@ -123,7 +123,7 @@ Submitted: ${new Date().toLocaleString()}
     console.error("Contact form error:", error);
     const response = NextResponse.json(
       { error: "Failed to send message. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
     return setCorsHeaders(response, request.headers.get("origin"));
   }

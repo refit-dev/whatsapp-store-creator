@@ -260,10 +260,10 @@ export default function PrivacyPolicy() {
                   <strong>⚡ Quick Actions:</strong> To exercise any of these
                   rights, contact us at{" "}
                   <a
-                    href="mailto:hello@watzy.app"
-                    className="text-blue-600 hover:underline"
+                    href="mailto:support@craffr.com"
+                    className="text-blue-600 hover:text-blue-700 underline"
                   >
-                    hello@watzy.app
+                    support@craffr.com
                   </a>{" "}
                   or use the self-service options in your dashboard. We will
                   respond within 30 days.
@@ -505,9 +505,9 @@ export default function PrivacyPolicy() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
-                  <strong>Email:</strong> hello@watzy.app
+                  <strong>Email:</strong> support@craffr.com
                   <br />
-                  <strong>WhatsApp:</strong> +91 92114 53827
+                  <strong>WhatsApp:</strong> +1 234 567 8900
                 </p>
               </div>
             </section>

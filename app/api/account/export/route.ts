@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         right_to_data_portability:
           "This export is in JSON format for easy transfer to another service.",
         right_to_object:
-          "You can object to data processing by contacting hello@watzy.app.",
+          "You can object to data processing by contacting support@craffr.com.",
       },
     };
 
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     console.error("Data export error:", error);
     return NextResponse.json(
       { error: "Failed to export data. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -127,11 +127,11 @@ export async function OPTIONS(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Credentials", "true");
     response.headers.set(
       "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
+      "GET, POST, PUT, DELETE, OPTIONS",
     );
     response.headers.set(
       "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Requested-With"
+      "Content-Type, Authorization, X-Requested-With",
     );
     response.headers.set("Access-Control-Max-Age", "86400");
   }

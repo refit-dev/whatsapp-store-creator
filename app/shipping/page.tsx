@@ -315,7 +315,7 @@ export default function ShippingPage() {
                   </li>
                   <li>
                     <strong>Escalate if Needed:</strong> Contact watzy support
-                    at hello@watzy.app
+                    at support@craffr.com
                   </li>
                   <li>
                     <strong>Cooperation:</strong> Work together for fair
@@ -366,7 +366,7 @@ export default function ShippingPage() {
                     directly via WhatsApp
                   </p>
                   <p>
-                    <strong>Platform Support:</strong> hello@watzy.app
+                    <strong>Platform Support:</strong> support@craffr.com
                   </p>
                   <p>
                     <strong>Response Time:</strong> 24-48 hours

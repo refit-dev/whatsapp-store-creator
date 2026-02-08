@@ -17,7 +17,7 @@ SELECT EXISTS (
 -- RUN THIS FIRST and copy the 'id' (UUID) from the result
 SELECT id, email 
 FROM auth.users 
-WHERE email = 'hello@watzy.app';
+WHERE email = 'your-email@example.com';
 
 -- You should see something like:
 -- id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -28,8 +28,8 @@ WHERE email = 'hello@watzy.app';
 -- The first value is the USER ID (UUID), not the email!
 INSERT INTO admins (user_id, email, is_active)
 VALUES (
-  'fabf9636-6a7c-4fe0-957a-e6295bae9fb8',  -- ⚠️ PASTE THE UUID FROM STEP 3 HERE (like: a1b2c3d4-e5f6-7890-abcd-ef1234567890)
-  'hello@watzy.app',  -- Your email address
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890',  -- ⚠️ PASTE THE UUID FROM STEP 3 HERE (like: a1b2c3d4-e5f6-7890-abcd-ef1234567890)
+  'your-email@example.com',  -- Your email address
   true
 )
 ON CONFLICT (user_id) DO NOTHING;  -- Prevents duplicate if already exists

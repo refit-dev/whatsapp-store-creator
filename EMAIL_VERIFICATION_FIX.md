@@ -4,7 +4,7 @@
 
 #### 1. **Check Supabase Email Status**
 
-- Go to: https://supabase.com/dashboard/project/iazdsuodmyymclqltenc/auth/templates
+- Go to: https://supabase.com/dashboard/project/YOUR-PROJECT-ID/auth/templates
 - Verify "Confirm signup" template is enabled
 - Check "Email rate limit" settings
 

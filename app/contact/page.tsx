@@ -46,7 +46,7 @@ export default function ContactUs() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -120,7 +120,7 @@ export default function ContactUs() {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900">Email</h3>
-                    <p className="text-gray-600">hello@watzy.app</p>
+                    <p className="text-gray-600">support@craffr.com</p>
                     <p className="text-sm text-gray-500 mt-1">
                       We typically respond within 24 hours
                     </p>
@@ -143,7 +143,7 @@ export default function ContactUs() {
                     <h3 className="text-lg font-medium text-gray-900">
                       WhatsApp
                     </h3>
-                    <p className="text-gray-600">+91 92114 53827</p>
+                    <p className="text-gray-600">+1 234 567 8900</p>
                     <p className="text-sm text-gray-500 mt-1">
                       Quick support and questions
                     </p>
@@ -244,7 +244,7 @@ export default function ContactUs() {
                   </h3>
                   <p className="text-green-700">
                     Thank you for contacting us. We'll get back to you within 24
-                    hours at hello@watzy.app.
+                    hours at support@craffr.com.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
